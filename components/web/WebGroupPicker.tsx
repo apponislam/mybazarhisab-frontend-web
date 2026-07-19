@@ -76,7 +76,7 @@ export function WebGroupPicker({ onGroupReady }: { onGroupReady: (s: GroupStats)
                                             onFocus={() => setJf(true)}
                                             onBlur={() => setJf(false)}
                                             placeholder="e.g. BZR-4821"
-                                            className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none tracking-widest font-mono"
+                                            className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none tracking-widest font-mono"
                                         />
                                     </div>
                                 </div>
@@ -135,7 +135,7 @@ export function WebGroupPicker({ onGroupReady }: { onGroupReady: (s: GroupStats)
                                             onFocus={() => setCf(true)}
                                             onBlur={() => setCf(false)}
                                             placeholder="e.g. Sabzi Mandi"
-                                            className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none"
+                                            className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none"
                                             style={{ fontFamily: "'DM Sans', sans-serif" }}
                                         />
                                     </div>

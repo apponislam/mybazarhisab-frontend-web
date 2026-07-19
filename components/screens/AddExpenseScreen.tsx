@@ -49,14 +49,14 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                             <span className="pl-4 text-muted-foreground">
                                 <Package className="w-4 h-4" />
                             </span>
-                            <input value={product} onChange={(e) => setProduct(e.target.value)} placeholder="e.g. Hilsha Fish, Rice, Onion" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input value={product} onChange={(e) => setProduct(e.target.value)} placeholder="e.g. Hilsha Fish, Rice, Onion" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <div className="grid grid-cols-2 gap-3">
                         <FieldBox label="Price (৳)" focused={fPrice}>
                             <div className="flex items-center" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
                                 <span className="pl-4 text-sm font-bold text-muted-foreground">৳</span>
-                                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                         <FieldBox label="Quantity" focused={fQty}>
@@ -64,7 +64,7 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                                 <span className="pl-4 text-muted-foreground">
                                     <Weight className="w-4 h-4" />
                                 </span>
-                                <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="0" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="0" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                     </div>
@@ -95,7 +95,7 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                         </div>
                     </FieldBox>
                     <FieldBox label="Notes (optional)" focused={fNotes}>
-                        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} onFocus={() => setFNotes(true)} onBlur={() => setFNotes(false)} placeholder="Any additional info…" rows={3} className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none resize-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} onFocus={() => setFNotes(true)} onBlur={() => setFNotes(false)} placeholder="Any additional info…" rows={3} className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none resize-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                     </FieldBox>
                     <div className="mt-2">
                         <PrimaryButton loading={loading} label="Save Expense" loadingLabel="Saving…" />

@@ -87,7 +87,7 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
                                 <span className="pl-4 text-muted-foreground">
                                     <Mail className="w-4 h-4" />
                                 </span>
-                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                         <FieldBox label="Password" focused={fP}>
@@ -95,7 +95,7 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
                                 <span className="pl-4 text-muted-foreground">
                                     <Lock className="w-4 h-4" />
                                 </span>
-                                <input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                                 <button type="button" tabIndex={-1} onClick={() => setShowPw((v) => !v)} className="pr-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                                     {showPw ? <EyeOff className="w-4 h-4" strokeWidth={1.8} /> : <Eye className="w-4 h-4" strokeWidth={1.8} />}
                                 </button>
@@ -207,7 +207,7 @@ function RegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () => 
                         <FieldBox key={field.label} label={field.label} focused={field.f}>
                             <div className="flex items-center" onFocus={() => field.sf(true)} onBlur={() => field.sf(false)}>
                                 <span className="pl-4 text-muted-foreground">{field.icon}</span>
-                                <input type={field.type} value={field.v} onChange={(e) => field.sv(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type={field.type} value={field.v} onChange={(e) => field.sv(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                     ))}
@@ -216,7 +216,7 @@ function RegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () => 
                             <span className="pl-4 text-muted-foreground">
                                 <Lock className="w-4 h-4" />
                             </span>
-                            <input type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 characters" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input type={showPass ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 characters" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             <button type="button" tabIndex={-1} onClick={() => setShowPass((v) => !v)} className="pr-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                                 {showPass ? <EyeOff className="w-4 h-4" strokeWidth={1.8} /> : <Eye className="w-4 h-4" strokeWidth={1.8} />}
                             </button>
@@ -239,7 +239,7 @@ function RegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () => 
                             <span className="pl-4 text-muted-foreground">
                                 <Lock className="w-4 h-4" />
                             </span>
-                            <input type={showRepeat ? "text" : "password"} value={repeat} onChange={(e) => setRepeat(e.target.value)} placeholder="Re-enter password" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input type={showRepeat ? "text" : "password"} value={repeat} onChange={(e) => setRepeat(e.target.value)} placeholder="Re-enter password" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             <button type="button" tabIndex={-1} onClick={() => setShowRepeat((v) => !v)} className="pr-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                                 {showRepeat ? <EyeOff className="w-4 h-4" strokeWidth={1.8} /> : <Eye className="w-4 h-4" strokeWidth={1.8} />}
                             </button>
@@ -297,7 +297,7 @@ function ForgotEmailScreen({ onBack, onNext }: { onBack: () => void; onNext: (e:
                             <span className="pl-4 text-muted-foreground">
                                 <Mail className="w-4 h-4" />
                             </span>
-                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoFocus className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required autoFocus className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <div className="mt-8 pt-4">
@@ -466,7 +466,7 @@ function ForgotNewPassScreen({ onBack, onDone }: { onBack: () => void; onDone: (
                                 <span className="pl-4 text-muted-foreground">
                                     <Lock className="w-4 h-4" />
                                 </span>
-                                <input type={sn ? "text" : "password"} value={np} onChange={(e) => setNp(e.target.value)} placeholder="Min. 8 characters" autoFocus className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type={sn ? "text" : "password"} value={np} onChange={(e) => setNp(e.target.value)} placeholder="Min. 8 characters" autoFocus className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                                 <button type="button" tabIndex={-1} onClick={() => setSn((v) => !v)} className="pr-4 text-muted-foreground hover:text-foreground cursor-pointer">
                                     {sn ? <EyeOff className="w-4 h-4" strokeWidth={1.8} /> : <Eye className="w-4 h-4" strokeWidth={1.8} />}
                                 </button>
@@ -489,7 +489,7 @@ function ForgotNewPassScreen({ onBack, onDone }: { onBack: () => void; onDone: (
                                 <span className="pl-4 text-muted-foreground">
                                     <Lock className="w-4 h-4" />
                                 </span>
-                                <input type={sr ? "text" : "password"} value={rp} onChange={(e) => setRp(e.target.value)} placeholder="Re-enter password" className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type={sr ? "text" : "password"} value={rp} onChange={(e) => setRp(e.target.value)} placeholder="Re-enter password" className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                                 <button type="button" tabIndex={-1} onClick={() => setSr((v) => !v)} className="pr-4 text-muted-foreground hover:text-foreground cursor-pointer">
                                     {sr ? <EyeOff className="w-4 h-4" strokeWidth={1.8} /> : <Eye className="w-4 h-4" strokeWidth={1.8} />}
                                 </button>

@@ -64,13 +64,13 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
                             <span className="pl-4 text-muted-foreground">
                                 <AlignLeft className="w-4 h-4" />
                             </span>
-                            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. July House Rent" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. July House Rent" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Amount (৳)" focused={fAmount}>
                         <div className="flex items-center" onFocus={() => setFAmount(true)} onBlur={() => setFAmount(false)}>
                             <span className="pl-4 text-sm font-bold text-muted-foreground">৳</span>
-                            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Date" focused={false}>
@@ -89,7 +89,7 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
                             onBlur={() => setFNotes(false)}
                             placeholder="Any additional info…"
                             rows={3}
-                            className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none resize-none"
+                            className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none resize-none"
                             style={{ fontFamily: "'DM Sans', sans-serif" }}
                         />
                     </FieldBox>

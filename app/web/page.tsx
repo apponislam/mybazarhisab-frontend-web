@@ -20,7 +20,7 @@ export default function WebPage() {
   useEffect(() => {
     const handleCheck = () => {
       if (window.innerWidth >= 768) {
-        router.replace("/dashboard");
+        router.replace("/");
       } else {
         setIsMobile(true);
       }
@@ -30,7 +30,7 @@ export default function WebPage() {
 
     const handleResize = () => {
       if (window.innerWidth >= 768) {
-        router.replace("/dashboard");
+        router.replace("/");
       }
     };
 

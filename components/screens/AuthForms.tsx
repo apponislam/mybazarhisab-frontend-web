@@ -54,7 +54,7 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
           <p className="mt-1 text-muted-foreground text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>Sign in to your account</p>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="flex-1 mx-5 rounded-3xl border border-border bg-card p-7 flex flex-col" style={{ boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}>
+          className="mx-5 rounded-3xl border border-border bg-card p-7 flex flex-col" style={{ boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}>
           <h2 className="text-xl font-semibold text-foreground mb-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>Welcome back</h2>
           <p className="text-muted-foreground text-sm mb-7" style={{ fontFamily: "'DM Sans', sans-serif" }}>Enter your credentials to continue</p>
           <form onSubmit={e => { e.preventDefault(); setLoginLoading(true); setTimeout(() => { setLoginLoading(false); onLogin(); }, 1500); }} className="flex flex-col gap-4">

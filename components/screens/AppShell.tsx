@@ -111,6 +111,34 @@ export function AppShell({ stats }: { stats: GroupStats }) {
 
   const showNav = subScreen === null || subScreen === "add-picker";
 
+  const computedStats = React.useMemo(() => {
+    const myUserId = "u1";
+    const myEntries = entries.filter(e => e.user.id === myUserId);
+    
+    const totalBazar = entries.reduce((sum, e) => sum + e.price * e.quantity, 0);
+    const totalBill = bills.reduce((sum, b) => sum + b.amount, 0);
+
+    return {
+      groupName: stats.groupName,
+      totalMembers: stats.totalMembers,
+      totalGroupBazarEntries: entries.length,
+      totalMyBazarEntries: myEntries.length,
+      totalProductsCreatedByMe: new Set(myEntries.map(e => e.product.id)).size,
+      thisMonthBazarExpense: totalBazar,
+      prevMonthBazarExpense: 0,
+      thisYearBazarExpense: totalBazar,
+      prevYearBazarExpense: 0,
+      thisMonthBillExpense: totalBill,
+      prevMonthBillExpense: 0,
+      thisYearBillExpense: totalBill,
+      prevYearBillExpense: 0,
+      thisMonthTotalExpense: totalBazar + totalBill,
+      prevMonthTotalExpense: 0,
+      thisYearTotalExpense: totalBazar + totalBill,
+      prevYearTotalExpense: 0,
+    };
+  }, [entries, bills, stats]);
+
   if (subScreen === "expense-detail" && selectedEntry) {
     return <ExpenseDetailScreen entry={selectedEntry}
       onBack={() => { setSelectedEntry(null); setSubScreen(null); }}
@@ -147,7 +175,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
       <div className="flex flex-col flex-1 min-h-0 relative">
         {/* Changed tab wrapper to be a flex column container to properly constrain inner tab height */}
         <div className="flex-1 min-h-0 relative flex flex-col">
-          {tab === "home"     && <HomeTab stats={stats} />}
+          {tab === "home"     && <HomeTab stats={computedStats} />}
           {tab === "expenses" && <ExpensesTab entries={entries} onDetail={e => { setSelectedEntry(e); setSubScreen("expense-detail"); }} />}
           {tab === "bills"    && <BillsTab bills={bills} onDetail={b => { setSelectedBill(b); setSubScreen("bill-detail"); }} />}
           {tab === "profile"  && <ProfileTab onEditProfile={() => setSubScreen("profile-edit")} onChangePassword={() => setSubScreen("profile-change-password")} />}

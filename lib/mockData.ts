@@ -108,9 +108,9 @@ export const BILL_CATEGORIES = Object.entries(BILL_META).map(([k, v]) => ({ key:
 
 export function makeMockStats(groupName: string): GroupStats {
   return {
-    groupName, totalMembers: 8, totalGroupBazarEntries: 134, totalMyBazarEntries: 47, totalProductsCreatedByMe: 23,
-    thisMonthBazarExpense: 12840, prevMonthBazarExpense: 10950, thisYearBazarExpense: 98400, prevYearBazarExpense: 87200,
-    thisMonthBillExpense: 4200, prevMonthBillExpense: 5100, thisYearBillExpense: 43600, prevYearBillExpense: 39800,
-    thisMonthTotalExpense: 17040, prevMonthTotalExpense: 16050, thisYearTotalExpense: 142000, prevYearTotalExpense: 127000,
+    groupName, totalMembers: 4, totalGroupBazarEntries: 0, totalMyBazarEntries: 0, totalProductsCreatedByMe: 0,
+    thisMonthBazarExpense: 0, prevMonthBazarExpense: 0, thisYearBazarExpense: 0, prevYearBazarExpense: 0,
+    thisMonthBillExpense: 0, prevMonthBillExpense: 0, thisYearBillExpense: 0, prevYearBillExpense: 0,
+    thisMonthTotalExpense: 0, prevMonthTotalExpense: 0, thisYearTotalExpense: 0, prevYearTotalExpense: 0,
   };
 }

@@ -42,19 +42,43 @@ function WebInputField({ label, icon, rightElement, error, ...props }: WebInputF
   );
 }
 
-// ─── Desktop Website Split-Pane Wrapper ──────────────────────────────────────
+// ─── Desktop Website Split Layout: Image Left, Forms Right ──────────────────
 function WebLayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#1a0e07] text-[#f5ede2] overflow-y-auto relative px-4 py-10">
-      {/* Warm radial glow backdrop */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 50% 30%, rgba(232,160,32,0.12) 0%, transparent 70%)" }} />
-      <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
-        style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-      
-      {/* Centered card container */}
-      <div className="w-full max-w-[440px] relative z-10">
-        {children}
+    <div className="min-h-screen w-full flex bg-[#1a0e07] text-[#f5ede2] overflow-hidden">
+      {/* Left Side — Hero Image Panel (Desktop only) */}
+      <div className="hidden md:flex md:w-[45%] lg:w-[50%] relative flex-shrink-0 overflow-hidden select-none">
+        {/* Warm overlay gradient blending into right side */}
+        <div className="absolute inset-0 z-10 pointer-events-none"
+          style={{ background: "linear-gradient(to left, #1a0e07 0%, transparent 25%)" }} />
+        <div className="absolute inset-0 z-10 pointer-events-none"
+          style={{ background: "linear-gradient(to top, #1a0e07 0%, transparent 30%)" }} />
+        
+        {/* Hero image fills */}
+        <img 
+          src="/assets/auth-hero.png" 
+          alt="Bazar Hisab — shared kitchen table with groceries" 
+          className="w-full h-full object-cover"
+        />
+
+        {/* Bottom brand tag */}
+        <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-[#1a0e07]/70 backdrop-blur-sm">
+          <img src="/assets/logo.png" alt="Logo" className="w-5 h-5 rounded-md object-contain" />
+          <span className="text-xs font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+            My Bazar <span className="text-primary">Hisab</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Right Side — Form Content centered in the middle of right 50% */}
+      <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-8 md:px-12 py-12 relative">
+        {/* Subtle dot grid background */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
+          style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+        
+        <div className="w-full max-w-[440px] relative z-10">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -117,23 +141,31 @@ function WebLoginScreen({
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
-      className="bg-[#251508] border border-border rounded-3xl p-8 shadow-2xl flex flex-col gap-6"
+      className="flex flex-col gap-6"
     >
-      {/* Header Info */}
-      <div className="flex flex-col gap-1.5 text-center relative pb-2">
-        {onBack && (
-          <button 
-            onClick={onBack}
-            className="absolute left-0 top-0 text-muted-foreground hover:text-foreground p-1 transition-colors flex items-center gap-1 text-xs font-semibold cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back
-          </button>
-        )}
-        <h2 className="text-2xl font-bold text-foreground mt-6" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-          Sign In
+      {/* Back link */}
+      {onBack && (
+        <button 
+          onClick={onBack}
+          className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-sm font-semibold cursor-pointer mb-2 self-start"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Home
+        </button>
+      )}
+
+      {/* Logo & Title */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3 mb-4">
+          <img src="/assets/logo.png" alt="Logo" className="w-10 h-10 rounded-xl object-contain" />
+          <span className="text-base font-bold" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+            My Bazar <span className="text-primary">Hisab</span>
+          </span>
+        </div>
+        <h2 className="text-3xl font-extrabold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          Welcome back
         </h2>
-        <p className="text-muted-foreground text-xs" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          Enter your room credentials to continue
+        <p className="text-muted-foreground text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          Enter your credentials to sign in
         </p>
       </div>
 
@@ -234,7 +266,7 @@ function WebRegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () 
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
-      className="bg-[#251508] border border-border rounded-3xl p-8 shadow-2xl flex flex-col gap-6 max-h-[90vh] overflow-y-auto"
+      className="flex flex-col gap-6"
     >
       <div className="flex flex-col gap-1.5 text-center relative pb-2">
         <button 
@@ -394,7 +426,7 @@ function WebForgotEmailScreen({ onBack, onNext }: { onBack: () => void; onNext: 
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
-      className="bg-[#251508] border border-border rounded-3xl p-8 shadow-2xl flex flex-col gap-6"
+      className="flex flex-col gap-6"
     >
       <div className="flex flex-col gap-1.5 text-center relative pb-2">
         <button 
@@ -477,7 +509,7 @@ function WebForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: 
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
-      className="bg-[#251508] border border-border rounded-3xl p-8 shadow-2xl flex flex-col gap-6"
+      className="flex flex-col gap-6"
     >
       <div className="flex flex-col gap-1.5 text-center relative pb-2">
         <button 
@@ -562,7 +594,7 @@ function WebForgotNewPassScreen({ onBack, onDone }: { onBack: () => void; onDone
     <motion.div 
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
-      className="bg-[#251508] border border-border rounded-3xl p-8 shadow-2xl flex flex-col gap-6"
+      className="flex flex-col gap-6"
     >
       <div className="flex flex-col gap-1.5 text-center relative pb-2">
         <button 
@@ -647,7 +679,7 @@ function WebForgotSuccessScreen({ onDone }: { onDone: () => void }) {
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }} 
       animate={{ opacity: 1, scale: 1 }} 
-      className="bg-[#251508] border border-border rounded-3xl p-8 shadow-2xl flex flex-col items-center justify-center text-center gap-6"
+      className="flex flex-col items-center justify-center text-center gap-6"
     >
       <div className="w-20 h-20 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center">
         <CheckCircle className="w-10 h-10 text-primary" strokeWidth={1.5} />

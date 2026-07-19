@@ -71,13 +71,13 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                             <span className="pl-4 text-muted-foreground">
                                 <AlignLeft className="w-4 h-4" />
                             </span>
-                            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Amount (৳)" focused={fAmount}>
                         <div className="flex items-center" onFocus={() => setFAmount(true)} onBlur={() => setFAmount(false)}>
                             <span className="pl-4 text-muted-foreground text-sm font-bold">৳</span>
-                            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Date" focused={false}>
@@ -85,7 +85,7 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                             <span className="pl-4 text-muted-foreground">
                                 <Calendar className="w-4 h-4" />
                             </span>
-                            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif", colorScheme: "dark" }} />
+                            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif", colorScheme: "dark" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Notes (optional)" focused={fNotes}>
@@ -95,7 +95,7 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                             onFocus={() => setFNotes(true)}
                             onBlur={() => setFNotes(false)}
                             rows={3}
-                            className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none resize-none"
+                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none resize-none"
                             style={{ fontFamily: "'DM Sans', sans-serif" }}
                         />
                     </FieldBox>

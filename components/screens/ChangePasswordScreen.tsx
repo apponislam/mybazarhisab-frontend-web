@@ -63,7 +63,7 @@ export function ChangePasswordScreen({ onBack }: { onBack: () => void }) {
                                             type={field.show ? "text" : "password"}
                                             value={field.value}
                                             onChange={(e) => field.set(e.target.value)}
-                                            className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none"
+                                            className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none"
                                             style={{ fontFamily: "'DM Sans', sans-serif" }}
                                             placeholder="••••••••"
                                         />

@@ -32,7 +32,7 @@ function WebInputField({ label, icon, rightElement, error, ...props }: WebInputF
                         setFocused(false);
                         props.onBlur?.(e);
                     }}
-                    className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none font-sans"
+                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none font-sans"
                 />
                 {rightElement && <div className="pr-4 flex items-center">{rightElement}</div>}
             </div>

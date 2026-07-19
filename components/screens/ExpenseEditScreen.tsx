@@ -53,7 +53,7 @@ export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarE
                         <FieldBox label="Price (৳)" focused={fPrice}>
                             <div className="flex items-center" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
                                 <span className="pl-4 text-muted-foreground text-sm font-bold">৳</span>
-                                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                         <FieldBox label="Quantity" focused={fQty}>
@@ -61,7 +61,7 @@ export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarE
                                 <span className="pl-4 text-muted-foreground">
                                     <Weight className="w-4 h-4" />
                                 </span>
-                                <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                     </div>
@@ -88,7 +88,7 @@ export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarE
                             <span className="pl-4 text-muted-foreground">
                                 <Calendar className="w-4 h-4" />
                             </span>
-                            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif", colorScheme: "dark" }} />
+                            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif", colorScheme: "dark" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Notes (optional)" focused={fNotes}>
@@ -98,7 +98,7 @@ export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarE
                             onFocus={() => setFNotes(true)}
                             onBlur={() => setFNotes(false)}
                             rows={3}
-                            className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder:text-muted-foreground text-sm outline-none resize-none"
+                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none resize-none"
                             style={{ fontFamily: "'DM Sans', sans-serif" }}
                         />
                     </FieldBox>

@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "motion/react";
-import { ShoppingBag, Receipt, Users, ArrowRight, CheckCircle2, TrendingUp, BarChart3, ShieldCheck, Sparkles, ArrowUpRight, Activity, Lock } from "lucide-react";
+import { ShoppingBag, Receipt, Users, ArrowRight, CheckCircle2, TrendingUp, BarChart3, ShieldCheck, Sparkles, ArrowUpRight, Activity, Lock, Heart, Shield } from "lucide-react";
 
 export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
     return (
@@ -164,29 +164,29 @@ export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
             <section id="features" className="relative z-10 bg-linear-to-b from-transparent via-[#201107]/30 to-transparent border-y border-[rgba(232,160,32,0.06)] py-24 select-none">
                 <div className="container mx-auto px-6 md:px-8">
                     <div className="text-center max-w-2xl mx-auto space-y-4 mb-16">
-                        <h3 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Premium features</h3>
+                        <h3 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Key Capabilities</h3>
                         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            Designed for Households & Family Groups
+                            Everything You Need for Household Bazar & Bills
                         </h2>
-                        <p className="text-muted-foreground text-sm">Collaborative expense management, comparison logs, and budget tools for unified household accounts.</p>
+                        <p className="text-muted-foreground text-sm">Easily record daily market purchases, manage monthly utility bills, and track your family group expenses together.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             {
                                 icon: <ShoppingBag className="w-6 h-6 text-primary" />,
-                                title: "Shared Groceries Ledger",
-                                desc: "Let all members of your family log groceries, bazar purchases, and other household additions in real-time.",
+                                title: "Daily Bazar & Groceries",
+                                desc: "Record market items like fish, meat, oil, rice, and vegetables with unit quantities (KG, GM, Piece) and exact prices.",
                             },
                             {
                                 icon: <Receipt className="w-6 h-6 text-accent" />,
-                                title: "Utility Bills & Rent Book",
-                                desc: "Monitor household bills like internet charges, gas, water, electricity, maid salaries, or home repairs month-over-month.",
+                                title: "Monthly Bills & Rent",
+                                desc: "Keep track of fixed and recurring household costs like house rent, electricity, gas, water, Wi-Fi, and maid fees.",
                             },
                             {
-                                icon: <BarChart3 className="w-6 h-6 text-green-400" />,
-                                title: "Cost Analytics & Comparison",
-                                desc: "Visualize and compare your monthly vs. yearly spending trends to optimize your household budget.",
+                                icon: <Users className="w-6 h-6 text-blue-400" />,
+                                title: "Group & Family Members",
+                                desc: "Invite up to 20 family members or flatmates into your group to log entries, track contributions, and view monthly totals.",
                             },
                         ].map((f, i) => (
                             <motion.div key={i} whileHover={{ y: -6 }} className="p-8 bg-card/40 border border-primary/5 rounded-3xl hover:border-primary/25 hover:bg-card/70 transition-all duration-300 shadow-xl relative overflow-hidden group">
@@ -280,23 +280,127 @@ export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
                 </div>
             </section>
 
-            {/* ─── CTA FOOTER SECTION ────────────────────────────────────────────── */}
-            <footer className="relative z-10 border-t border-[rgba(232,160,32,0.06)] py-16 select-none bg-[#0a0502]">
-                <div className="container mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl overflow-hidden bg-primary flex items-center justify-center p-0.5 border border-primary/20">
-                            <img src="/assets/logo.png" alt="Bazar Hisab Logo" className="w-full h-full object-contain rounded-lg" />
+            {/* ─── PRE-FOOTER CTA BANNER ─────────────────────────────────────────── */}
+            <section className="relative z-10 py-16 select-none">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-[#201107] via-[#1a0e07] to-[#2b1609] border border-primary/20 p-8 md:p-14 shadow-2xl">
+                        {/* Background ambient glow */}
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div className="space-y-3 text-center md:text-left max-w-xl">
+                                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/25 bg-primary/10 text-primary text-xs font-semibold font-mono">
+                                    <Sparkles className="w-3.5 h-3.5" /> Start Managing Today
+                                </span>
+                                <h3 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                    Ready to Simplify Your Household & Family Expenses?
+                                </h3>
+                                <p className="text-muted-foreground text-sm leading-relaxed">
+                                    Join households keeping clean, transparent bazar records and monthly budget tracking.
+                                </p>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.04 }}
+                                whileTap={{ scale: 0.96 }}
+                                onClick={onSignIn}
+                                className="px-8 py-4 bg-linear-to-r from-primary to-orange-500 hover:from-accent hover:to-orange-600 text-[#1a0e07] font-bold text-base rounded-2xl transition-all duration-300 cursor-pointer shadow-xl shadow-primary/20 shrink-0 flex items-center gap-2 group"
+                            >
+                                Launch Web App
+                                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                            </motion.button>
                         </div>
-                        <span className="text-lg font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                            My Bazar <span className="text-primary font-sans font-extrabold">Hisab</span>
-                        </span>
+                    </div>
+                </div>
+            </section>
+
+            {/* ─── GORGEOUS MULTI-COLUMN FOOTER ───────────────────────────────────── */}
+            <footer className="relative z-10 border-t border-[rgba(232,160,32,0.08)] bg-[#090402] pt-16 pb-12 select-none">
+                <div className="container mx-auto px-6 md:px-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-[rgba(232,160,32,0.06)]">
+                        {/* Brand Column */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary flex items-center justify-center p-0.5 border border-primary/20 shadow-md shadow-primary/10">
+                                    <img src="/assets/logo.png" alt="Bazar Hisab Logo" className="w-full h-full object-contain rounded-lg" />
+                                </div>
+                                <span className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                                    My Bazar <span className="text-primary font-sans font-extrabold">Hisab</span>
+                                </span>
+                            </div>
+                            <p className="text-muted-foreground text-xs leading-relaxed">
+                                The modern collaborative spending ledger for families and shared households. Track daily groceries, utility bills, and monthly budgets effortlessly.
+                            </p>
+                            <div className="flex items-center gap-2 pt-2 text-[11px] text-muted-foreground font-mono">
+                                <Shield className="w-3.5 h-3.5 text-primary" />
+                                <span>Private & Encrypted Accounts</span>
+                            </div>
+                        </div>
+
+                        {/* Navigation Column */}
+                        <div className="space-y-4">
+                            <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Quick Navigation</h4>
+                            <ul className="space-y-2.5 text-sm text-muted-foreground">
+                                {["Features", "How it Works", "Benefits"].map((link) => (
+                                    <li key={link}>
+                                        <a href={`#${link.toLowerCase().replace(/\s+/g, "")}`} className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 group">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:w-2.5 group-hover:bg-primary transition-all" />
+                                            {link}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Key Capabilities */}
+                        <div className="space-y-4">
+                            <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Key Modules</h4>
+                            <ul className="space-y-2.5 text-xs text-muted-foreground font-mono">
+                                <li className="flex items-center gap-2">
+                                    <ShoppingBag className="w-3.5 h-3.5 text-primary" />
+                                    <span>Daily Bazar & Groceries</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <Receipt className="w-3.5 h-3.5 text-accent" />
+                                    <span>Utility Bills & Rent Book</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <Users className="w-3.5 h-3.5 text-blue-400" />
+                                    <span>Family Groups (Up to 20)</span>
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <TrendingUp className="w-3.5 h-3.5 text-green-400" />
+                                    <span>Monthly Expense Records</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Quick Access Card */}
+                        <div className="space-y-4 bg-[#140a04] p-5 rounded-2xl border border-primary/10 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full" />
+                            <h4 className="text-xs font-bold text-foreground">Get Started Free</h4>
+                            <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                Access your shared family dashboard instantly from any web browser or mobile phone.
+                            </p>
+                            <button
+                                onClick={onSignIn}
+                                className="w-full py-2.5 bg-linear-to-r from-primary to-orange-500 hover:from-accent hover:to-orange-600 text-[#1a0e07] font-bold text-xs rounded-xl transition-all duration-300 cursor-pointer shadow-md shadow-primary/10 flex items-center justify-center gap-1.5"
+                            >
+                                Open Dashboard <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground/50 font-mono text-center md:text-left">© {new Date().getFullYear()} My Bazar Hisab. Built for families and shared household groups.</p>
-
-                    <button onClick={onSignIn} className="px-6 py-3 bg-linear-to-r from-primary to-orange-500 hover:from-accent hover:to-orange-600 text-[#1a0e07] font-bold text-sm rounded-xl transition-all duration-300 cursor-pointer shadow-lg shadow-primary/10 active:scale-95">
-                        Launch Web App
-                    </button>
+                    {/* Bottom Bar */}
+                    <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+                        <p className="font-mono text-[11px] text-center sm:text-left">
+                            © {new Date().getFullYear()} My Bazar Hisab. All rights reserved.
+                        </p>
+                        <p className="flex items-center gap-1.5 text-[11px]">
+                            Built for families with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" /> & care.
+                        </p>
+                    </div>
                 </div>
             </footer>
         </div>

@@ -18,7 +18,7 @@ function WebInputField({ label, icon, rightElement, error, ...props }: WebInputF
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">{label}</label>
             <div
                 className={`flex items-center rounded-xl border transition-all duration-200 ${
-                    error ? "border-destructive/60 bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(212,24,61,0.08)]" : focused ? "border-primary bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(232,160,32,0.12)]" : "border-[rgba(232,160,32,0.18)] bg-[#2e1a0a]"
+                    error ? "border-destructive/60 bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(212,24,61,0.08)]" : focused ? "border-primary bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(232,160,32,0.12)]" : "border-primary/20 bg-[#2e1a0a]"
                 }`}
             >
                 <span className="pl-4 text-muted-foreground shrink-0">{icon}</span>
@@ -454,7 +454,7 @@ function WebForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: 
                                 value={digit}
                                 onChange={(e) => handleChange(i, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(i, e)}
-                                className="w-full aspect-square text-center text-xl font-bold text-[#f5ede2] rounded-xl outline-none transition-all border border-[rgba(232,160,32,0.18)] bg-[#2e1a0a] focus:border-primary focus:shadow-[0_0_0_3px_rgba(232,160,32,0.1)] font-mono"
+                                className="w-full aspect-square text-center text-xl font-bold text-[#f5ede2] rounded-xl outline-none transition-all border border-base-amber bg-[#2e1a0a] focus:border-primary focus:shadow-[0_0_0_3px_rgba(232,160,32,0.1)] font-mono"
                             />
                         </div>
                     ))}

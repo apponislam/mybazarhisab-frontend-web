@@ -193,6 +193,10 @@
     }
 }
 
+.border-base-amber {
+    border-color: rgba(232, 160, 32, 0.2);
+}
+
 /* Custom Scrollbar — matches site warm dark theme */
 ::-webkit-scrollbar {
     width: 8px;

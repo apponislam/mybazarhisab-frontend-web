@@ -11,7 +11,7 @@ export default function RootRedirector() {
       if (window.innerWidth < 768) {
         router.replace("/web");
       } else {
-        router.replace("/app");
+        router.replace("/dashboard");
       }
     };
 

@@ -6,7 +6,7 @@ import { initials, avatarColor } from "@/lib/mockData";
 
 export const BG_DOTS = <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />;
 
-export const TOP_LINE = <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />;
+export const TOP_LINE = <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-transparent via-primary to-transparent" />;
 
 export function ScreenShell({ children, scrollable }: { children: React.ReactNode; scrollable?: boolean }) {
     return (

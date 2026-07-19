@@ -47,8 +47,8 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
     <ScreenShell scrollable>
       <div className="flex flex-col flex-1 pb-10">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-14 pb-8 px-8">
-          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30 mb-4">
-            <BookOpen className="w-7 h-7 text-primary-foreground" strokeWidth={2} />
+          <div className="w-16 h-16 mb-4 flex items-center justify-center">
+            <img src="/assets/logo.png" alt="My Bazar Hisab Logo" className="w-full h-full object-contain rounded-2xl" />
           </div>
           <h1 className="text-3xl font-bold text-foreground text-center" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>My Bazar <span className="text-primary">Hisab</span></h1>
           <p className="mt-1 text-muted-foreground text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>Sign in to your account</p>

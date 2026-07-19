@@ -17,20 +17,8 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
       {BG_DOTS}
       <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         className="relative flex flex-col items-center">
-        <div className="relative mb-8">
-          <div className="w-24 h-24 rounded-3xl bg-primary/10 border border-primary/30 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
-              <BookOpen className="w-8 h-8 text-primary-foreground" strokeWidth={2} />
-            </div>
-          </div>
-          <motion.div initial={{ opacity: 0, x: -8, y: 8 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ delay: 0.5 }}
-            className="absolute -bottom-2 -left-5 w-10 h-10 rounded-xl bg-accent/80 flex items-center justify-center border border-primary/20">
-            <ShoppingBag className="w-5 h-5 text-primary-foreground" strokeWidth={1.8} />
-          </motion.div>
-          <motion.div initial={{ opacity: 0, x: 8, y: 8 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ delay: 0.6 }}
-            className="absolute -bottom-2 -right-5 w-10 h-10 rounded-xl bg-accent/80 flex items-center justify-center border border-primary/20">
-            <TrendingUp className="w-5 h-5 text-primary-foreground" strokeWidth={1.8} />
-          </motion.div>
+        <div className="relative mb-8 flex justify-center">
+          <img src="/assets/logo.png" alt="My Bazar Hisab Logo" className="w-28 h-28 object-contain rounded-3xl" />
         </div>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground mb-1" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>My Bazar</h1>

@@ -45,72 +45,16 @@ function WebInputField({ label, icon, rightElement, error, ...props }: WebInputF
 // ─── Desktop Website Split-Pane Wrapper ──────────────────────────────────────
 function WebLayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen w-full flex bg-[#1a0e07] text-[#f5ede2] overflow-hidden">
-      {/* Left Marketing Banner (Desktop only) */}
-      <div className="hidden md:flex md:w-[45%] lg:w-[40%] bg-[#251508] border-r border-[rgba(232,160,32,0.15)] flex-col justify-between p-12 relative overflow-hidden flex-shrink-0 select-none">
-        {/* Glowing Accents */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(circle at 10% 20%, rgba(232,160,32,0.15) 0%, transparent 60%)" }} />
-        
-        {/* Logo and branding */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <img src="/assets/logo.png" alt="Logo" className="w-full h-full object-contain rounded-2xl" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground leading-none" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-              My Bazar <span className="text-primary">Hisab</span>
-            </h1>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Your Room Companion</span>
-          </div>
-        </div>
-
-        {/* Feature Highlights */}
-        <div className="relative z-10 my-auto flex flex-col gap-8">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-extrabold text-foreground tracking-tight leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Take Control of Your <br /><span className="text-primary">Shared Market Account</span>
-            </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Log food, groceries, bills, room cleaner salaries, and rent. Let Bazar Hisab calculate room net shares dynamically.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-5">
-            {[
-              { title: "Dynamic Split calculations", desc: "No ledger papers needed. Instantly see room split balances.", emoji: "📊" },
-              { title: "Bazar shopping feed", desc: "Record Hilsha fish, rice, oil with weights & pricing.", emoji: "🛒" },
-              { title: "Internet & Utility bills", desc: "Track flat subscriptions, wifi, and helper bill records.", emoji: "🔌" }
-            ].map(f => (
-              <div key={f.title} className="flex gap-4 p-4 rounded-2xl border border-[rgba(232,160,32,0.08)] bg-[#1a0e07]/40 backdrop-blur-md">
-                <span className="text-2xl">{f.emoji}</span>
-                <div>
-                  <h4 className="text-sm font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>{f.title}</h4>
-                  <p className="text-xs text-muted-foreground mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Brand stamp footer */}
-        <div className="relative z-10 text-xs text-muted-foreground/60 flex items-center justify-between font-mono">
-          <span>v1.2.0 • Safe sync</span>
-          <span>© {new Date().getFullYear()} apponislam</span>
-        </div>
-      </div>
-
-      {/* Right Content Panel - Centers the cards */}
-      <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-4 md:px-12 py-10 relative bg-[#1a0e07]">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
-          style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-        
-        {/* Render Card layout */}
-        <div className="w-full max-w-[440px] relative z-10">
-          {children}
-        </div>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#1a0e07] text-[#f5ede2] overflow-y-auto relative px-4 py-10">
+      {/* Warm radial glow backdrop */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at 50% 30%, rgba(232,160,32,0.12) 0%, transparent 70%)" }} />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      
+      {/* Centered card container */}
+      <div className="w-full max-w-[440px] relative z-10">
+        {children}
       </div>
     </div>
   );

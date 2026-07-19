@@ -13,7 +13,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className="h-full antialiased" suppressHydrationWarning={true}>
-            <body className="h-full">{children}</body>
+            <body className="h-full" suppressHydrationWarning={true}>
+                {children}
+            </body>
         </html>
     );
 }

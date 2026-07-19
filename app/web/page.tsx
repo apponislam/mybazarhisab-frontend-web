@@ -11,6 +11,7 @@ import { GroupPickerScreen } from "@/components/screens/GroupPickerScreen";
 import { AppShell } from "@/components/screens/AppShell";
 
 // Import new dedicated web/desktop components
+import { WebLandingPage } from "@/components/web/WebLandingPage";
 import { WebAuthForms } from "@/components/web/WebAuthForms";
 import { WebGroupPicker } from "@/components/web/WebGroupPicker";
 import { WebAppShell } from "@/components/web/WebAppShell";
@@ -22,6 +23,7 @@ export default function WebPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [groupStats, setGroupStats] = useState<GroupStats | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [showLanding, setShowLanding] = useState(true);
 
   // Handle responsiveness dynamically without routing redirects
   useEffect(() => {
@@ -33,6 +35,13 @@ export default function WebPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Instantly bypass mobile splash screen on desktop
+  useEffect(() => {
+    if (isMobile === false) {
+      setShowSplash(false);
+    }
+  }, [isMobile]);
+
   // Loading state while checking browser window width
   if (isMobile === null) {
     return (
@@ -42,13 +51,23 @@ export default function WebPage() {
     );
   }
 
-  // 1. Splash loading screen (Unified animation)
-  if (showSplash) {
+  // 1. Splash loading screen (Mobile only)
+  if (showSplash && isMobile) {
     return <SplashScreen onDone={() => setShowSplash(false)} />;
   }
 
-  // 2. Unauthenticated Login/Register Screen
+  // 2. Unauthenticated Login/Register/Landing Screen
   if (!isLoggedIn) {
+    if (!isMobile && showLanding) {
+      return (
+        <AnimatePresence mode="wait">
+          <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="size-full">
+            <WebLandingPage onSignIn={() => setShowLanding(false)} />
+          </motion.div>
+        </AnimatePresence>
+      );
+    }
+
     return (
       <AnimatePresence mode="wait">
         {isMobile ? (
@@ -57,7 +76,10 @@ export default function WebPage() {
           </motion.div>
         ) : (
           <motion.div key="auth-desktop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="size-full">
-            <WebAuthForms onLogin={() => setIsLoggedIn(true)} />
+            <WebAuthForms 
+              onLogin={() => setIsLoggedIn(true)} 
+              onBack={() => setShowLanding(true)}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -95,6 +117,7 @@ export default function WebPage() {
             onLogout={() => {
               setIsLoggedIn(false);
               setGroupStats(null);
+              setShowLanding(true); // Return to landing page on logout
             }} 
           />
         </motion.div>

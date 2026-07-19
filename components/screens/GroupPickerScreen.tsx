@@ -15,7 +15,7 @@ export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupSta
 
     return (
         <ScreenShell scrollable>
-            <div className="flex items-center justify-between px-6 pt-14 pb-6 flex-shrink-0">
+            <div className="flex items-center justify-between px-6 pt-14 pb-6 shrink-0">
                 <div>
                     <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                         My Bazar <span className="text-primary">Hisab</span>
@@ -28,7 +28,7 @@ export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupSta
                     <Home className="w-5 h-5 text-primary-foreground" strokeWidth={2} />
                 </div>
             </div>
-            <div className="mx-6 h-px bg-border mb-6 flex-shrink-0" />
+            <div className="mx-6 h-px bg-border mb-6 shrink-0" />
             <div className="flex-1 flex flex-col px-6 pb-8 gap-6">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border bg-card p-6" style={{ boxShadow: "0 4px 32px rgba(0,0,0,0.4)" }}>
                     <div className="flex items-center gap-3 mb-4">
@@ -61,7 +61,15 @@ export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupSta
                                 <span className="pl-4 text-muted-foreground">
                                     <Users className="w-4 h-4" />
                                 </span>
-                                <input type="text" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} onFocus={() => setJf(true)} onBlur={() => setJf(false)} placeholder="e.g. BZR-4821" className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none tracking-widest font-mono" />
+                                <input
+                                    type="text"
+                                    value={joinCode}
+                                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                                    onFocus={() => setJf(true)}
+                                    onBlur={() => setJf(false)}
+                                    placeholder="e.g. BZR-4821"
+                                    className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none tracking-widest font-mono"
+                                />
                             </div>
                         </div>
                         <PrimaryButton loading={jl} label="Join Group" loadingLabel="Joining…" />
@@ -103,10 +111,25 @@ export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupSta
                                 <span className="pl-4 text-muted-foreground">
                                     <Users className="w-4 h-4" />
                                 </span>
-                                <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} onFocus={() => setCf(true)} onBlur={() => setCf(false)} placeholder="e.g. Sabzi Mandi" className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input
+                                    type="text"
+                                    value={groupName}
+                                    onChange={(e) => setGroupName(e.target.value)}
+                                    onFocus={() => setCf(true)}
+                                    onBlur={() => setCf(false)}
+                                    placeholder="e.g. Sabzi Mandi"
+                                    className="flex-1 px-3 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none"
+                                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                                />
                             </div>
                         </div>
-                        <motion.button type="submit" disabled={cl || !groupName.trim()} whileTap={{ scale: 0.97 }} className="w-full py-4 rounded-xl border text-foreground font-semibold text-base disabled:opacity-50 cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif", borderColor: "rgba(192,96,16,0.5)" }}>
+                        <motion.button
+                            type="submit"
+                            disabled={cl || !groupName.trim()}
+                            whileTap={{ scale: 0.97 }}
+                            className="w-full py-4 rounded-xl border text-foreground font-semibold text-base disabled:opacity-50 cursor-pointer"
+                            style={{ fontFamily: "'DM Sans', sans-serif", borderColor: "rgba(192,96,16,0.5)" }}
+                        >
                             {cl ? (
                                 <span className="flex items-center justify-center gap-2 text-accent">
                                     <SpinnerIcon />

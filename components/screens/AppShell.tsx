@@ -31,7 +31,7 @@ function BottomNav({ tab, onTab, onAdd }: { tab: AppTab; onTab: (t: AppTab) => v
         { id: "profile", icon: <User className="w-5 h-5" strokeWidth={1.8} />, label: "Profile" },
     ];
     return (
-        <div className="relative flex items-end bg-card border-t border-border px-2 pb-2 pt-1 flex-shrink-0" style={{ boxShadow: "0 -4px 24px rgba(0,0,0,0.4)" }}>
+        <div className="relative flex items-end bg-card border-t border-border px-2 pb-2 pt-1 shrink-0" style={{ boxShadow: "0 -4px 24px rgba(0,0,0,0.4)" }}>
             {tabs.slice(0, 2).map((t) => (
                 <button key={t.id} onClick={() => onTab(t.id)} className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all cursor-pointer" style={{ color: tab === t.id ? "#e8a020" : "#a08060" }}>
                     {t.icon}
@@ -82,7 +82,7 @@ function AddPicker({ onExpense, onBill, onClose }: { onExpense: () => void; onBi
                         { icon: <Receipt className="w-6 h-6 text-white" strokeWidth={2} />, bg: "bg-accent", label: "Add Bill", sub: "Log rent, utilities, subscriptions and other bills", onClick: onBill, border: "border-accent/40" },
                     ].map((item) => (
                         <motion.button key={item.label} onClick={item.onClick} whileTap={{ scale: 0.97 }} className={`flex items-center gap-4 p-5 rounded-2xl border ${item.border} text-left transition-all cursor-pointer`} style={{ background: "rgba(232,160,32,0.05)" }}>
-                            <div className={`w-12 h-12 rounded-xl ${item.bg} flex items-center justify-center flex-shrink-0 shadow-lg`}>{item.icon}</div>
+                            <div className={`w-12 h-12 rounded-xl ${item.bg} flex items-center justify-center shrink-0 shadow-lg`}>{item.icon}</div>
                             <div className="flex-1">
                                 <p className="text-base font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                     {item.label}
@@ -91,7 +91,7 @@ function AddPicker({ onExpense, onBill, onClose }: { onExpense: () => void; onBi
                                     {item.sub}
                                 </p>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                            <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
                         </motion.button>
                     ))}
                 </div>

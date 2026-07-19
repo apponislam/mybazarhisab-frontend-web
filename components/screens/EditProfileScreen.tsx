@@ -52,7 +52,7 @@ export function EditProfileScreen({ onBack }: { onBack: () => void }) {
                     Edit <span className="text-primary">Profile</span>
                 </h2>
 
-                <div className="flex justify-center mb-7 flex-shrink-0">
+                <div className="flex justify-center mb-7 shrink-0">
                     <button type="button" onClick={() => fileRef.current?.click()} className="relative group cursor-pointer">
                         <div className="w-24 h-24 rounded-full border-2 border-dashed border-primary/40 group-hover:border-primary/80 transition-all overflow-hidden" style={{ boxShadow: "0 0 0 4px rgba(232,160,32,0.08)" }}>
                             {photo ? (
@@ -89,13 +89,21 @@ export function EditProfileScreen({ onBack }: { onBack: () => void }) {
                     ].map((field) => (
                         <FieldBox key={field.label} label={field.label} focused={field.f}>
                             <div className="flex items-center" onFocus={() => field.setF(true)} onBlur={() => field.setF(false)}>
-                                <span className="pl-4 text-muted-foreground flex-shrink-0">{field.icon}</span>
+                                <span className="pl-4 text-muted-foreground shrink-0">{field.icon}</span>
                                 <input type={field.type} value={field.value} onChange={(e) => field.set(e.target.value)} className="flex-1 px-3 py-3.5 bg-transparent text-foreground text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                     ))}
                     <FieldBox label="About Me" focused={fAbout}>
-                        <textarea value={about} onChange={(e) => setAbout(e.target.value)} onFocus={() => setFAbout(true)} onBlur={() => setFAbout(false)} rows={3} className="w-full px-4 py-3.5 bg-transparent text-foreground text-sm outline-none resize-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                        <textarea
+                            value={about}
+                            onChange={(e) => setAbout(e.target.value)}
+                            onFocus={() => setFAbout(true)}
+                            onBlur={() => setFAbout(false)}
+                            rows={3}
+                            className="w-full px-4 py-3.5 bg-transparent text-foreground text-sm outline-none resize-none"
+                            style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        />
                     </FieldBox>
 
                     <SectionLabel>Address</SectionLabel>

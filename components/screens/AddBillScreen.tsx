@@ -31,7 +31,7 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
         <ScreenShell scrollable>
             <div className="flex flex-col px-6 pt-12 pb-8 relative">
                 <BackButton onBack={onBack} label="Cancel" />
-                <div className="flex items-center gap-3 mb-7 flex-shrink-0">
+                <div className="flex items-center gap-3 mb-7 shrink-0">
                     <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center shadow-md shadow-accent/30">
                         <Receipt className="w-5 h-5 text-white" strokeWidth={2} />
                     </div>
@@ -50,7 +50,7 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
                             Category
                         </label>
                         <button type="button" onClick={() => setShowCatPicker(true)} className="flex items-center gap-3 p-4 rounded-xl border transition-all text-left cursor-pointer" style={{ borderColor: "rgba(232,160,32,0.3)", background: "#2e1a0a" }}>
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border" style={{ background: `${meta.color}20`, borderColor: `${meta.color}40`, color: meta.color }}>
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border" style={{ background: `${meta.color}20`, borderColor: `${meta.color}40`, color: meta.color }}>
                                 {meta.icon}
                             </div>
                             <span className="flex-1 text-sm font-medium text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -82,7 +82,16 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
                         </div>
                     </FieldBox>
                     <FieldBox label="Notes (optional)" focused={fNotes}>
-                        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} onFocus={() => setFNotes(true)} onBlur={() => setFNotes(false)} placeholder="Any additional info…" rows={3} className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none resize-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                        <textarea
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            onFocus={() => setFNotes(true)}
+                            onBlur={() => setFNotes(false)}
+                            placeholder="Any additional info…"
+                            rows={3}
+                            className="w-full px-4 py-3.5 bg-transparent text-foreground placeholder-muted-foreground text-sm outline-none resize-none"
+                            style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        />
                     </FieldBox>
                     <div className="mt-2">
                         <PrimaryButton loading={loading} label="Save Bill" loadingLabel="Saving…" />
@@ -111,7 +120,7 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
                                         className="flex items-center gap-2.5 p-3 rounded-xl border transition-all text-left cursor-pointer"
                                         style={{ borderColor: category === c.key ? `${c.color}70` : "rgba(232,160,32,0.15)", background: category === c.key ? `${c.color}15` : "rgba(46,26,10,0.8)" }}
                                     >
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border" style={{ background: `${c.color}20`, borderColor: `${c.color}40`, color: c.color }}>
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border" style={{ background: `${c.color}20`, borderColor: `${c.color}40`, color: c.color }}>
                                             {c.icon}
                                         </div>
                                         <span className="text-xs font-medium text-foreground truncate" style={{ fontFamily: "'DM Sans', sans-serif" }}>

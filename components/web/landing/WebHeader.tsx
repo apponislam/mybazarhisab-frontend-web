@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { motion } from "motion/react";
 
 export function WebHeader({ onSignIn }: { onSignIn: () => void }) {
@@ -15,7 +16,7 @@ export function WebHeader({ onSignIn }: { onSignIn: () => void }) {
                 </motion.div>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    {["Features", "How it Works", "Benefits", "Ratings", "Contact"].map((link) => {
+                    {["Features", "How it Works", "Benefits", "Ratings"].map((link) => {
                         const href = `#${link.toLowerCase().replace(/\s+/g, "")}`;
                         return (
                             <a key={link} href={href} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors relative py-1 group">
@@ -24,6 +25,10 @@ export function WebHeader({ onSignIn }: { onSignIn: () => void }) {
                             </a>
                         );
                     })}
+                    <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors relative py-1 group">
+                        Contact
+                        <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+                    </Link>
                 </nav>
 
                 <motion.button

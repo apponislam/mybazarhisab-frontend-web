@@ -6,7 +6,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
     return (
         <footer className="relative z-10 border-t border-[rgba(232,160,32,0.08)] bg-[#090402] pt-16 pb-12 select-none">
             <div className="container mx-auto px-6 md:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-16 border-b border-[rgba(232,160,32,0.06)]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-[rgba(232,160,32,0.06)]">
                     {/* Brand Column */}
                     <div className="lg:col-span-2 space-y-4">
                         <div className="flex items-center gap-3">
@@ -17,7 +17,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                                 My Bazar <span className="text-primary font-sans font-extrabold">Hisab</span>
                             </span>
                         </div>
-                        <p className="text-muted-foreground text-xs leading-relaxed max-w-sm">
+                        <p className="text-muted-foreground text-xs leading-relaxed max-w-md">
                             The modern collaborative spending ledger for families and shared households. Track daily groceries, utility bills, and monthly budgets effortlessly.
                         </p>
                         <div className="flex items-center gap-2 pt-2 text-[11px] text-muted-foreground font-mono">
@@ -64,27 +64,12 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                                 </Link>
                             </li>
                             <li>
-                                <a href="#contact" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5">
+                                <Link href="/contact" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
                                     Support & Help Center
-                                </a>
+                                </Link>
                             </li>
                         </ul>
-                    </div>
-
-                    {/* Quick Access Card */}
-                    <div className="space-y-4 bg-[#140a04] p-5 rounded-2xl border border-primary/10 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full" />
-                        <h4 className="text-xs font-bold text-foreground">Get Started Free</h4>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">
-                            Access your shared family dashboard instantly from any web browser or mobile phone.
-                        </p>
-                        <button
-                            onClick={onSignIn}
-                            className="w-full py-2.5 bg-linear-to-r from-primary to-orange-500 hover:from-accent hover:to-orange-600 text-[#1a0e07] font-bold text-xs rounded-xl transition-all duration-300 cursor-pointer shadow-md shadow-primary/10 flex items-center justify-center gap-1.5"
-                        >
-                            Open Dashboard <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
                     </div>
                 </div>
 

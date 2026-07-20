@@ -2,15 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ShoppingBag, Receipt, Users, TrendingUp, Shield, Heart, ArrowRight } from "lucide-react";
 
-export function WebFooter({
-    onSignIn,
-    onOpenPrivacy,
-    onOpenTerms,
-}: {
-    onSignIn: () => void;
-    onOpenPrivacy?: () => void;
-    onOpenTerms?: () => void;
-}) {
+export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
     return (
         <footer className="relative z-10 border-t border-[rgba(232,160,32,0.08)] bg-[#090402] pt-16 pb-12 select-none">
             <div className="container mx-auto px-6 md:px-8">
@@ -56,7 +48,6 @@ export function WebFooter({
                             <li>
                                 <Link
                                     href="/privacy-policy"
-                                    onClick={() => onOpenPrivacy?.()}
                                     className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
@@ -66,7 +57,6 @@ export function WebFooter({
                             <li>
                                 <Link
                                     href="/terms-and-conditions"
-                                    onClick={() => onOpenTerms?.()}
                                     className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />

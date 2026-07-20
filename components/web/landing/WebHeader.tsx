@@ -15,7 +15,7 @@ export function WebHeader({ onSignIn }: { onSignIn: () => void }) {
                 </motion.div>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    {["Features", "How it Works", "Benefits", "Ratings"].map((link) => {
+                    {["Features", "How it Works", "Benefits", "Ratings", "Contact"].map((link) => {
                         const href = `#${link.toLowerCase().replace(/\s+/g, "")}`;
                         return (
                             <a key={link} href={href} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors relative py-1 group">

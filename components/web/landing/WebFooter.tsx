@@ -1,13 +1,22 @@
 import React from "react";
+import Link from "next/link";
 import { ShoppingBag, Receipt, Users, TrendingUp, Shield, Heart, ArrowRight } from "lucide-react";
 
-export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
+export function WebFooter({
+    onSignIn,
+    onOpenPrivacy,
+    onOpenTerms,
+}: {
+    onSignIn: () => void;
+    onOpenPrivacy?: () => void;
+    onOpenTerms?: () => void;
+}) {
     return (
         <footer className="relative z-10 border-t border-[rgba(232,160,32,0.08)] bg-[#090402] pt-16 pb-12 select-none">
             <div className="container mx-auto px-6 md:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-[rgba(232,160,32,0.06)]">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-16 border-b border-[rgba(232,160,32,0.06)]">
                     {/* Brand Column */}
-                    <div className="space-y-4">
+                    <div className="lg:col-span-2 space-y-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary flex items-center justify-center p-0.5 border border-primary/20 shadow-md shadow-primary/10">
                                 <img src="/assets/logo.png" alt="Bazar Hisab Logo" className="w-full h-full object-contain rounded-lg" />
@@ -16,7 +25,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                                 My Bazar <span className="text-primary font-sans font-extrabold">Hisab</span>
                             </span>
                         </div>
-                        <p className="text-muted-foreground text-xs leading-relaxed">
+                        <p className="text-muted-foreground text-xs leading-relaxed max-w-sm">
                             The modern collaborative spending ledger for families and shared households. Track daily groceries, utility bills, and monthly budgets effortlessly.
                         </p>
                         <div className="flex items-center gap-2 pt-2 text-[11px] text-muted-foreground font-mono">
@@ -29,7 +38,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                     <div className="space-y-4">
                         <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Quick Navigation</h4>
                         <ul className="space-y-2.5 text-sm text-muted-foreground">
-                            {["Features", "How it Works", "Benefits", "Ratings"].map((link) => (
+                            {["Features", "How it Works", "Benefits", "Ratings", "Contact"].map((link) => (
                                 <li key={link}>
                                     <a href={`#${link.toLowerCase().replace(/\s+/g, "")}`} className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 group">
                                         <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:w-2.5 group-hover:bg-primary transition-all" />
@@ -40,25 +49,35 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                         </ul>
                     </div>
 
-                    {/* Key Capabilities */}
+                    {/* Legal & Privacy Column */}
                     <div className="space-y-4">
-                        <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Key Modules</h4>
-                        <ul className="space-y-2.5 text-xs text-muted-foreground font-mono">
-                            <li className="flex items-center gap-2">
-                                <ShoppingBag className="w-3.5 h-3.5 text-primary" />
-                                <span>Daily Bazar & Groceries</span>
+                        <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Legal & Policies</h4>
+                        <ul className="space-y-2.5 text-xs text-muted-foreground">
+                            <li>
+                                <Link
+                                    href="/privacy-policy"
+                                    onClick={() => onOpenPrivacy?.()}
+                                    className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                    Privacy Policy
+                                </Link>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <Receipt className="w-3.5 h-3.5 text-accent" />
-                                <span>Utility Bills & Rent Book</span>
+                            <li>
+                                <Link
+                                    href="/terms-and-conditions"
+                                    onClick={() => onOpenTerms?.()}
+                                    className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                    Terms & Conditions
+                                </Link>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <Users className="w-3.5 h-3.5 text-blue-400" />
-                                <span>Family Groups (Up to 20)</span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                                <TrendingUp className="w-3.5 h-3.5 text-green-400" />
-                                <span>Monthly Expense Records</span>
+                            <li>
+                                <a href="#contact" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                    Support & Help Center
+                                </a>
                             </li>
                         </ul>
                     </div>

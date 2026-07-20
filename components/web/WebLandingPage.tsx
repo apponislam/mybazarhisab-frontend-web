@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { WebHeader } from "./landing/WebHeader";
 import { HeroSection } from "./landing/HeroSection";
 import { FeaturesSection } from "./landing/FeaturesSection";
 import { HowItWorksSection } from "./landing/HowItWorksSection";
 import { BenefitsSection } from "./landing/BenefitsSection";
 import { RatingsSection } from "./landing/RatingsSection";
+import { ContactSection } from "./landing/ContactSection";
 import { CtaBanner } from "./landing/CtaBanner";
 import { WebFooter } from "./landing/WebFooter";
+import { PrivacyPolicyView } from "./landing/PrivacyPolicyView";
+import { TermsView } from "./landing/TermsView";
 
 export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
+    const [view, setView] = useState<"home" | "privacy" | "terms">("home");
+
+    if (view === "privacy") {
+        return <PrivacyPolicyView onBack={() => setView("home")} />;
+    }
+
+    if (view === "terms") {
+        return <TermsView onBack={() => setView("home")} />;
+    }
+
     return (
         <div className="min-h-screen bg-[#130a04] text-[#f5ede2] flex flex-col font-sans overflow-x-hidden selection:bg-primary selection:text-primary-foreground relative">
             {/* ─── FLOATING AMBIENT ORBS & BACKGROUNDS ─────────────────────────────────── */}
@@ -26,8 +39,13 @@ export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
             <HowItWorksSection />
             <BenefitsSection />
             <RatingsSection />
+            <ContactSection />
             <CtaBanner onSignIn={onSignIn} />
-            <WebFooter onSignIn={onSignIn} />
+            <WebFooter
+                onSignIn={onSignIn}
+                onOpenPrivacy={() => setView("privacy")}
+                onOpenTerms={() => setView("terms")}
+            />
         </div>
     );
 }

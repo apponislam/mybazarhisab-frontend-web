@@ -5,7 +5,6 @@ import { FeaturesSection } from "./landing/FeaturesSection";
 import { HowItWorksSection } from "./landing/HowItWorksSection";
 import { BenefitsSection } from "./landing/BenefitsSection";
 import { RatingsSection } from "./landing/RatingsSection";
-import { ContactSection } from "./landing/ContactSection";
 import { CtaBanner } from "./landing/CtaBanner";
 import { WebFooter } from "./landing/WebFooter";
 
@@ -27,7 +26,6 @@ export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
             <HowItWorksSection />
             <BenefitsSection />
             <RatingsSection />
-            <ContactSection />
             <CtaBanner onSignIn={onSignIn} />
             <WebFooter onSignIn={onSignIn} />
         </div>

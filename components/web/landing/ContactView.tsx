@@ -42,7 +42,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
 
     return (
         <div className="min-h-screen w-full bg-[#130a04] text-[#f5ede2] flex flex-col font-sans">
-            {/* Simple Top Header */}
+            {/* Top Header */}
             <header className="sticky top-0 z-50 w-full bg-[#130a04]/90 border-b border-border backdrop-blur-sm select-none">
                 <div className="container mx-auto px-6 max-w-5xl h-16 flex items-center justify-between">
                     {onBack ? (
@@ -73,11 +73,11 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                         Contact Support & Help Center
                     </h1>
                     <p className="text-sm text-muted-foreground max-w-2xl">
-                        Have questions about managing your family group, need technical assistance, or want to share feedback? We are here to help.
+                        Have questions about managing your family group or need technical assistance? Send us a message below.
                     </p>
                 </div>
 
-                {/* Grid Section: Contact Info + Form */}
+                {/* Grid Section: Contact Details + Form */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 pt-4 border-t border-border">
                     {/* Left Contact Details */}
                     <div className="lg:col-span-2 space-y-6">
@@ -147,7 +147,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <h2 className="text-xl font-bold text-foreground mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                    Send a Support Message
+                                    Send Us a Message
                                 </h2>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -181,14 +181,14 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                                         type="text"
                                         value={subject}
                                         onChange={(e) => setSubject(e.target.value)}
-                                        placeholder="Need help joining group"
+                                        placeholder="Question about family group limits"
                                         required
                                         className="w-full px-4 py-3 rounded-xl border border-border bg-[#170c05] text-sm text-foreground outline-none focus:border-primary transition-all font-sans"
                                     />
                                 </div>
 
                                 <div className="space-y-1.5 text-left">
-                                    <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Message</label>
+                                    <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Your Message</label>
                                     <textarea
                                         rows={4}
                                         value={message}
@@ -205,7 +205,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                                     className="w-full py-3.5 rounded-xl bg-primary text-[#1a0e07] font-bold text-sm hover:bg-accent transition-all cursor-pointer shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                                 >
                                     {loading ? (
-                                        "Sending Ticket..."
+                                        "Sending Message..."
                                     ) : (
                                         <>
                                             Submit Message <Send className="w-4 h-4" />

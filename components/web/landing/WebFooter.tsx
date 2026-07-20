@@ -41,9 +41,9 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                         </ul>
                     </div>
 
-                    {/* Legal & Privacy Column */}
+                    {/* Legal & Support Column */}
                     <div className="space-y-4">
-                        <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Legal & Policies</h4>
+                        <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Legal & Support</h4>
                         <ul className="space-y-2.5 text-xs text-muted-foreground">
                             <li>
                                 <Link
@@ -66,7 +66,13 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                             <li>
                                 <Link href="/contact" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                    Support & Help Center
+                                    Contact Support
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/feedback" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                    Give Feedback & Review
                                 </Link>
                             </li>
                         </ul>

@@ -324,7 +324,7 @@ export function WebAppShell({ stats, onLogout }: { stats: GroupStats; onLogout: 
                                             <span>🛒</span> Recent Bazar Logs
                                         </h3>
 
-                                        <div className="space-y-3.5 max-h-[360px] overflow-y-auto pr-1">
+                                        <div className="space-y-3.5 max-h-90 overflow-y-auto pr-1">
                                             {entries.slice(0, 5).map((e) => (
                                                 <div key={e.id} className="p-3.5 rounded-xl bg-[#1a0e07] border border-[rgba(232,160,32,0.06)] flex items-center justify-between gap-3">
                                                     <div className="flex items-center gap-2.5 min-w-0">
@@ -357,13 +357,7 @@ export function WebAppShell({ stats, onLogout }: { stats: GroupStats; onLogout: 
                                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
                                     <div className="relative w-full sm:w-80">
                                         <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                        <input
-                                            type="text"
-                                            value={expenseSearch}
-                                            onChange={(e) => setExpenseSearch(e.target.value)}
-                                            placeholder="Search bazar items or buyers..."
-                                            className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none"
-                                        />
+                                        <input type="text" value={expenseSearch} onChange={(e) => setExpenseSearch(e.target.value)} placeholder="Search bazar items or buyers..." className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
                                     </div>
 
                                     <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">
@@ -451,13 +445,7 @@ export function WebAppShell({ stats, onLogout }: { stats: GroupStats; onLogout: 
                                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
                                     <div className="relative w-full sm:w-80">
                                         <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                        <input
-                                            type="text"
-                                            value={billSearch}
-                                            onChange={(e) => setBillSearch(e.target.value)}
-                                            placeholder="Search bills or titles..."
-                                            className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none"
-                                        />
+                                        <input type="text" value={billSearch} onChange={(e) => setBillSearch(e.target.value)} placeholder="Search bills or titles..." className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
                                     </div>
 
                                     <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">

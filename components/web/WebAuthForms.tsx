@@ -17,9 +17,7 @@ function WebInputField({ label, icon, rightElement, error, ...props }: WebInputF
         <div className="flex flex-col gap-1.5 text-left">
             <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">{label}</label>
             <div
-                className={`flex items-center rounded-xl border transition-all duration-200 ${
-                    error ? "border-destructive/60 bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(212,24,61,0.08)]" : focused ? "border-primary bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(232,160,32,0.12)]" : "border-primary/20 bg-[#2e1a0a]"
-                }`}
+                className={`flex items-center rounded-xl border transition-all duration-200 ${error ? "border-destructive/60 bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(212,24,61,0.08)]" : focused ? "border-primary bg-[#2e1a0a] shadow-[0_0_0_3px_rgba(232,160,32,0.12)]" : "border-primary/20 bg-[#2e1a0a]"}`}
             >
                 <span className="pl-4 text-muted-foreground shrink-0">{icon}</span>
                 <input
@@ -72,7 +70,7 @@ function WebLayoutWrapper({ children }: { children: React.ReactNode }) {
                 {/* Subtle dot grid background */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
 
-                <div className="w-full max-w-[420px] relative z-10">{children}</div>
+                <div className="w-full max-w-105 relative z-10">{children}</div>
             </div>
         </div>
     );

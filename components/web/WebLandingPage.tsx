@@ -12,9 +12,9 @@ export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
     return (
         <div className="min-h-screen bg-[#130a04] text-[#f5ede2] flex flex-col font-sans overflow-x-hidden selection:bg-primary selection:text-primary-foreground relative">
             {/* ─── FLOATING AMBIENT ORBS & BACKGROUNDS ─────────────────────────────────── */}
-            <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] pointer-events-none animate-pulse" style={{ animationDuration: "10s" }} />
-            <div className="absolute top-[35%] right-[-10%] w-[700px] h-[700px] bg-accent/8 rounded-full blur-[160px] pointer-events-none animate-pulse" style={{ animationDuration: "14s" }} />
-            <div className="absolute bottom-[15%] left-[-15%] w-[550px] h-[550px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-[-10%] left-[-10%] w-150 h-150 bg-primary/10 rounded-full blur-[140px] pointer-events-none animate-pulse" style={{ animationDuration: "10s" }} />
+            <div className="absolute top-[35%] right-[-10%] w-175 h-175 bg-accent/8 rounded-full blur-[160px] pointer-events-none animate-pulse" style={{ animationDuration: "14s" }} />
+            <div className="absolute bottom-[15%] left-[-15%] w-137.5 h-137.5 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Grid Overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />

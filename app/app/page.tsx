@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { GroupStats } from "@/types";
 
 // Import original mobile-only screens
-import { SplashScreen } from "@/components/screens/SplashScreen";
-import { AuthForms } from "@/components/screens/AuthForms";
-import { GroupPickerScreen } from "@/components/screens/GroupPickerScreen";
-import { AppShell } from "@/components/screens/AppShell";
+import { SplashScreen } from "@/components/app/screens/SplashScreen";
+import { AuthForms } from "@/components/app/screens/AuthForms";
+import { GroupPickerScreen } from "@/components/app/screens/GroupPickerScreen";
+import { AppShell } from "@/components/app/screens/AppShell";
 
 export default function AppPage() {
   const router = useRouter();

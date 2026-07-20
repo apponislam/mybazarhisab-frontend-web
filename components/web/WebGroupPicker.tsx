@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Home, Users, LogIn, Plus } from "lucide-react";
 import { GroupStats } from "@/types";
-import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/ui/Shared";
+import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/app/ui/Shared";
 import { makeMockStats } from "@/lib/mockData";
 
 export function WebGroupPicker({ onGroupReady }: { onGroupReady: (s: GroupStats) => void }) {

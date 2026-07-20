@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Edit3, Trash2, Weight, Hash, Calendar, AlignLeft } from "lucide-react";
 import { MockBazarEntry } from "@/types";
-import { ScreenShell, Avatar, DeleteConfirm } from "@/components/ui/Shared";
+import { ScreenShell, Avatar, DeleteConfirm } from "@/components/app/ui/Shared";
 import { fmtFull, fmtDate } from "@/lib/mockData";
 
 export function ExpenseDetailScreen({ entry, onBack, onEdit, onDelete }: {

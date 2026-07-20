@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "motion/react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle, BookOpen, User, Camera, Phone } from "lucide-react";
-import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox, SpinnerIcon } from "@/components/ui/Shared";
+import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox, SpinnerIcon } from "@/components/app/ui/Shared";
 import { avatarColor, initials } from "@/lib/mockData";
 
 export function AuthForms({ onLogin }: { onLogin: () => void }) {

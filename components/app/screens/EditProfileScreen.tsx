@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { motion } from "motion/react";
 import { Camera, User, Mail, Phone, Globe, MapPin, CheckCircle } from "lucide-react";
-import { ScreenShell, BackButton, PrimaryButton, FieldBox, SectionLabel } from "@/components/ui/Shared";
+import { ScreenShell, BackButton, PrimaryButton, FieldBox, SectionLabel } from "@/components/app/ui/Shared";
 import { MOCK_USERS, avatarColor, initials } from "@/lib/mockData";
 
 export function EditProfileScreen({ onBack }: { onBack: () => void }) {

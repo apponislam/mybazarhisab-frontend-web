@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { User, Shield, Info, Bell, BellOff, Mail, Globe, MapPin, FileText, LogOut, Trash2, AlertTriangle } from "lucide-react";
-import { Toggle, SettingsRow } from "@/components/ui/Shared";
+import { Toggle, SettingsRow } from "@/components/app/ui/Shared";
 import { initials, avatarColor, MOCK_USERS } from "@/lib/mockData";
 
 export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile: () => void; onChangePassword: () => void }) {

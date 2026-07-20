@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { Edit3, ChevronRight, AlignLeft, Calendar, X } from "lucide-react";
-import { MockBill, BillCategory } from "@/types";
-import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/ui/Shared";
+import { Receipt, ChevronRight, AlignLeft, Calendar, X } from "lucide-react";
+import { BillCategory } from "@/types";
+import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 import { toInputDate, BILL_META, BILL_CATEGORIES } from "@/lib/mockData";
 
-export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBack: () => void; onSave: (updated: MockBill) => void }) {
-    const [category, setCategory] = useState<BillCategory>(bill.category);
-    const [title, setTitle] = useState(bill.title);
-    const [amount, setAmount] = useState(String(bill.amount));
-    const [date, setDate] = useState(toInputDate(bill.date));
-    const [notes, setNotes] = useState(bill.notes ?? "");
+export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+    const [category, setCategory] = useState<BillCategory>("RENT");
+    const [title, setTitle] = useState("");
+    const [amount, setAmount] = useState("");
+    const [date, setDate] = useState(toInputDate(new Date()));
+    const [notes, setNotes] = useState("");
     const [loading, setLoading] = useState(false);
     const [showCatPicker, setShowCatPicker] = useState(false);
     const [fTitle, setFTitle] = useState(false);
@@ -23,15 +23,8 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            onSave({
-                ...bill,
-                category,
-                title,
-                amount: Number(amount),
-                date: new Date(date),
-                notes: notes || undefined,
-            });
-        }, 1200);
+            onDone();
+        }, 1400);
     };
 
     return (
@@ -40,14 +33,14 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                 <BackButton onBack={onBack} label="Cancel" />
                 <div className="flex items-center gap-3 mb-7 shrink-0">
                     <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center shadow-md shadow-accent/30">
-                        <Edit3 className="w-5 h-5 text-white" strokeWidth={2} />
+                        <Receipt className="w-5 h-5 text-white" strokeWidth={2} />
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                            Edit Bill
+                            Add Bill
                         </h2>
                         <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            {bill.title}
+                            Utility or recurring expense
                         </p>
                     </div>
                 </div>
@@ -71,13 +64,13 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                             <span className="pl-4 text-muted-foreground">
                                 <AlignLeft className="w-4 h-4" />
                             </span>
-                            <input value={title} onChange={(e) => setTitle(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. July House Rent" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Amount (৳)" focused={fAmount}>
                         <div className="flex items-center" onFocus={() => setFAmount(true)} onBlur={() => setFAmount(false)}>
-                            <span className="pl-4 text-muted-foreground text-sm font-bold">৳</span>
-                            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <span className="pl-4 text-sm font-bold text-muted-foreground">৳</span>
+                            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                         </div>
                     </FieldBox>
                     <FieldBox label="Date" focused={false}>
@@ -94,13 +87,14 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                             onChange={(e) => setNotes(e.target.value)}
                             onFocus={() => setFNotes(true)}
                             onBlur={() => setFNotes(false)}
+                            placeholder="Any additional info…"
                             rows={3}
                             className="w-full px-4 py-3.5 bg-transparent text-sm outline-none resize-none"
                             style={{ fontFamily: "'DM Sans', sans-serif" }}
                         />
                     </FieldBox>
                     <div className="mt-2">
-                        <PrimaryButton loading={loading} label="Save Changes" loadingLabel="Saving…" />
+                        <PrimaryButton loading={loading} label="Save Bill" loadingLabel="Saving…" />
                     </div>
                 </form>
                 {showCatPicker && (
@@ -142,4 +136,4 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
         </ScreenShell>
     );
 }
-export default BillEditScreen;
+export default AddBillScreen;

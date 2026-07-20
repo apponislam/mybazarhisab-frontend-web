@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Edit3, Trash2, Calendar, CreditCard, AlignLeft } from "lucide-react";
 import { MockBill } from "@/types";
-import { ScreenShell, Avatar, DeleteConfirm } from "@/components/ui/Shared";
+import { ScreenShell, Avatar, DeleteConfirm } from "@/components/app/ui/Shared";
 import { fmtFull, fmtDate, BILL_META } from "@/lib/mockData";
 
 export function BillDetailScreen({ bill, onBack, onEdit, onDelete }: { bill: MockBill; onBack: () => void; onEdit: () => void; onDelete: () => void }) {

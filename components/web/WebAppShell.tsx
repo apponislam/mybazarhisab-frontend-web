@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Settings, Lock, Mail, Phone, Camera } from "lucide-react";
 import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@/types";
 import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
-import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/ui/Shared";
+import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/app/ui/Shared";
 
 export function WebAppShell({ stats, onLogout }: { stats: GroupStats; onLogout: () => void }) {
     // Website Tabs

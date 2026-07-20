@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Shield, Lock, EyeOff, Eye, CheckCircle } from "lucide-react";
-import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/ui/Shared";
+import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 
 export function ChangePasswordScreen({ onBack }: { onBack: () => void }) {
     const [current, setCurrent] = useState("");

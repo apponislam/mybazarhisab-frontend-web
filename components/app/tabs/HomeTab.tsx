@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { ChevronUp, ChevronDown, ShoppingBag, Star, Calendar, TrendingUp, Minus, BookOpen, Package, Receipt, BarChart2 } from "lucide-react";
 import { GroupStats } from "@/types";
-import { SectionLabel } from "@/components/ui/Shared";
+import { SectionLabel } from "@/components/app/ui/Shared";
 import { fmt } from "@/lib/mockData";
 
 const now = new Date();

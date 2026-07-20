@@ -2,24 +2,24 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Home, ShoppingBag, Receipt, User, Plus, ChevronRight, X } from "lucide-react";
 import { GroupStats, AppTab, AppSubScreen, MockBazarEntry, MockBill } from "@/types";
-import { ScreenShell } from "@/components/ui/Shared";
+import { ScreenShell } from "@/components/app/ui/Shared";
 import { INITIAL_ENTRIES, INITIAL_BILLS } from "@/lib/mockData";
 
 // Import tabs
-import { HomeTab } from "@/components/tabs/HomeTab";
-import { ExpensesTab } from "@/components/tabs/ExpensesTab";
-import { BillsTab } from "@/components/tabs/BillsTab";
-import { ProfileTab } from "@/components/tabs/ProfileTab";
+import { HomeTab } from "@/components/app/tabs/HomeTab";
+import { ExpensesTab } from "@/components/app/tabs/ExpensesTab";
+import { BillsTab } from "@/components/app/tabs/BillsTab";
+import { ProfileTab } from "@/components/app/tabs/ProfileTab";
 
 // Import subscreens
-import { AddExpenseScreen } from "@/components/screens/AddExpenseScreen";
-import { AddBillScreen } from "@/components/screens/AddBillScreen";
-import { ExpenseDetailScreen } from "@/components/screens/ExpenseDetailScreen";
-import { ExpenseEditScreen } from "@/components/screens/ExpenseEditScreen";
-import { BillDetailScreen } from "@/components/screens/BillDetailScreen";
-import { BillEditScreen } from "@/components/screens/BillEditScreen";
-import { EditProfileScreen } from "@/components/screens/EditProfileScreen";
-import { ChangePasswordScreen } from "@/components/screens/ChangePasswordScreen";
+import { AddExpenseScreen } from "@/components/app/screens/AddExpenseScreen";
+import { AddBillScreen } from "@/components/app/screens/AddBillScreen";
+import { ExpenseDetailScreen } from "@/components/app/screens/ExpenseDetailScreen";
+import { ExpenseEditScreen } from "@/components/app/screens/ExpenseEditScreen";
+import { BillDetailScreen } from "@/components/app/screens/BillDetailScreen";
+import { BillEditScreen } from "@/components/app/screens/BillEditScreen";
+import { EditProfileScreen } from "@/components/app/screens/EditProfileScreen";
+import { ChangePasswordScreen } from "@/components/app/screens/ChangePasswordScreen";
 
 // ─── Bottom Nav ───────────────────────────────────────────────────────────────
 

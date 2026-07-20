@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { ChevronRight } from "lucide-react";
 import { MockBill } from "@/types";
-import { FilterTabs, Avatar } from "@/components/ui/Shared";
+import { FilterTabs, Avatar } from "@/components/app/ui/Shared";
 import { fmtFull, fmtDate, isThisMonth, BILL_META } from "@/lib/mockData";
 
 const now = new Date();

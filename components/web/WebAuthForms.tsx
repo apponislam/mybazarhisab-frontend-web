@@ -68,11 +68,11 @@ function WebLayoutWrapper({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Right Side — Form Content centered in the middle of right 50% */}
-            <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-8 md:px-12 py-12 relative">
+            <div className="flex-1 flex flex-col justify-center items-center overflow-y-auto px-6 sm:px-8 md:px-12 py-8 sm:py-12 relative">
                 {/* Subtle dot grid background */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle, #e8a020 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
 
-                <div className="w-full max-w-[440px] relative z-10">{children}</div>
+                <div className="w-full max-w-[420px] relative z-10">{children}</div>
             </div>
         </div>
     );
@@ -129,31 +129,31 @@ function WebLoginScreen({ onLogin, onBack, onRegister, onForgot }: { onLogin: ()
     };
 
     return (
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6">
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4 sm:gap-6">
             {/* Back link */}
             {onBack && (
-                <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-sm font-semibold cursor-pointer mb-2 self-start">
-                    <ArrowLeft className="w-4 h-4" /> Back to Home
+                <button onClick={onBack} className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-semibold cursor-pointer mb-1 sm:mb-2 self-start">
+                    <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Back to Home
                 </button>
             )}
 
             {/* Logo & Title */}
-            <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-3 mb-4">
-                    <img src="/assets/logo.png" alt="Logo" className="w-10 h-10 rounded-xl object-contain" />
-                    <span className="text-base font-bold" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+            <div className="flex flex-col gap-1 sm:gap-2">
+                <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-4">
+                    <img src="/assets/logo.png" alt="Logo" className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl object-contain" />
+                    <span className="text-sm sm:text-base font-bold" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                         My Bazar <span className="text-primary">Hisab</span>
                     </span>
                 </div>
-                <h2 className="text-3xl font-extrabold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     Welcome back
                 </h2>
-                <p className="text-muted-foreground text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                <p className="text-muted-foreground text-xs sm:text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     Enter your credentials to sign in
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4">
                 <WebInputField label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" required icon={<Mail className="w-4 h-4" />} />
 
                 <WebInputField
@@ -177,18 +177,18 @@ function WebLoginScreen({ onLogin, onBack, onRegister, onForgot }: { onLogin: ()
                     </button>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-1 sm:pt-2">
                     <PrimaryButton loading={loading} label="Sign In" loadingLabel="Signing in…" />
                 </div>
             </form>
 
-            <div className="flex items-center gap-3 my-2 select-none">
+            <div className="flex items-center gap-3 my-1.5 sm:my-2 select-none">
                 <div className="flex-1 h-px bg-border" />
                 <span className="text-muted-foreground text-[10px] uppercase tracking-widest font-mono">New Here?</span>
                 <div className="flex-1 h-px bg-border" />
             </div>
 
-            <button type="button" onClick={onRegister} className="w-full py-3.5 rounded-xl border border-border text-foreground text-sm font-semibold hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <button type="button" onClick={onRegister} className="w-full py-2.5 sm:py-3.5 rounded-xl border border-border text-foreground text-sm font-semibold hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 Create an Account
             </button>
         </motion.div>

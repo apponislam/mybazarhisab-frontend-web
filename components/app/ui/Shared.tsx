@@ -34,7 +34,7 @@ export function PrimaryButton({ loading, label, loadingLabel, type = "submit", o
             onClick={onClick}
             disabled={loading || disabled}
             whileTap={{ scale: 0.97 }}
-            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-base transition-all hover:bg-accent disabled:opacity-50 cursor-pointer"
+            className="w-full py-3.5 sm:py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-base transition-all hover:bg-accent disabled:opacity-50 cursor-pointer"
             style={{ fontFamily: "'DM Sans', sans-serif", boxShadow: "0 4px 20px rgba(232,160,32,0.3)" }}
         >
             {loading ? (

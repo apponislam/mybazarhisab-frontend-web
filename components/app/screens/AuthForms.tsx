@@ -51,23 +51,23 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
 
     return (
         <ScreenShell scrollable>
-            <div className="flex flex-col flex-1 pb-10">
-                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-14 pb-8 px-8">
-                    <div className="w-16 h-16 mb-4 flex items-center justify-center">
+            <div className="flex flex-col flex-1 pb-8">
+                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-10 pb-6 px-6 sm:pt-14 sm:pb-8 sm:px-8">
+                    <div className="w-14 h-14 mb-3 sm:w-16 sm:h-16 sm:mb-4 flex items-center justify-center">
                         <img src="/assets/logo.png" alt="My Bazar Hisab Logo" className="w-full h-full object-contain rounded-2xl" />
                     </div>
-                    <h1 className="text-3xl font-bold text-foreground text-center" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-foreground text-center" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                         My Bazar <span className="text-primary">Hisab</span>
                     </h1>
                     <p className="mt-1 text-muted-foreground text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Sign in to your account
                     </p>
                 </motion.div>
-                <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mx-5 rounded-3xl border border-border bg-card p-7 flex flex-col" style={{ boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}>
+                <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mx-4 sm:mx-5 rounded-2xl sm:rounded-3xl border border-border bg-card p-6 sm:p-7 flex flex-col" style={{ boxShadow: "0 8px 48px rgba(0,0,0,0.5)" }}>
                     <h2 className="text-xl font-semibold text-foreground mb-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Welcome back
                     </h2>
-                    <p className="text-muted-foreground text-sm mb-7" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    <p className="text-muted-foreground text-sm mb-5 sm:mb-7" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Enter your credentials to continue
                     </p>
                     <form

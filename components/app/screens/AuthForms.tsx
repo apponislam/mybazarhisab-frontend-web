@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "motion/react";
-import { Mail, Lock, Eye, EyeOff, CheckCircle, BookOpen, User, Camera, Phone } from "lucide-react";
-import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox, SpinnerIcon } from "@/components/app/ui/Shared";
-import { avatarColor, initials } from "@/lib/mockData";
+import { Mail, Lock, Eye, EyeOff, CheckCircle, User, Camera, Phone } from "lucide-react";
+import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox } from "@/components/app/ui/Shared";
 
 export function AuthForms({ onLogin }: { onLogin: () => void }) {
     const [screen, setScreen] = useState<"login" | "register" | "forgot-email" | "forgot-otp" | "forgot-newpass" | "forgot-success">("login");

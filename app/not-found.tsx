@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { AlertTriangle, Home, ArrowLeft } from "lucide-react";
+import { AlertTriangle, Home } from "lucide-react";
 import { BG_DOTS, TOP_LINE } from "@/components/app/ui/Shared";
 
 export default function NotFound() {

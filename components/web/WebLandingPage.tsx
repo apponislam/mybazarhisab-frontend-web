@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "motion/react";
-import { ShoppingBag, Receipt, Users, ArrowRight, CheckCircle2, TrendingUp, BarChart3, ShieldCheck, Sparkles, ArrowUpRight, Activity, Lock, Heart, Shield } from "lucide-react";
+import { ShoppingBag, Receipt, Users, ArrowRight, CheckCircle2, TrendingUp, BarChart3, Sparkles, ArrowUpRight, Lock, Heart, Shield } from "lucide-react";
 
 export function WebLandingPage({ onSignIn }: { onSignIn: () => void }) {
     return (

@@ -41,7 +41,7 @@ import {
     Gift,
     MoreHorizontal,
 } from "lucide-react";
-import { BazarUnit, BillCategory, MockBazarEntry, MockBill, MockUser } from "@/types";
+import { BazarUnit, BillCategory, MockBazarEntry, MockBill } from "@/types";
 import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
 
 export default function DashboardPage() {

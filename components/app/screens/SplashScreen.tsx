@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { motion } from "motion/react";
-import { BookOpen, ShoppingBag, TrendingUp } from "lucide-react";
 import { BG_DOTS } from "@/components/app/ui/Shared";
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {

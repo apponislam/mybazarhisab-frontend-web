@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle, User, Camera, Phone, ArrowLeft } from "lucide-react";
-import { PrimaryButton, SpinnerIcon } from "@/components/app/ui/Shared";
+import { PrimaryButton } from "@/components/app/ui/Shared";
 
 // ─── Web Custom Input Field Component ─────────────────────────────────────────
 interface WebInputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {

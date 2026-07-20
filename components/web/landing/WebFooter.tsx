@@ -30,7 +30,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                     <div className="space-y-4">
                         <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Quick Navigation</h4>
                         <ul className="space-y-2.5 text-sm text-muted-foreground">
-                            {["Features", "How it Works", "Benefits", "Ratings", "Contact"].map((link) => (
+                            {["Features", "How it Works", "Benefits", "Ratings"].map((link) => (
                                 <li key={link}>
                                     <a href={`#${link.toLowerCase().replace(/\s+/g, "")}`} className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 group">
                                         <span className="w-1.5 h-1.5 rounded-full bg-primary/40 group-hover:w-2.5 group-hover:bg-primary transition-all" />
@@ -80,12 +80,9 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-                    <p className="font-mono text-[11px] text-center sm:text-left">
+                <div className="pt-8 text-center text-xs text-muted-foreground">
+                    <p className="font-mono text-[11px]">
                         © {new Date().getFullYear()} My Bazar Hisab. All rights reserved.
-                    </p>
-                    <p className="flex items-center gap-1.5 text-[11px]">
-                        Built for families with <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" /> & care.
                     </p>
                 </div>
             </div>

@@ -3,26 +3,31 @@ import { RootState } from "../../store";
 
 export type UserRole = "USER" | "ADMIN";
 
+export type TUserAddress = {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+};
+
 export type TUser = {
-    isPhoneVerified: boolean;
-    verifiedBadge: boolean;
-    balance: number;
-    noCommission: number;
     _id: string;
     name: string;
     email: string;
     role: UserRole;
     phone: string;
+    profileImage?: string;
+    language?: string;
+    aboutme?: string;
+    address?: TUserAddress;
     isActive: boolean;
     isEmailVerified: boolean;
+    isDeleted?: boolean;
+    lastLogin?: string;
+    groupId?: string;
     createdAt: string;
     updatedAt: string;
-    lastLogin: string;
-    boostEndTime: string;
-    boostPack: string;
-    boostStartTime: string;
-    isBoosted: boolean;
-    photo?: string;
 };
 
 type TAuthState = {

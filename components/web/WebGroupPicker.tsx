@@ -1,17 +1,36 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { Home, Users, LogIn, Plus } from "lucide-react";
+import { Home, Users, LogIn, Plus, LogOut } from "lucide-react";
 import { GroupStats } from "@/types";
 import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/app/ui/Shared";
 import { makeMockStats } from "@/lib/mockData";
+import { toast } from "sonner";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { logOut } from "@/redux/features/auth/authSlice";
 
-export function WebGroupPicker({ onGroupReady }: { onGroupReady: (s: GroupStats) => void }) {
+export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: GroupStats) => void; onLogout?: () => void }) {
     const [joinCode, setJoinCode] = useState("");
     const [groupName, setGroupName] = useState("");
     const [jf, setJf] = useState(false);
     const [cf, setCf] = useState(false);
     const [jl, setJl] = useState(false);
     const [cl, setCl] = useState(false);
+
+    const dispatch = useAppDispatch();
+    const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+    const handleLogout = async () => {
+        try {
+            await logoutMutation().unwrap();
+        } catch {
+            // Proceed with local logout even if server request fails
+        } finally {
+            dispatch(logOut());
+            toast.success("Logged out successfully");
+            onLogout?.();
+        }
+    };
 
     return (
         <ScreenShell scrollable>
@@ -164,6 +183,20 @@ export function WebGroupPicker({ onGroupReady }: { onGroupReady: (s: GroupStats)
                             </form>
                         </div>
                     </motion.div>
+                </div>
+
+                {/* Bottom Center Logout Button */}
+                <div className="mt-10 flex justify-center">
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="flex items-center gap-2 px-6 py-3 rounded-2xl border border-destructive/30 bg-destructive/10 hover:bg-destructive/20 text-destructive text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 shadow-lg"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span>{isLoggingOut ? "Logging out…" : "Logout from Account"}</span>
+                    </button>
                 </div>
             </div>
         </ScreenShell>

@@ -73,7 +73,12 @@ export default function AppPage() {
     return (
       <AnimatePresence mode="wait">
         <motion.div key="group-mobile" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="size-full">
-          <GroupPickerScreen onGroupReady={s => setGroupStats(s)} />
+          <GroupPickerScreen 
+            onGroupReady={s => setGroupStats(s)} 
+            onLogout={() => {
+              setIsLoggedIn(false);
+            }} 
+          />
         </motion.div>
       </AnimatePresence>
     );

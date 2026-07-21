@@ -1,17 +1,36 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { Home, Users, LogIn, Plus } from "lucide-react";
+import { Home, Users, LogIn, Plus, LogOut } from "lucide-react";
 import { GroupStats } from "@/types";
 import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/app/ui/Shared";
 import { makeMockStats } from "@/lib/mockData";
+import { toast } from "sonner";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { logOut } from "@/redux/features/auth/authSlice";
 
-export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupStats) => void }) {
+export function GroupPickerScreen({ onGroupReady, onLogout }: { onGroupReady: (s: GroupStats) => void; onLogout?: () => void }) {
     const [joinCode, setJoinCode] = useState("");
     const [groupName, setGroupName] = useState("");
     const [jf, setJf] = useState(false);
     const [cf, setCf] = useState(false);
     const [jl, setJl] = useState(false);
     const [cl, setCl] = useState(false);
+
+    const dispatch = useAppDispatch();
+    const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+
+    const handleLogout = async () => {
+        try {
+            await logoutMutation().unwrap();
+        } catch {
+            // Proceed with local logout even if server request fails
+        } finally {
+            dispatch(logOut());
+            toast.success("Logged out successfully");
+            onLogout?.();
+        }
+    };
 
     return (
         <ScreenShell scrollable>
@@ -24,8 +43,8 @@ export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupSta
                         Manage your market groups
                     </p>
                 </div>
-                <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center shadow-md shadow-primary/30">
-                    <Home className="w-5 h-5 text-primary-foreground" strokeWidth={2} />
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-md shadow-primary/30">
+                    <Home className="w-4 h-4 text-primary-foreground" strokeWidth={2} />
                 </div>
             </div>
             <div className="mx-6 h-px bg-border mb-6 shrink-0" />
@@ -144,6 +163,20 @@ export function GroupPickerScreen({ onGroupReady }: { onGroupReady: (s: GroupSta
                         </motion.button>
                     </form>
                 </motion.div>
+
+                {/* Bottom Center Logout Button */}
+                <div className="mt-4 flex justify-center pb-2">
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-destructive/30 bg-destructive/10 hover:bg-destructive/20 text-destructive text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 shadow-md"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span>{isLoggingOut ? "Logging out…" : "Logout from Account"}</span>
+                    </button>
+                </div>
             </div>
         </ScreenShell>
     );

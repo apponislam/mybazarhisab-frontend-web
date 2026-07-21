@@ -81,7 +81,13 @@ export default function WebPage() {
     return (
       <AnimatePresence mode="wait">
         <motion.div key="group-desktop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="size-full">
-          <WebGroupPicker onGroupReady={s => setGroupStats(s)} />
+          <WebGroupPicker 
+            onGroupReady={s => setGroupStats(s)} 
+            onLogout={() => {
+              setIsLoggedIn(false);
+              setShowLanding(true);
+            }} 
+          />
         </motion.div>
       </AnimatePresence>
     );

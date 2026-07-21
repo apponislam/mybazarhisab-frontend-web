@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Providers from "@/components/providers/Providers";
 
 export const metadata: Metadata = {
     title: "My Bazar Hisab — Your Market Account Book",
@@ -14,7 +15,7 @@ export default function RootLayout({
     return (
         <html lang="en" className="h-full antialiased" suppressHydrationWarning={true}>
             <body className="h-full" suppressHydrationWarning={true}>
-                {children}
+                <Providers>{children}</Providers>
             </body>
         </html>
     );

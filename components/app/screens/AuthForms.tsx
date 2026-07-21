@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "motion/react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle, User, Camera, Phone } from "lucide-react";
 import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox } from "@/components/app/ui/Shared";
+import { toast } from "sonner";
+import { useLoginMutation, useRegisterMutation } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/features/auth/authSlice";
 
 export function AuthForms({ onLogin }: { onLogin: () => void }) {
     const [screen, setScreen] = useState<"login" | "register" | "forgot-email" | "forgot-otp" | "forgot-newpass" | "forgot-success">("login");
@@ -12,6 +16,8 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
     const [loginLoading, setLoginLoading] = useState(false);
     const [fE, setFE] = useState(false);
     const [fP, setFP] = useState(false);
+    const dispatch = useAppDispatch();
+    const [loginMutation] = useLoginMutation();
 
     if (screen === "register") return <RegisterScreen onBack={() => setScreen("login")} onDone={onLogin} />;
     if (screen === "forgot-email")
@@ -71,13 +77,25 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
                         Enter your credentials to continue
                     </p>
                     <form
-                        onSubmit={(e) => {
+                        onSubmit={async (e) => {
                             e.preventDefault();
                             setLoginLoading(true);
-                            setTimeout(() => {
-                                setLoginLoading(false);
+                            try {
+                                const res = await loginMutation({ email, password }).unwrap();
+                                const userData = res?.data?.user || res?.user || res?.data;
+                                const token = res?.data?.accessToken || res?.token || res?.accessToken;
+
+                                if (userData && token) {
+                                    dispatch(setUser({ user: userData, token }));
+                                }
+                                toast.success(res?.message || "Login successful!");
                                 onLogin();
-                            }, 1500);
+                            } catch (err: any) {
+                                const errorMessage = err?.data?.message || err?.message || "Login failed. Please check your credentials.";
+                                toast.error(errorMessage);
+                            } finally {
+                                setLoginLoading(false);
+                            }
                         }}
                         className="flex flex-col gap-4"
                     >

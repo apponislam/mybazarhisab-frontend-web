@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle, User, Camera, Phone, ArrowLeft } from "lucide-react";
 import { PrimaryButton } from "@/components/app/ui/Shared";
+import { toast } from "sonner";
+import { useLoginMutation, useRegisterMutation } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/features/auth/authSlice";
 
 // ─── Web Custom Input Field Component ─────────────────────────────────────────
 interface WebInputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -116,14 +120,28 @@ function WebLoginScreen({ onLogin, onBack, onRegister, onForgot }: { onLogin: ()
     const [password, setPassword] = useState("");
     const [showPw, setShowPw] = useState(false);
     const [loading, setLoading] = useState(false);
+    const dispatch = useAppDispatch();
+    const [loginMutation] = useLoginMutation();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            const res = await loginMutation({ email, password }).unwrap();
+            const userData = res?.data?.user || res?.user || res?.data;
+            const token = res?.data?.accessToken || res?.token || res?.accessToken;
+
+            if (userData && token) {
+                dispatch(setUser({ user: userData, token }));
+            }
+            toast.success(res?.message || "Login successful!");
             onLogin();
-        }, 1500);
+        } catch (err: any) {
+            const errorMessage = err?.data?.message || err?.message || "Login failed. Please check your credentials.";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -211,14 +229,29 @@ function WebRegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () 
     const sc = ["", "#ef4444", "#e8a020", "#22c55e"];
     const slb = ["", "Weak", "Fair", "Strong"];
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const dispatch = useAppDispatch();
+    const [registerMutation] = useRegisterMutation();
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (mismatch || password.length < 8) return;
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            const res = await registerMutation({ name, email, phone, password }).unwrap();
+            const userData = res?.data?.user || res?.user || res?.data;
+            const token = res?.data?.accessToken || res?.token || res?.accessToken;
+
+            if (userData && token) {
+                dispatch(setUser({ user: userData, token }));
+            }
+            toast.success(res?.message || "Account created successfully!");
             onDone();
-        }, 1600);
+        } catch (err: any) {
+            const errorMessage = err?.data?.message || err?.message || "Registration failed. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { GroupStats } from "@/types";
+import { useAppSelector } from "@/redux/hooks";
+import { currentUser, currentToken } from "@/redux/features/auth/authSlice";
+import { makeMockStats } from "@/lib/mockData";
 
 // Import new dedicated web/desktop components
 import { WebLandingPage } from "@/components/web/WebLandingPage";
@@ -15,10 +18,20 @@ export default function WebPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  // Core Authentication & Data States
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Redux Authentication State
+  const user = useAppSelector(currentUser);
+  const token = useAppSelector(currentToken);
+  const isLoggedIn = Boolean(user && token);
+
   const [groupStats, setGroupStats] = useState<GroupStats | null>(null);
   const [showLanding, setShowLanding] = useState(true);
+
+  // If user already has a groupId, initialize default group stats
+  useEffect(() => {
+    if (user?.groupId && !groupStats) {
+      setGroupStats(makeMockStats("My Bazar Group"));
+    }
+  }, [user, groupStats]);
 
   // Handle responsiveness dynamically with routing redirects
   useEffect(() => {
@@ -68,7 +81,7 @@ export default function WebPage() {
       <AnimatePresence mode="wait">
         <motion.div key="auth-desktop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="size-full">
           <WebAuthForms 
-            onLogin={() => setIsLoggedIn(true)} 
+            onLogin={() => {}} 
             onBack={() => setShowLanding(true)}
           />
         </motion.div>
@@ -84,7 +97,7 @@ export default function WebPage() {
           <WebGroupPicker 
             onGroupReady={s => setGroupStats(s)} 
             onLogout={() => {
-              setIsLoggedIn(false);
+              setGroupStats(null);
               setShowLanding(true);
             }} 
           />
@@ -100,7 +113,6 @@ export default function WebPage() {
         <WebAppShell 
           stats={groupStats} 
           onLogout={() => {
-            setIsLoggedIn(false);
             setGroupStats(null);
             setShowLanding(true); // Return to landing page on logout
           }} 

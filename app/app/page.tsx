@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { GroupStats } from "@/types";
+import { useAppSelector } from "@/redux/hooks";
+import { currentUser, currentToken } from "@/redux/features/auth/authSlice";
+import { makeMockStats } from "@/lib/mockData";
 
 // Import original mobile-only screens
 import { SplashScreen } from "@/components/app/screens/SplashScreen";
@@ -15,10 +18,20 @@ export default function AppPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  // Core Authentication & Data States
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Redux Authentication State
+  const user = useAppSelector(currentUser);
+  const token = useAppSelector(currentToken);
+  const isLoggedIn = Boolean(user && token);
+
   const [groupStats, setGroupStats] = useState<GroupStats | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+
+  // If user already has a groupId, initialize default group stats
+  useEffect(() => {
+    if (user?.groupId && !groupStats) {
+      setGroupStats(makeMockStats("My Bazar Group"));
+    }
+  }, [user, groupStats]);
 
   // Handle responsiveness dynamically with routing redirects
   useEffect(() => {
@@ -62,7 +75,7 @@ export default function AppPage() {
     return (
       <AnimatePresence mode="wait">
         <motion.div key="auth-mobile" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} className="size-full">
-          <AuthForms onLogin={() => setIsLoggedIn(true)} />
+          <AuthForms onLogin={() => {}} />
         </motion.div>
       </AnimatePresence>
     );
@@ -76,7 +89,7 @@ export default function AppPage() {
           <GroupPickerScreen 
             onGroupReady={s => setGroupStats(s)} 
             onLogout={() => {
-              setIsLoggedIn(false);
+              setGroupStats(null);
             }} 
           />
         </motion.div>

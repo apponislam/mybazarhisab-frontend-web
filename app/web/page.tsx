@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { GroupStats } from "@/types";
-import { useAppSelector } from "@/redux/hooks";
-import { currentUser, currentToken } from "@/redux/features/auth/authSlice";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { currentUser, currentToken, logOut } from "@/redux/features/auth/authSlice";
 import { makeMockStats } from "@/lib/mockData";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
 
 // Import new dedicated web/desktop components
 import { WebLandingPage } from "@/components/web/WebLandingPage";
@@ -17,6 +18,9 @@ import { WebAppShell } from "@/components/web/WebAppShell";
 export default function WebPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  const dispatch = useAppDispatch();
+  const [logoutMutation] = useLogoutMutation();
 
   // Redux Authentication State
   const user = useAppSelector(currentUser);
@@ -112,7 +116,13 @@ export default function WebPage() {
       <motion.div key="app-desktop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }} className="size-full">
         <WebAppShell 
           stats={groupStats} 
-          onLogout={() => {
+          onLogout={async () => {
+            try {
+              await logoutMutation().unwrap();
+            } catch (err) {
+              // ignore
+            }
+            dispatch(logOut());
             setGroupStats(null);
             setShowLanding(true); // Return to landing page on logout
           }} 

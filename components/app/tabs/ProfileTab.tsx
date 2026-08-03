@@ -3,8 +3,22 @@ import { motion } from "motion/react";
 import { User, Shield, Info, Bell, BellOff, Mail, Globe, MapPin, FileText, LogOut, Trash2, AlertTriangle } from "lucide-react";
 import { Toggle, SettingsRow } from "@/components/app/ui/Shared";
 import { initials, avatarColor, MOCK_USERS } from "@/lib/mockData";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { logOut } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile: () => void; onChangePassword: () => void }) {
+    const dispatch = useAppDispatch();
+    const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+    const handleLogout = async () => {
+        try {
+            await logoutMutation().unwrap();
+        } catch (err) {
+            // Proceed anyway
+        }
+        dispatch(logOut());
+    };
+
     const me = MOCK_USERS[0];
     const [pushNotif, setPushNotif] = useState(true);
     const [emailNotif, setEmailNotif] = useState(true);
@@ -79,7 +93,7 @@ export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile:
                             Danger Zone
                         </p>
                     </div>
-                    <SettingsRow icon={<LogOut className="w-4 h-4" />} label="Sign Out" sub="Sign out from this device" onClick={() => {}} danger />
+                    <SettingsRow icon={<LogOut className="w-4 h-4" />} label={isLoggingOut ? "Signing Out..." : "Sign Out"} sub="Sign out from this device" onClick={handleLogout} danger />
                     <div className="h-px mx-4" style={{ background: "rgba(212,24,61,0.15)" }} />
                     <SettingsRow icon={<Trash2 className="w-4 h-4" />} label="Delete Account" sub="Permanently remove your account and data" onClick={() => setShowDeleteConfirm((v) => !v)} danger />
                 </motion.div>

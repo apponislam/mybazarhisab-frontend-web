@@ -9,15 +9,6 @@ type RefreshTokenResponse = {
     };
 };
 
-type SetUserPasswordResponse = {
-    success: boolean;
-    message: string;
-    data: {
-        userId: string;
-        email: string;
-    };
-};
-
 type ValidateReferralResponse = {
     success: boolean;
     message: string;

@@ -82,8 +82,8 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
                             setLoginLoading(true);
                             try {
                                 const res = await loginMutation({ email, password }).unwrap();
-                                const userData = res?.data?.user || res?.user || res?.data;
-                                const token = res?.data?.accessToken || res?.token || res?.accessToken;
+                                const userData = res?.data?.user;
+                                const token = res?.data?.accessToken;
 
                                 if (userData && token) {
                                     dispatch(setUser({ user: userData, token }));

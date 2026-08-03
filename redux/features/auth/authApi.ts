@@ -28,17 +28,23 @@ type ValidateReferralResponse = {
     };
 };
 
+type CommonResponse<T = null> = {
+    success: boolean;
+    message: string;
+    data: T;
+};
+
 const authApi = baseApi.injectEndpoints({
     overrideExisting: true,
     endpoints: (builder) => ({
-        login: builder.mutation({
+        login: builder.mutation<CommonResponse<{ user: TUser; accessToken: string }>, any>({
             query: (userInfo) => ({
                 url: "/auth/login",
                 method: "POST",
                 body: userInfo,
             }),
         }),
-        register: builder.mutation({
+        register: builder.mutation<CommonResponse<{ user: TUser; accessToken: string }>, any>({
             query: (userInfo) => ({
                 url: "/auth/register",
                 method: "POST",
@@ -52,7 +58,7 @@ const authApi = baseApi.injectEndpoints({
                 credentials: "include",
             }),
         }),
-        logout: builder.mutation<void, void>({
+        logout: builder.mutation<CommonResponse, void>({
             query: () => ({
                 url: "/auth/logout",
                 method: "POST",
@@ -66,37 +72,66 @@ const authApi = baseApi.injectEndpoints({
             }),
         }),
         // === Forgot password endpoints ===
-        forgotPassword: builder.mutation<{ success: boolean; message: string }, { phone: string }>({
+        forgotPassword: builder.mutation<CommonResponse, { email: string }>({
             query: (body) => ({
                 url: "/auth/forgot-password",
                 method: "POST",
                 body,
             }),
         }),
-        resetPassword: builder.mutation<{ success: boolean; message: string }, { phone: string; otp: string; newPassword: string }>({
+        verifyOtp: builder.mutation<CommonResponse<{ token: string }>, { email: string; otp: string }>({
+            query: (body) => ({
+                url: "/auth/verify-otp",
+                method: "POST",
+                body,
+            }),
+        }),
+        resendOtp: builder.mutation<CommonResponse, { email: string }>({
+            query: (body) => ({
+                url: "/auth/resend-otp",
+                method: "POST",
+                body,
+            }),
+        }),
+        resetPassword: builder.mutation<CommonResponse, { token?: string; newPassword: string }>({
             query: (body) => ({
                 url: "/auth/reset-password",
                 method: "POST",
                 body,
             }),
         }),
-        verifyEmail: builder.query({
-            query: ({ userId, token }: { userId: string; token: string }) => ({
+        verifyEmail: builder.query<CommonResponse, { email: string; token?: string; otp?: string }>({
+            query: ({ email, token, otp }) => ({
                 url: `/auth/verify-email`,
                 method: "GET",
-                params: { token, id: userId },
+                params: { email, token, otp },
+            }),
+        }),
+        resendVerificationEmail: builder.mutation<CommonResponse, { email: string }>({
+            query: (body) => ({
+                url: "/auth/resend-verification",
+                method: "POST",
+                body,
             }),
         }),
 
-        setUserPasswordByAdmin: builder.mutation<{ success: boolean; message: string; data: null }, { userId: string; password: string }>({
-            query: ({ userId, password }) => ({
-                url: `/auth/set-password/${userId}`,
-                method: "POST",
-                body: { password },
+        // === Profile & User Management ===
+        getMe: builder.query<CommonResponse<TUser>, void>({
+            query: () => ({
+                url: "/auth/me",
+                method: "GET",
                 credentials: "include",
             }),
         }),
-        changePassword: builder.mutation<{ success: boolean; message: string; data: null }, { currentPassword: string; newPassword: string }>({
+        updateProfile: builder.mutation<CommonResponse<TUser>, any>({
+            query: (body) => ({
+                url: "/auth/profile",
+                method: "PATCH",
+                body,
+                credentials: "include",
+            }),
+        }),
+        changePassword: builder.mutation<CommonResponse, { currentPassword: string; newPassword: string }>({
             query: (body) => ({
                 url: "/auth/change-password",
                 method: "POST",
@@ -104,7 +139,75 @@ const authApi = baseApi.injectEndpoints({
                 credentials: "include",
             }),
         }),
+        updateEmail: builder.mutation<CommonResponse, { email: string; password?: string }>({
+            query: (body) => ({
+                url: "/auth/update-email",
+                method: "POST",
+                body,
+                credentials: "include",
+            }),
+        }),
+        verifyNewEmail: builder.query<CommonResponse, { email: string; token: string }>({
+            query: ({ email, token }) => ({
+                url: "/auth/verify-new-email",
+                method: "GET",
+                params: { email, token },
+            }),
+        }),
+        resendEmailUpdate: builder.mutation<CommonResponse, { password?: string }>({
+            query: (body) => ({
+                url: "/auth/resend-email-update",
+                method: "POST",
+                body,
+                credentials: "include",
+            }),
+        }),
+        deleteAccount: builder.mutation<CommonResponse, void>({
+            query: () => ({
+                url: "/auth/me",
+                method: "DELETE",
+                credentials: "include",
+            }),
+        }),
+
+        // === Admin Actions ===
+        setUserPasswordByAdmin: builder.mutation<CommonResponse, { userId: string; password?: string }>({
+            query: ({ userId, password }) => ({
+                url: `/auth/set-password/${userId}`,
+                method: "POST",
+                body: { password },
+                credentials: "include",
+            }),
+        }),
+        deleteUserByAdmin: builder.mutation<CommonResponse, string>({
+            query: (userId) => ({
+                url: `/auth/${userId}`,
+                method: "DELETE",
+                credentials: "include",
+            }),
+        }),
     }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useRefreshTokenMutation, useLogoutMutation, useForgotPasswordMutation, useResetPasswordMutation, useVerifyEmailQuery, useSetUserPasswordByAdminMutation, useValidateReferralCodeQuery, useChangePasswordMutation } = authApi;
+export const {
+    useLoginMutation,
+    useRegisterMutation,
+    useRefreshTokenMutation,
+    useLogoutMutation,
+    useForgotPasswordMutation,
+    useVerifyOtpMutation,
+    useResendOtpMutation,
+    useResetPasswordMutation,
+    useVerifyEmailQuery,
+    useResendVerificationEmailMutation,
+    useGetMeQuery,
+    useUpdateProfileMutation,
+    useChangePasswordMutation,
+    useUpdateEmailMutation,
+    useVerifyNewEmailQuery,
+    useResendEmailUpdateMutation,
+    useDeleteAccountMutation,
+    useSetUserPasswordByAdminMutation,
+    useDeleteUserByAdminMutation,
+    useValidateReferralCodeQuery,
+} = authApi;

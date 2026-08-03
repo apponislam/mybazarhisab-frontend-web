@@ -93,75 +93,75 @@ export type CreateBazarEntryPayload = {
 const bazarEntryApi = baseApi.injectEndpoints({
     overrideExisting: true,
     endpoints: (builder) => ({
-        // POST /bazar-entry
+        // POST /bazar-entries
         createBazarEntry: builder.mutation<CommonResponse<TBazarEntry>, CreateBazarEntryPayload>({
             query: (body) => ({
-                url: "/bazar-entry",
+                url: "/bazar-entries",
                 method: "POST",
                 body,
             }),
             invalidatesTags: ["BazarEntry", "BazarEntryStats"],
         }),
 
-        // POST /bazar-entry/bulk
+        // POST /bazar-entries/bulk
         createBulkBazarEntries: builder.mutation<
             CommonResponse<{ count: number; entries: TBazarEntry[] }>,
             { entries: CreateBazarEntryPayload[] }
         >({
             query: (body) => ({
-                url: "/bazar-entry/bulk",
+                url: "/bazar-entries/bulk",
                 method: "POST",
                 body,
             }),
             invalidatesTags: ["BazarEntry", "BazarEntryStats"],
         }),
 
-        // GET /bazar-entry
+        // GET /bazar-entries
         getAllBazarEntries: builder.query<CommonResponse<TBazarEntry[]>, BazarEntryQueryParams | void>({
             query: (params) => ({
-                url: "/bazar-entry",
+                url: "/bazar-entries",
                 method: "GET",
                 params: params || undefined,
             }),
             providesTags: ["BazarEntry"],
         }),
 
-        // GET /bazar-entry/stats
+        // GET /bazar-entries/stats
         getBazarEntryStats: builder.query<
             CommonResponse<{ totalEntries: number; totalAmount: number }>,
             BazarEntryStatsParams | void
         >({
             query: (params) => ({
-                url: "/bazar-entry/stats",
+                url: "/bazar-entries/stats",
                 method: "GET",
                 params: params || undefined,
             }),
             providesTags: ["BazarEntryStats"],
         }),
 
-        // GET /bazar-entry/:id
+        // GET /bazar-entries/:id
         getBazarEntryById: builder.query<CommonResponse<TBazarEntry>, string>({
             query: (id) => ({
-                url: `/bazar-entry/${id}`,
+                url: `/bazar-entries/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "BazarEntry", id }],
         }),
 
-        // PATCH /bazar-entry/:id
+        // PATCH /bazar-entries/:id
         updateBazarEntry: builder.mutation<CommonResponse<TBazarEntry>, { id: string; data: Partial<CreateBazarEntryPayload> }>({
             query: ({ id, data }) => ({
-                url: `/bazar-entry/${id}`,
+                url: `/bazar-entries/${id}`,
                 method: "PATCH",
                 body: data,
             }),
             invalidatesTags: ["BazarEntry", "BazarEntryStats"],
         }),
 
-        // DELETE /bazar-entry/:id
+        // DELETE /bazar-entries/:id
         deleteBazarEntry: builder.mutation<CommonResponse<TBazarEntry>, string>({
             query: (id) => ({
-                url: `/bazar-entry/${id}`,
+                url: `/bazar-entries/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["BazarEntry", "BazarEntryStats"],
@@ -169,20 +169,20 @@ const bazarEntryApi = baseApi.injectEndpoints({
 
         // ── Admin Routes ───────────────────────────────────────────────────────
 
-        // GET /bazar-entry/admin
+        // GET /bazar-entries/admin
         getAllBazarEntriesByAdmin: builder.query<CommonResponse<TBazarEntry[]>, BazarEntryAdminQueryParams | void>({
             query: (params) => ({
-                url: "/bazar-entry/admin",
+                url: "/bazar-entries/admin",
                 method: "GET",
                 params: params || undefined,
             }),
             providesTags: ["BazarEntry"],
         }),
 
-        // GET /bazar-entry/admin/:id
+        // GET /bazar-entries/admin/:id
         getBazarEntryByIdByAdmin: builder.query<CommonResponse<TBazarEntry>, string>({
             query: (id) => ({
-                url: `/bazar-entry/admin/${id}`,
+                url: `/bazar-entries/admin/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "BazarEntry", id }],

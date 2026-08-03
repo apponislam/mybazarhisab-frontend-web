@@ -1,0 +1,106 @@
+import { baseApi } from "../../api/baseApi";
+
+// ── Types ──────────────────────────────────────────────────────────────────────
+
+export type TDashboardMonthlyTrend = {
+    label: string;
+    bazarExpense: number;
+    billExpense: number;
+    totalExpense: number;
+};
+
+export type TProductPricePoint = {
+    date: string;
+    pricePerUnit: number;
+    unit: string;
+    notes?: string;
+};
+
+export type TMeta = {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+};
+
+type CommonResponse<T = null> = {
+    success: boolean;
+    message: string;
+    data: T;
+    meta?: TMeta;
+};
+
+export type MonthlyTrendParams = {
+    view?: string; // "monthly" or default yearly
+};
+
+export type ProductPriceGrowthParams = {
+    productId: string;
+    page?: number;
+    limit?: number;
+};
+
+export type StatementParams = {
+    startDate?: string;
+    endDate?: string;
+    year?: string;
+};
+
+// ── API ────────────────────────────────────────────────────────────────────────
+
+const dashboardApi = baseApi.injectEndpoints({
+    overrideExisting: true,
+    endpoints: (builder) => ({
+        // GET /dashboard/admin-stats (Admin)
+        getAdminDashboardStats: builder.query<CommonResponse<any>, void>({
+            query: () => ({
+                url: "/dashboard/admin-stats",
+                method: "GET",
+            }),
+            providesTags: ["Dashboard"],
+        }),
+
+        // GET /dashboard/user-stats
+        getUserDashboardStats: builder.query<CommonResponse<any>, void>({
+            query: () => ({
+                url: "/dashboard/user-stats",
+                method: "GET",
+            }),
+            providesTags: ["Dashboard"],
+        }),
+
+        // GET /dashboard/monthly-trend
+        getMonthlyExpenseTrend: builder.query<CommonResponse<TDashboardMonthlyTrend[]>, MonthlyTrendParams | void>({
+            query: (params) => ({
+                url: "/dashboard/monthly-trend",
+                method: "GET",
+                params: params || undefined,
+            }),
+            providesTags: ["Dashboard"],
+        }),
+
+        // GET /dashboard/product-price-growth/:productId
+        getProductPriceGrowthTrend: builder.query<CommonResponse<TProductPricePoint[]>, ProductPriceGrowthParams>({
+            query: ({ productId, ...params }) => ({
+                url: `/dashboard/product-price-growth/${productId}`,
+                method: "GET",
+                params,
+            }),
+            providesTags: ["Dashboard"],
+        }),
+
+        // GET /dashboard/statement (returns PDF blob)
+        getStatementPdf: builder.query<Blob, StatementParams | void>({
+            query: (params) => ({
+                url: "/dashboard/statement",
+                method: "GET",
+                params: params || undefined,
+                responseHandler: (response: Response) => response.blob(),
+            }),
+        }),
+    }),
+});
+
+export const { useGetAdminDashboardStatsQuery, useGetUserDashboardStatsQuery, useGetMonthlyExpenseTrendQuery, useGetProductPriceGrowthTrendQuery, useGetStatementPdfQuery } = dashboardApi;

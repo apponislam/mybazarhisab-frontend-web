@@ -2,27 +2,7 @@ import { baseApi } from "../../api/baseApi";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-export type BillCategory =
-    | "RENT"
-    | "TRAVEL"
-    | "WIFI"
-    | "ELECTRICITY"
-    | "GAS"
-    | "WATER"
-    | "MAID"
-    | "MAINTENANCE"
-    | "SUBSCRIPTION"
-    | "MOBILE"
-    | "MEDICAL"
-    | "EDUCATION"
-    | "SHOPPING"
-    | "ENTERTAINMENT"
-    | "LAUNDRY"
-    | "LOAN_EMI"
-    | "SALON_GROOMING"
-    | "GIFTS_FESTIVALS"
-    | "UTILITIES"
-    | "OTHERS";
+export type BillCategory = "RENT" | "TRAVEL" | "WIFI" | "ELECTRICITY" | "GAS" | "WATER" | "MAID" | "MAINTENANCE" | "SUBSCRIPTION" | "MOBILE" | "MEDICAL" | "EDUCATION" | "SHOPPING" | "ENTERTAINMENT" | "LAUNDRY" | "LOAN_EMI" | "SALON_GROOMING" | "GIFTS_FESTIVALS" | "UTILITIES" | "OTHERS";
 
 export type TBillUser = {
     _id: string;
@@ -104,75 +84,69 @@ export type CreateBillPayload = {
 const billApi = baseApi.injectEndpoints({
     overrideExisting: true,
     endpoints: (builder) => ({
-        // POST /bill
+        // POST /bills
         createBill: builder.mutation<CommonResponse<TBill>, CreateBillPayload>({
             query: (body) => ({
-                url: "/bill",
+                url: "/bills",
                 method: "POST",
                 body,
             }),
             invalidatesTags: ["Bill", "BillStats"],
         }),
 
-        // POST /bill/bulk
-        createBulkBills: builder.mutation<
-            CommonResponse<{ count: number; bills: TBill[] }>,
-            { bills: CreateBillPayload[] }
-        >({
+        // POST /bills/bulk
+        createBulkBills: builder.mutation<CommonResponse<{ count: number; bills: TBill[] }>, { bills: CreateBillPayload[] }>({
             query: (body) => ({
-                url: "/bill/bulk",
+                url: "/bills/bulk",
                 method: "POST",
                 body,
             }),
             invalidatesTags: ["Bill", "BillStats"],
         }),
 
-        // GET /bill
+        // GET /bills
         getAllBills: builder.query<CommonResponse<TBill[]>, BillQueryParams | void>({
             query: (params) => ({
-                url: "/bill",
+                url: "/bills",
                 method: "GET",
                 params: params || undefined,
             }),
             providesTags: ["Bill"],
         }),
 
-        // GET /bill/stats
-        getBillStats: builder.query<
-            CommonResponse<{ totalEntries: number; totalAmount: number }>,
-            BillStatsParams | void
-        >({
+        // GET /bills/stats
+        getBillStats: builder.query<CommonResponse<{ totalEntries: number; totalAmount: number }>, BillStatsParams | void>({
             query: (params) => ({
-                url: "/bill/stats",
+                url: "/bills/stats",
                 method: "GET",
                 params: params || undefined,
             }),
             providesTags: ["BillStats"],
         }),
 
-        // GET /bill/:id
+        // GET /bills/:id
         getBillById: builder.query<CommonResponse<TBill>, string>({
             query: (id) => ({
-                url: `/bill/${id}`,
+                url: `/bills/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Bill", id }],
         }),
 
-        // PATCH /bill/:id
+        // PATCH /bills/:id
         updateBill: builder.mutation<CommonResponse<TBill>, { id: string; data: Partial<CreateBillPayload> }>({
             query: ({ id, data }) => ({
-                url: `/bill/${id}`,
+                url: `/bills/${id}`,
                 method: "PATCH",
                 body: data,
             }),
             invalidatesTags: ["Bill", "BillStats"],
         }),
 
-        // DELETE /bill/:id
+        // DELETE /bills/:id
         deleteBill: builder.mutation<CommonResponse<TBill>, string>({
             query: (id) => ({
-                url: `/bill/${id}`,
+                url: `/bills/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Bill", "BillStats"],
@@ -180,20 +154,20 @@ const billApi = baseApi.injectEndpoints({
 
         // ── Admin Routes ───────────────────────────────────────────────────────
 
-        // GET /bill/admin
+        // GET /bills/admin
         getAllBillsByAdmin: builder.query<CommonResponse<TBill[]>, BillAdminQueryParams | void>({
             query: (params) => ({
-                url: "/bill/admin",
+                url: "/bills/admin",
                 method: "GET",
                 params: params || undefined,
             }),
             providesTags: ["Bill"],
         }),
 
-        // GET /bill/admin/:id
+        // GET /bills/admin/:id
         getBillByIdByAdmin: builder.query<CommonResponse<TBill>, string>({
             query: (id) => ({
-                url: `/bill/admin/${id}`,
+                url: `/bills/admin/${id}`,
                 method: "GET",
             }),
             providesTags: (_result, _error, id) => [{ type: "Bill", id }],
@@ -201,14 +175,4 @@ const billApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {
-    useCreateBillMutation,
-    useCreateBulkBillsMutation,
-    useGetAllBillsQuery,
-    useGetBillStatsQuery,
-    useGetBillByIdQuery,
-    useUpdateBillMutation,
-    useDeleteBillMutation,
-    useGetAllBillsByAdminQuery,
-    useGetBillByIdByAdminQuery,
-} = billApi;
+export const { useCreateBillMutation, useCreateBulkBillsMutation, useGetAllBillsQuery, useGetBillStatsQuery, useGetBillByIdQuery, useUpdateBillMutation, useDeleteBillMutation, useGetAllBillsByAdminQuery, useGetBillByIdByAdminQuery } = billApi;

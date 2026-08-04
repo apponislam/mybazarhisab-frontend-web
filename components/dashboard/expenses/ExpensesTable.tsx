@@ -118,10 +118,14 @@ export function ExpensesTable({
                                         <td className="p-4">
                                             <div className="flex items-center gap-2">
                                                 <div
-                                                    className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0"
+                                                    className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0"
                                                     style={{ background: avatarColor(e.user?._id || "") }}
                                                 >
-                                                    {initials(userName)}
+                                                    {e.user?.profileImage ? (
+                                                        <img src={e.user.profileImage} alt={userName} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        initials(userName)
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <p className="text-xs font-semibold">{userName}</p>

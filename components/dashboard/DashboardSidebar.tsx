@@ -16,6 +16,8 @@ import {
     LogOut,
 } from "lucide-react";
 
+import { useGetMeQuery } from "@/redux/features/auth/authApi";
+
 interface DashboardSidebarProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
@@ -23,6 +25,22 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarProps) {
     const router = useRouter();
+    const { data: userData } = useGetMeQuery();
+    const user = userData?.data;
+
+    const userName = user?.name || "Admin User";
+    const userEmail = user?.email || "admin@mybazarhisab.com";
+    const profileImage = user?.profileImage;
+
+    function initials(name: string) {
+        if (!name) return "AU";
+        return name
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+    }
 
     const navItems = [
         { id: "overview", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" />, href: "/dashboard" },
@@ -79,10 +97,16 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
 
             {/* User Details Footer */}
             <div className="p-4 border-t border-[rgba(232,160,32,0.1)] flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-sm text-primary-foreground">AH</div>
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0 shadow-md">
+                    {profileImage ? (
+                        <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
+                    ) : (
+                        initials(userName)
+                    )}
+                </div>
                 <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold truncate">Ahmed Hassan</h4>
-                    <p className="text-[10px] text-muted-foreground truncate font-mono">ahmed@email.com</p>
+                    <h4 className="text-xs font-bold truncate text-foreground">{userName}</h4>
+                    <p className="text-[10px] text-muted-foreground truncate font-mono">{userEmail}</p>
                 </div>
                 <button
                     onClick={() => router.push("/login")}

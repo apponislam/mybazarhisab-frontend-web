@@ -90,10 +90,14 @@ export function ReviewsTable({ reviews, isLoading, onDeleteReview }: ReviewsTabl
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
                                             <div
-                                                className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md"
+                                                className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md"
                                                 style={{ background: avatarColor(rev.user?._id || "") }}
                                             >
-                                                {initials(rev.user?.name || "User")}
+                                                {rev.user?.profileImage ? (
+                                                    <img src={rev.user.profileImage} alt={rev.user.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    initials(rev.user?.name || "User")
+                                                )}
                                             </div>
                                             <div>
                                                 <h4 className="font-semibold text-foreground">{rev.user?.name || "Anonymous User"}</h4>

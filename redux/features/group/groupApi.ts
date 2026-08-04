@@ -21,10 +21,26 @@ export type TGroup = {
     updatedAt: string;
 };
 
+export type TMeta = {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+};
+
 type CommonResponse<T = null> = {
     success: boolean;
     message: string;
     data: T;
+    meta?: TMeta;
+};
+
+export type GroupAdminQueryParams = {
+    searchTerm?: string;
+    page?: number;
+    limit?: number;
 };
 
 // ── API ────────────────────────────────────────────────────────────────────────
@@ -97,7 +113,58 @@ const groupApi = baseApi.injectEndpoints({
             }),
             providesTags: ["Group"],
         }),
+
+        // ── Admin Endpoints ────────────────────────────────────────────────────
+
+        // GET /groups/admin/all
+        getAllGroupsAdmin: builder.query<CommonResponse<TGroup[]>, GroupAdminQueryParams | void>({
+            query: (params) => ({
+                url: "/groups/admin/all",
+                method: "GET",
+                params: params || undefined,
+            }),
+            providesTags: ["Group"],
+        }),
+
+        // GET /groups/admin/:id
+        getGroupByIdAdmin: builder.query<CommonResponse<TGroup>, string>({
+            query: (id) => ({
+                url: `/groups/admin/${id}`,
+                method: "GET",
+            }),
+            providesTags: (_result, _error, id) => [{ type: "Group", id }],
+        }),
+
+        // DELETE /groups/admin/:id
+        deleteGroupByAdmin: builder.mutation<CommonResponse<TGroup>, string>({
+            query: (id) => ({
+                url: `/groups/admin/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Group"],
+        }),
+
+        // DELETE /groups/admin/:groupId/members/:userId
+        removeMemberByAdmin: builder.mutation<CommonResponse<TGroup>, { groupId: string; userId: string }>({
+            query: ({ groupId, userId }) => ({
+                url: `/groups/admin/${groupId}/members/${userId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Group"],
+        }),
     }),
 });
 
-export const { useCreateGroupMutation, useJoinGroupMutation, useLeaveGroupMutation, useUpdateGroupMutation, useGenerateInviteCodeMutation, useGetMyGroupQuery, useCheckGroupMembershipQuery } = groupApi;
+export const {
+    useCreateGroupMutation,
+    useJoinGroupMutation,
+    useLeaveGroupMutation,
+    useUpdateGroupMutation,
+    useGenerateInviteCodeMutation,
+    useGetMyGroupQuery,
+    useCheckGroupMembershipQuery,
+    useGetAllGroupsAdminQuery,
+    useGetGroupByIdAdminQuery,
+    useDeleteGroupByAdminMutation,
+    useRemoveMemberByAdminMutation,
+} = groupApi;

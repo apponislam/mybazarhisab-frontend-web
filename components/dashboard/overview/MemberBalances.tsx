@@ -4,7 +4,7 @@ import React from "react";
 import { fmtFull } from "@/lib/mockData";
 
 interface MemberSplit {
-    user: { id: string; name: string };
+    user: { id: string; name: string; profileImage?: string };
     spent: number;
     balance: number;
 }
@@ -17,10 +17,12 @@ export function MemberBalances({ memberSplits }: MemberBalancesProps) {
     const AVATAR_COLORS = ["#c06010", "#8b6914", "#3d7a5c", "#5a4a8a", "#7a3d3d"];
 
     function avatarColor(id: string) {
-        return AVATAR_COLORS[id.charCodeAt(1) % AVATAR_COLORS.length];
+        if (!id) return AVATAR_COLORS[0];
+        return AVATAR_COLORS[id.charCodeAt(id.length - 1) % AVATAR_COLORS.length];
     }
 
     function initials(name: string) {
+        if (!name) return "U";
         return name
             .split(" ")
             .map((w) => w[0])
@@ -40,8 +42,12 @@ export function MemberBalances({ memberSplits }: MemberBalancesProps) {
                     return (
                         <div key={s.user.id} className="p-4 rounded-2xl border border-[rgba(232,160,32,0.08)] bg-[#1a0e07] flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-inner text-xs" style={{ background: avatarColor(s.user.id) }}>
-                                    {initials(s.user.name)}
+                                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center font-bold text-white shadow-inner text-xs shrink-0" style={{ background: avatarColor(s.user.id) }}>
+                                    {s.user.profileImage ? (
+                                        <img src={s.user.profileImage} alt={s.user.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        initials(s.user.name)
+                                    )}
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-semibold">{s.user.name}</h4>

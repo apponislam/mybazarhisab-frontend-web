@@ -70,7 +70,9 @@ export function ProductTable({ products, isLoading, searchTerm, onViewDetails, o
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-[10px] text-muted-foreground font-mono">ID: {product._id.slice(-8)}</p>
+                                            <p className="text-[10px] text-muted-foreground font-mono select-all" title={product._id}>
+                                                ID: {product._id}
+                                            </p>
                                         </div>
                                     </div>
                                 </td>

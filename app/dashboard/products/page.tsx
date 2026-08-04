@@ -110,16 +110,21 @@ export default function DashboardProductsPage() {
                             <input
                                 type="text"
                                 value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
-                                placeholder="Search by product name or description…"
-                                className="w-full pl-10 pr-24 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground transition-colors"
+                                onChange={(e) => {
+                                    setSearchInput(e.target.value);
+                                    setSearchTerm(e.target.value.trim());
+                                    setPage(1);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        setPage(1);
+                                        setSearchTerm(searchInput.trim());
+                                    }
+                                }}
+                                placeholder="Search products (Press Enter to search)…"
+                                className="w-full pl-10 pr-4 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground transition-colors"
                             />
-                            <button
-                                type="submit"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-accent transition-all cursor-pointer"
-                            >
-                                Search
-                            </button>
                         </form>
 
                         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">

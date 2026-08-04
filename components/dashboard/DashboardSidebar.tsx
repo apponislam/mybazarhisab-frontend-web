@@ -21,12 +21,12 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
     const router = useRouter();
 
     const navItems = [
-        { id: "overview", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
-        { id: "expenses", label: "Bazar Expenses", icon: <ShoppingBag className="w-4 h-4" /> },
-        { id: "bills", label: "Monthly Bills", icon: <Receipt className="w-4 h-4" /> },
+        { id: "overview", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" />, href: "/dashboard" },
+        { id: "expenses", label: "Bazar Expenses", icon: <ShoppingBag className="w-4 h-4" />, href: "/dashboard/expenses" },
+        { id: "bills", label: "Monthly Bills", icon: <Receipt className="w-4 h-4" />, href: "/dashboard/bills" },
         { id: "products", label: "Products Catalog", icon: <Package className="w-4 h-4" />, href: "/dashboard/products" },
-        { id: "members", label: "Group Members", icon: <Users className="w-4 h-4" /> },
-        { id: "settings", label: "Account Settings", icon: <Settings className="w-4 h-4" /> },
+        { id: "members", label: "Group Members", icon: <Users className="w-4 h-4" />, href: "/dashboard/members" },
+        { id: "settings", label: "Account Settings", icon: <Settings className="w-4 h-4" />, href: "/dashboard/settings" },
     ];
 
     return (
@@ -52,11 +52,8 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
                         <button
                             key={item.id}
                             onClick={() => {
-                                if (item.href) {
-                                    router.push(item.href);
-                                } else {
-                                    onTabChange(item.id);
-                                }
+                                onTabChange(item.id);
+                                router.push(item.href);
                             }}
                             className="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-left"
                             style={{

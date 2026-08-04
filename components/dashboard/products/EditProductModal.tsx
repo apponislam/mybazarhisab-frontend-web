@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Edit2, X } from "lucide-react";
 import { toast } from "sonner";
 import { TProduct, CreateProductPayload, useUpdateProductMutation } from "@/redux/features/product/productApi";
+import { ImageUpload } from "./ImageUpload";
 
 interface EditProductModalProps {
     product: TProduct | null;
@@ -98,16 +99,12 @@ export function EditProductModal({ product, onClose }: EditProductModalProps) {
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Photo Image URL</label>
-                                <input
-                                    type="url"
-                                    value={formData.photo}
-                                    onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
-                                    placeholder="https://example.com/image.png"
-                                    className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 font-mono text-xs text-foreground"
-                                />
-                            </div>
+                            <ImageUpload
+                                value={formData.photo}
+                                onChange={(url) => setFormData({ ...formData, photo: url })}
+                                onRemove={() => setFormData({ ...formData, photo: "" })}
+                                label="Product Photo (Cloudinary Upload)"
+                            />
 
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Description</label>

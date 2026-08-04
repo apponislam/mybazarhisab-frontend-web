@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
+import { UploadCloud, X, Loader2, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 interface ImageUploadProps {
@@ -9,9 +9,10 @@ interface ImageUploadProps {
     onChange: (url: string) => void;
     onRemove?: () => void;
     label?: string;
+    variant?: "circle" | "square";
 }
 
-export function ImageUpload({ value, onChange, onRemove, label = "Product Photo" }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, onRemove, label = "Photo", variant = "square" }: ImageUploadProps) {
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,20 +62,24 @@ export function ImageUpload({ value, onChange, onRemove, label = "Product Photo"
         }
     };
 
+    const isCircle = variant === "circle";
+    const shapeClass = isCircle ? "rounded-full" : "rounded-3xl";
+
     return (
-        <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-muted-foreground">{label}</label>
+        <div className={`flex flex-col gap-1.5 font-sans ${isCircle ? "items-center text-center" : ""}`}>
+            {label && <label className="text-xs font-semibold text-muted-foreground">{label}</label>}
 
             {value ? (
-                <div className="relative w-full h-44 rounded-2xl border border-border bg-[#1a0e07] overflow-hidden group flex items-center justify-center">
-                    <img src={value} alt="Product photo" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                /* Image Preview Container */
+                <div className={`relative w-36 h-36 sm:w-40 sm:h-40 ${shapeClass} border-2 border-primary/40 bg-[#1a0e07] overflow-hidden group shadow-xl flex items-center justify-center shrink-0`}>
+                    <img src={value} alt="Uploaded photo" className={`w-full h-full object-cover ${shapeClass}`} />
+                    <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2 ${shapeClass}`}>
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="px-3.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-accent transition-colors cursor-pointer shadow-md"
+                            className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-[11px] font-bold hover:bg-accent transition-colors cursor-pointer shadow-md"
                         >
-                            Change Photo
+                            Change
                         </button>
                         <button
                             type="button"
@@ -82,7 +87,7 @@ export function ImageUpload({ value, onChange, onRemove, label = "Product Photo"
                                 onChange("");
                                 onRemove?.();
                             }}
-                            className="p-2 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer shadow-md"
+                            className="p-1.5 rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors cursor-pointer shadow-md"
                             title="Remove photo"
                         >
                             <X className="w-4 h-4" />
@@ -90,25 +95,26 @@ export function ImageUpload({ value, onChange, onRemove, label = "Product Photo"
                     </div>
                 </div>
             ) : (
+                /* Upload Box Container */
                 <div
                     onClick={() => !uploading && fileInputRef.current?.click()}
-                    className={`w-full h-36 rounded-2xl border-2 border-dashed border-border hover:border-primary/60 bg-[#1a0e07] flex flex-col items-center justify-center p-4 text-center cursor-pointer transition-all ${
+                    className={`w-36 h-36 sm:w-40 sm:h-40 ${shapeClass} border-2 border-dashed border-border hover:border-primary/60 bg-[#1a0e07] flex flex-col items-center justify-center p-3 text-center cursor-pointer transition-all shrink-0 ${
                         uploading ? "opacity-60 pointer-events-none" : ""
                     }`}
                 >
                     {uploading ? (
                         <div className="flex flex-col items-center gap-2">
-                            <Loader2 className="w-7 h-7 text-primary animate-spin" />
-                            <p className="text-xs font-mono text-primary font-semibold">Uploading to Cloudinary…</p>
+                            <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                            <p className="text-[10px] font-mono text-primary font-semibold">Uploading…</p>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center gap-2">
-                            <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                                <UploadCloud className="w-5 h-5" />
+                            <div className={`w-10 h-10 ${isCircle ? "rounded-full" : "rounded-2xl"} bg-primary/10 border border-primary/20 flex items-center justify-center text-primary`}>
+                                {isCircle ? <Camera className="w-5 h-5" /> : <UploadCloud className="w-5 h-5" />}
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-foreground">Click or drop file to upload</p>
-                                <p className="text-[10px] text-muted-foreground font-mono mt-0.5">Direct Cloudinary upload (PNG, JPG, WEBP)</p>
+                                <p className="text-xs font-bold text-foreground leading-tight">Upload Photo</p>
+                                <p className="text-[9px] text-muted-foreground font-mono mt-0.5">Cloudinary (PNG, JPG)</p>
                             </div>
                         </div>
                     )}

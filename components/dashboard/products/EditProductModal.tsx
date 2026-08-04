@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Edit2, X } from "lucide-react";
 import { toast } from "sonner";
 import { TProduct, CreateProductPayload, useUpdateProductMutation } from "@/redux/features/product/productApi";
-import { ImageUpload } from "./ImageUpload";
+import { ImageUpload } from "@/components/dashboard/ImageUpload";
 
 interface EditProductModalProps {
     product: TProduct | null;

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { CreateProductPayload, useCreateProductMutation } from "@/redux/features/product/productApi";
-import { ImageUpload } from "./ImageUpload";
+import { ImageUpload } from "@/components/dashboard/ImageUpload";
 
 interface CreateProductModalProps {
     show: boolean;

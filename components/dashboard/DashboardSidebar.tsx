@@ -24,7 +24,7 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
     const navItems = [
         { id: "overview", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" />, href: "/dashboard" },
         { id: "expenses", label: "Bazar Expenses", icon: <ShoppingBag className="w-4 h-4" />, href: "/dashboard/expenses" },
-        { id: "bills", label: "Monthly Bills", icon: <Receipt className="w-4 h-4" />, href: "/dashboard/bills" },
+        { id: "bills", label: "All Bills", icon: <Receipt className="w-4 h-4" />, href: "/dashboard/bills" },
         { id: "products", label: "Products Catalog", icon: <Package className="w-4 h-4" />, href: "/dashboard/products" },
         { id: "contacts", label: "Support Messages", icon: <Mail className="w-4 h-4" />, href: "/dashboard/contacts" },
         { id: "members", label: "Group Members", icon: <Users className="w-4 h-4" />, href: "/dashboard/members" },

@@ -2,34 +2,71 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X } from "lucide-react";
-import { BillCategory } from "@/types";
-import { BILL_META } from "@/lib/mockData";
+import { X, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { BillCategory, useCreateBillMutation } from "@/redux/features/bill/billApi";
 
 interface AddBillModalProps {
     show: boolean;
     onClose: () => void;
-    onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void;
 }
 
-export function AddBillModal({ show, onClose, onSubmit }: AddBillModalProps) {
+const CATEGORY_OPTIONS: { key: BillCategory; label: string }[] = [
+    { key: "RENT", label: "House Rent" },
+    { key: "TRAVEL", label: "Travel / Transport" },
+    { key: "WIFI", label: "WiFi / Internet" },
+    { key: "ELECTRICITY", label: "Electricity" },
+    { key: "GAS", label: "Gas Bill" },
+    { key: "WATER", label: "Water Bill" },
+    { key: "MAID", label: "Maid / Staff" },
+    { key: "MAINTENANCE", label: "Maintenance" },
+    { key: "SUBSCRIPTION", label: "Subscriptions" },
+    { key: "MOBILE", label: "Mobile Recharge" },
+    { key: "MEDICAL", label: "Medical" },
+    { key: "EDUCATION", label: "Education" },
+    { key: "SHOPPING", label: "Shopping" },
+    { key: "ENTERTAINMENT", label: "Entertainment" },
+    { key: "LAUNDRY", label: "Laundry" },
+    { key: "LOAN_EMI", label: "Loan EMI" },
+    { key: "SALON_GROOMING", label: "Salon & Grooming" },
+    { key: "GIFTS_FESTIVALS", label: "Gifts & Festivals" },
+    { key: "UTILITIES", label: "Utilities" },
+    { key: "OTHERS", label: "Others" },
+];
+
+export function AddBillModal({ show, onClose }: AddBillModalProps) {
+    const [createBill, { isLoading }] = useCreateBillMutation();
     const [category, setCategory] = useState<BillCategory>("RENT");
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
     const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
     const [notes, setNotes] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title || !amount) return;
-        onSubmit(category, title, Number(amount), date, notes);
-        setTitle("");
-        setAmount("");
-        setNotes("");
-        onClose();
-    };
+        if (!title.trim() || !amount) {
+            toast.error("Please enter a title and amount");
+            return;
+        }
 
-    const BILL_CATEGORIES_LIST = Object.entries(BILL_META).map(([k, v]) => ({ key: k as BillCategory, label: v.label }));
+        try {
+            await createBill({
+                category,
+                title: title.trim(),
+                amount: Number(amount),
+                date: date ? new Date(date).toISOString() : undefined,
+                notes: notes.trim() || undefined,
+            }).unwrap();
+
+            toast.success("Bill created successfully!");
+            setTitle("");
+            setAmount("");
+            setNotes("");
+            onClose();
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to create bill");
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -42,13 +79,18 @@ export function AddBillModal({ show, onClose, onSubmit }: AddBillModalProps) {
                         className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5"
                     >
                         <div className="flex items-center justify-between border-b border-border pb-3">
-                            <h3 className="text-lg font-bold text-foreground">Add Monthly Bill</h3>
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+                                    <Plus className="w-5 h-5 text-primary" />
+                                </div>
+                                <h3 className="text-base font-bold text-foreground font-sans">Add Monthly Bill</h3>
+                            </div>
                             <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground cursor-pointer">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Category</label>
@@ -58,7 +100,7 @@ export function AddBillModal({ show, onClose, onSubmit }: AddBillModalProps) {
                                         className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground"
                                         style={{ colorScheme: "dark" }}
                                     >
-                                        {BILL_CATEGORIES_LIST.map((c) => (
+                                        {CATEGORY_OPTIONS.map((c) => (
                                             <option key={c.key} value={c.key}>
                                                 {c.label}
                                             </option>
@@ -113,8 +155,8 @@ export function AddBillModal({ show, onClose, onSubmit }: AddBillModalProps) {
                                 <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs">
                                     Cancel
                                 </button>
-                                <button type="submit" className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer text-xs">
-                                    Save Bill
+                                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer text-xs disabled:opacity-50">
+                                    {isLoading ? "Saving…" : "Save Bill"}
                                 </button>
                             </div>
                         </form>

@@ -217,7 +217,6 @@ export default function DashboardPage() {
             <AddBillModal
                 show={showAddBill}
                 onClose={() => setShowAddBill(false)}
-                onSubmit={handleAddBill}
             />
         </div>
     );

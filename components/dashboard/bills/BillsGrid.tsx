@@ -1,94 +1,133 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, X } from "lucide-react";
-import { MockBill } from "@/types";
-import { BILL_META, fmtDate } from "@/lib/mockData";
+import React from "react";
+import { Search, Trash2, Eye, Receipt, User, Calendar, ShieldCheck } from "lucide-react";
+import { TBill, BillCategory } from "@/redux/features/bill/billApi";
 
 interface BillsGridProps {
-    bills: MockBill[];
-    onDeleteBill: (id: string) => void;
+    bills: TBill[];
+    isLoading: boolean;
+    searchTerm: string;
+    onSearchChange: (term: string) => void;
+    onViewDetails?: (id: string) => void;
+    onDeleteBill: (bill: TBill) => void;
 }
 
-export function BillsGrid({ bills, onDeleteBill }: BillsGridProps) {
-    const [billSearch, setBillSearch] = useState("");
-    const [billFilter, setBillFilter] = useState<"month" | "all">("month");
+const CATEGORY_COLORS: Record<string, string> = {
+    RENT: "#e8a020",
+    TRAVEL: "#38bdf8",
+    WIFI: "#818cf8",
+    ELECTRICITY: "#facc15",
+    GAS: "#fb923c",
+    WATER: "#60a5fa",
+    MAID: "#f472b6",
+    MAINTENANCE: "#a78bfa",
+    SUBSCRIPTION: "#c084fc",
+    MOBILE: "#4ade80",
+    OTHERS: "#94a3b8",
+};
 
+export function BillsGrid({
+    bills,
+    isLoading,
+    searchTerm,
+    onSearchChange,
+    onViewDetails,
+    onDeleteBill,
+}: BillsGridProps) {
     return (
         <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
+            {/* Search Toolbar */}
             <div className="flex items-center justify-between gap-4 shrink-0">
                 <div className="relative w-80">
                     <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
                         type="text"
-                        value={billSearch}
-                        onChange={(e) => setBillSearch(e.target.value)}
-                        placeholder="Search bills or titles..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground"
+                        value={searchTerm}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        placeholder="Search admin bills (Press Enter to search)…"
+                        className="w-full pl-10 pr-4 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground focus:border-primary/60 transition-colors"
                     />
                 </div>
 
-                <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">
-                    {(["month", "all"] as const).map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => setBillFilter(f)}
-                            className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
-                            style={{
-                                background: billFilter === f ? "#e8a020" : "transparent",
-                                color: billFilter === f ? "#1a0e07" : "#a08060",
-                            }}
-                        >
-                            {f === "month" ? "This Month" : "All Time"}
-                        </button>
-                    ))}
+                <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-primary/10 border border-primary/20 text-xs text-primary font-mono font-semibold">
+                    <ShieldCheck className="w-4 h-4" /> Admin Live Sync
                 </div>
             </div>
 
+            {/* Grid Container */}
             <div className="flex-1 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
-                    {bills
-                        .filter((b) => {
-                            const isThisMonth = (d: Date) => {
-                                const now = new Date();
-                                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                            };
-                            if (billFilter === "month" && !isThisMonth(b.date)) return false;
-                            const query = billSearch.toLowerCase();
+                {isLoading ? (
+                    <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                        <p className="text-xs font-mono">Fetching admin bills catalog…</p>
+                    </div>
+                ) : bills.length === 0 ? (
+                    <div className="py-20 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                        <Receipt className="w-10 h-10 text-muted-foreground/40 mb-1" />
+                        <p className="text-sm font-semibold">No bills found</p>
+                        <p className="text-xs text-muted-foreground">Try clearing search or add a new bill.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
+                        {bills.map((b) => {
+                            const catColor = CATEGORY_COLORS[b.category] || "#e8a020";
                             return (
-                                b.title.toLowerCase().includes(query) ||
-                                b.user.name.toLowerCase().includes(query) ||
-                                b.category.toLowerCase().includes(query)
-                            );
-                        })
-                        .map((b) => {
-                            const meta = BILL_META[b.category];
-                            return (
-                                <div key={b.id} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden">
+                                <div
+                                    key={b._id}
+                                    className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden group hover:border-primary/40 transition-all shadow-md"
+                                >
                                     <div>
                                         <div className="flex items-center justify-between gap-2 mb-3">
-                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
-                                                {meta.icon} {meta.label}
+                                            <span
+                                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border"
+                                                style={{ background: `${catColor}15`, color: catColor, borderColor: `${catColor}30` }}
+                                            >
+                                                <Receipt className="w-3 h-3" /> {b.category}
                                             </span>
-                                            <button onClick={() => onDeleteBill(b.id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer">
-                                                <X className="w-3.5 h-3.5" />
-                                            </button>
+                                            <div className="flex items-center gap-1">
+                                                {onViewDetails && (
+                                                    <button
+                                                        onClick={() => onViewDetails(b._id)}
+                                                        className="text-muted-foreground hover:text-primary p-1 rounded-md transition-colors cursor-pointer"
+                                                        title="View Details"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => onDeleteBill(b)}
+                                                    className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer"
+                                                    title="Delete Bill"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </div>
+
                                         <h4 className="text-base font-semibold text-foreground">{b.title}</h4>
                                         {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
+                                        <p className="text-[10px] text-muted-foreground font-mono select-all mt-2" title={b._id}>
+                                            ID: {b._id}
+                                        </p>
                                     </div>
 
                                     <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
                                         <div>
-                                            <p className="text-[10px] text-muted-foreground font-mono">Paid by: {b.user.name}</p>
-                                            <p className="text-[9px] text-muted-foreground font-mono mt-0.5">{fmtDate(b.date)}</p>
+                                            <p className="text-[10px] text-muted-foreground font-mono flex items-center gap-1">
+                                                <User className="w-3 h-3" /> {b.user?.name || "Group Biller"}
+                                            </p>
+                                            <p className="text-[9px] text-muted-foreground font-mono mt-0.5 flex items-center gap-1">
+                                                <Calendar className="w-3 h-3" /> {new Date(b.date || b.createdAt).toLocaleDateString()}
+                                            </p>
                                         </div>
-                                        <p className="text-lg font-bold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
+                                        <p className="text-lg font-bold text-accent font-mono">৳{b.amount?.toLocaleString()}</p>
                                     </div>
                                 </div>
                             );
                         })}
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     );

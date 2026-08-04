@@ -1,13 +1,30 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, Camera } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, Camera, ShieldCheck, Globe, MapPin, LayoutDashboard, ChevronDown, Edit3 } from "lucide-react";
+import { toast } from "sonner";
 import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@/types";
 import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
 import { PrimaryButton } from "@/components/app/ui/Shared";
+import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/redux/features/auth/authApi";
+import { ImageUpload } from "@/components/dashboard/ImageUpload";
 
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
+    const router = useRouter();
     // Website Tabs
     const [tab, setTab] = useState<"home" | "expenses" | "bills" | "profile">("home");
+    const [showUserDropdown, setShowUserDropdown] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowUserDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     // Core App States (Independent copies for the web shell)
     const [entries, setEntries] = useState<MockBazarEntry[]>(INITIAL_ENTRIES);
@@ -23,12 +40,65 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const [showAddExpense, setShowAddExpense] = useState(false);
     const [showAddBill, setShowAddBill] = useState(false);
 
-    // Profile forms dummy states
-    const [name, setName] = useState("Ahmed Hassan");
-    const [email, setEmail] = useState("ahmed@email.com");
-    const [phone, setPhone] = useState("+880 1712-345678");
-    const [profileLoading, setProfileLoading] = useState(false);
-    const [passLoading, setPassLoading] = useState(false);
+    // Profile RTK Query Hooks & State
+    const { data: userData } = useGetMeQuery();
+    const [updateProfile, { isLoading: profileLoading }] = useUpdateProfileMutation();
+    const [changePassword, { isLoading: passLoading }] = useChangePasswordMutation();
+
+    const currentUser = userData?.data;
+
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [profileImage, setProfileImage] = useState("");
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [language, setLanguage] = useState("English");
+    const [aboutme, setAboutme] = useState("");
+
+    // Address fields
+    const [street, setStreet] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [zipCode, setZipCode] = useState("");
+    const [country, setCountry] = useState("Bangladesh");
+
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
+
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 20) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useEffect(() => {
+        if (currentUser) {
+            setProfileImage(currentUser.profileImage || "");
+            setName(currentUser.name || "");
+            setEmail(currentUser.email || "");
+            setPhone(currentUser.phone || "");
+            setLanguage(currentUser.language || "English");
+            setAboutme(currentUser.aboutme || "");
+
+            if (currentUser.address) {
+                setStreet(currentUser.address.street || "");
+                setCity(currentUser.address.city || "");
+                setState(currentUser.address.state || "");
+                setZipCode(currentUser.address.zipCode || "");
+                setCountry(currentUser.address.country || "Bangladesh");
+            }
+        }
+    }, [currentUser]);
 
     // Calculations
     const calculations = useMemo(() => {
@@ -166,10 +236,20 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     };
 
     return (
-        <div className="min-h-screen bg-[#1a0e07] text-[#f5ede2] flex flex-col font-sans overflow-x-hidden">
-            {/* ─── Top Website Header ────────────────────────────────────────────── */}
-            <header className="sticky top-0 z-40 w-full bg-[#251508] border-b border-[rgba(232,160,32,0.15)] shadow-md select-none">
-                <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="min-h-screen bg-[#1a0e07] text-[#f5ede2] flex flex-col font-sans overflow-x-clip">
+            {/* ─── Top Website Header (Animated Sticky Header) ────────────────────── */}
+            <header
+                className={`sticky top-0 z-50 w-full transition-all duration-300 ease-in-out select-none border-b ${
+                    scrolled
+                        ? "bg-[#251508]/85 backdrop-blur-md border-[rgba(232,160,32,0.3)] shadow-2xl"
+                        : "bg-[#251508] border-[rgba(232,160,32,0.15)] shadow-md"
+                }`}
+            >
+                <div
+                    className={`container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 ease-in-out ${
+                        scrolled ? "h-16" : "h-20"
+                    }`}
+                >
                     {/* Logo & Group */}
                     <div className="flex items-center gap-3">
                         <img src="/assets/logo.png" alt="Bazar Hisab" className="w-9 h-9 object-contain rounded-xl" />
@@ -177,7 +257,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             <span className="text-lg font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                                 My Bazar <span className="text-primary">Hisab</span>
                             </span>
-                            <span className="ml-3 hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-semibold font-mono">{stats?.groupName || "My Bazar Group"} ⭐️</span>
+                            <span className="ml-3 hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-semibold font-mono">{stats?.groupName || "My Bazar Group"}</span>
                         </div>
                     </div>
 
@@ -212,21 +292,117 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             </button>
                         </div>
 
-                        {/* User details */}
+                        {/* Dynamic User Profile Avatar & Dropdown Menu */}
                         <div className="h-8 w-px bg-border mx-1 hidden sm:block" />
 
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground">AH</div>
-                            <button onClick={onLogout} className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Log Out">
-                                <LogOut className="w-4 h-4" />
+                        <div className="relative" ref={dropdownRef}>
+                            <button
+                                onClick={() => setShowUserDropdown((prev) => !prev)}
+                                className="flex items-center gap-2 p-1 rounded-full border border-border/80 hover:border-primary/50 bg-[#1a0e07] transition-all cursor-pointer shadow-md"
+                            >
+                                <div className="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0">
+                                    {currentUser?.profileImage ? (
+                                        <img src={currentUser.profileImage} alt={currentUser.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        initials(currentUser?.name || "User")
+                                    )}
+                                </div>
+                                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 mr-1 ${showUserDropdown ? "rotate-180 text-primary" : ""}`} />
                             </button>
+
+                            {/* Dropdown Menu Box */}
+                            <AnimatePresence>
+                                {showUserDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute right-0 mt-3 w-64 rounded-2xl bg-[#251508] border border-border shadow-2xl p-3 z-50 flex flex-col gap-2 font-sans"
+                                    >
+                                        {/* User Header */}
+                                        <div className="p-2.5 rounded-xl bg-[#1a0e07] border border-border/60 flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0 shadow-sm">
+                                                {currentUser?.profileImage ? (
+                                                    <img src={currentUser.profileImage} alt={currentUser.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    initials(currentUser?.name || "User")
+                                                )}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center justify-between gap-1">
+                                                    <h4 className="text-xs font-bold text-foreground truncate">{currentUser?.name || "User"}</h4>
+                                                    {currentUser?.role && (
+                                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-primary/20 text-primary border border-primary/30 shrink-0">
+                                                            {currentUser.role}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-[10px] text-muted-foreground font-mono truncate">{currentUser?.email || "user@email.com"}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Admin Dashboard Navigation Button */}
+                                        {currentUser?.role === "ADMIN" && (
+                                            <button
+                                                onClick={() => {
+                                                    setShowUserDropdown(false);
+                                                    router.push("/dashboard");
+                                                }}
+                                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary font-bold text-xs hover:bg-primary/25 transition-all cursor-pointer"
+                                            >
+                                                <ShieldCheck className="w-4 h-4 text-primary" />
+                                                <span>Go to Admin Dashboard</span>
+                                            </button>
+                                        )}
+
+                                        {/* Profile Details Button */}
+                                        <button
+                                            onClick={() => {
+                                                setTab("profile");
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
+                                        >
+                                            <User className="w-4 h-4 text-muted-foreground" />
+                                            <span>Profile & Settings</span>
+                                        </button>
+
+                                        {/* Change Password Button */}
+                                        <button
+                                            onClick={() => {
+                                                setTab("profile");
+                                                setShowUserDropdown(false);
+                                            }}
+                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
+                                        >
+                                            <Lock className="w-4 h-4 text-muted-foreground" />
+                                            <span>Change Password</span>
+                                        </button>
+
+                                        <div className="h-px bg-border/60 my-0.5" />
+
+                                        {/* Log Out Button */}
+                                        <button
+                                            onClick={() => {
+                                                setShowUserDropdown(false);
+                                                onLogout();
+                                            }}
+                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-destructive/15 text-muted-foreground hover:text-destructive text-xs font-semibold transition-all cursor-pointer"
+                                        >
+                                            <LogOut className="w-4 h-4 text-destructive" />
+                                            <span>Log Out</span>
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </div>
                 </div>
             </header>
 
             {/* ─── Main Website Content Area ───────────────────────────────────────── */}
-            <main className="max-w-6xl mx-auto w-full px-6 py-10 flex-1 flex flex-col min-h-0 relative">
+            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col min-h-0 relative">
                 {/* Mobile View Navigation Helper */}
                 <div className="md:hidden flex items-center justify-around bg-[#251508] border border-border p-1.5 rounded-2xl mb-6 select-none shadow-lg">
                     {[
@@ -512,94 +688,330 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                         {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
                         {tab === "profile" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                                {/* Edit Profile Panel */}
-                                <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-                                            <User className="w-5 h-5 text-primary" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start font-sans">
+                                {/* Profile Overview / Edit Panel */}
+                                {!isEditingProfile ? (
+                                    <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
+                                        <div className="flex items-center justify-between border-b border-border pb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+                                                    <User className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-foreground">User Profile Overview</h3>
+                                                    <p className="text-xs text-muted-foreground">Your account & contact details</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setIsEditingProfile(true)}
+                                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-accent transition-all cursor-pointer shadow-md"
+                                            >
+                                                <Edit3 className="w-3.5 h-3.5" />
+                                                <span>Edit Profile</span>
+                                            </button>
                                         </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                                Edit Profile Details
-                                            </h3>
-                                            <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                                Update your contact information
-                                            </p>
+
+                                        {/* Avatar & Name Header */}
+                                        <div className="flex flex-col items-center justify-center py-2 text-center border-b border-border/60 pb-6">
+                                            <div className="w-24 h-24 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-2xl text-primary-foreground border-2 border-primary/40 shadow-xl mb-3">
+                                                {profileImage ? (
+                                                    <img src={profileImage} alt={name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    initials(name || "User")
+                                                )}
+                                            </div>
+                                            <h3 className="text-lg font-bold text-foreground">{name || "User Name"}</h3>
+                                            <p className="text-xs text-muted-foreground font-mono mt-0.5">{email}</p>
+                                            {currentUser?.role && (
+                                                <span className="mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-primary/15 text-primary border border-primary/30">
+                                                    {currentUser.role} ROLE
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Details Grid */}
+                                        <div className="space-y-3.5 text-xs">
+                                            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1a0e07] border border-border/60">
+                                                <span className="text-muted-foreground font-semibold flex items-center gap-2">
+                                                    <Phone className="w-3.5 h-3.5 text-primary" /> Phone Number:
+                                                </span>
+                                                <span className="font-mono font-bold text-foreground">{phone || "Not specified"}</span>
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1a0e07] border border-border/60">
+                                                <span className="text-muted-foreground font-semibold flex items-center gap-2">
+                                                    <Globe className="w-3.5 h-3.5 text-primary" /> Language:
+                                                </span>
+                                                <span className="font-bold text-foreground">{language || "English"}</span>
+                                            </div>
+
+                                            {aboutme && (
+                                                <div className="p-3.5 rounded-2xl bg-[#1a0e07] border border-border/60 space-y-1">
+                                                    <span className="text-muted-foreground font-semibold block">About Me / Bio:</span>
+                                                    <p className="text-foreground italic">{aboutme}</p>
+                                                </div>
+                                            )}
+
+                                            <div className="p-4 rounded-2xl bg-[#1a0e07] border border-border/60 space-y-2">
+                                                <span className="text-muted-foreground font-bold font-mono flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                                                    <MapPin className="w-3.5 h-3.5 text-primary" /> Address Details
+                                                </span>
+                                                <p className="text-foreground font-mono text-xs">
+                                                    {[street, city, state, zipCode, country].filter(Boolean).join(", ") || "No address specified"}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div className="flex items-center justify-center my-2">
-                                        <div className="relative cursor-pointer group">
-                                            <div className="w-20 h-20 rounded-full border-2 border-dashed border-primary/30 flex items-center justify-center font-bold text-2xl bg-[#1a0e07]">AH</div>
-                                            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-md">
-                                                <Camera className="w-3.5 h-3.5 text-primary-foreground" />
+                                ) : (
+                                    /* Editable Profile Form Panel */
+                                    <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
+                                        <div className="flex items-center justify-between border-b border-border pb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+                                                    <User className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-foreground">Edit Profile Details</h3>
+                                                    <p className="text-xs text-muted-foreground">Update your contact information</p>
+                                                </div>
                                             </div>
+                                            <button
+                                                onClick={() => setIsEditingProfile(false)}
+                                                className="px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
+                                            >
+                                                Cancel
+                                            </button>
                                         </div>
+
+                                        {/* Profile Avatar Photo (Full Round & Centered) */}
+                                        <div className="flex flex-col items-center justify-center text-center py-2">
+                                            <ImageUpload
+                                                label="Profile Avatar Photo"
+                                                variant="circle"
+                                                value={profileImage}
+                                                onChange={(url) => setProfileImage(url)}
+                                                onRemove={() => setProfileImage("")}
+                                            />
+                                        </div>
+
+                                        <form
+                                            onSubmit={async (e) => {
+                                                e.preventDefault();
+                                                if (!name.trim()) {
+                                                    toast.error("Name cannot be empty");
+                                                    return;
+                                                }
+                                                try {
+                                                    await updateProfile({
+                                                        profileImage: profileImage || undefined,
+                                                        name: name.trim(),
+                                                        phone: phone.trim() || undefined,
+                                                        language: language.trim() || undefined,
+                                                        aboutme: aboutme.trim() || undefined,
+                                                        address: {
+                                                            street: street.trim() || undefined,
+                                                            city: city.trim() || undefined,
+                                                            state: state.trim() || undefined,
+                                                            zipCode: zipCode.trim() || undefined,
+                                                            country: country.trim() || undefined,
+                                                        },
+                                                    }).unwrap();
+                                                    toast.success("Complete profile details updated successfully!");
+                                                    setIsEditingProfile(false);
+                                                } catch (err: any) {
+                                                    toast.error(err?.data?.message || err?.message || "Failed to update profile");
+                                                }
+                                            }}
+                                            className="flex flex-col gap-4"
+                                        >
+                                            <FieldBox label="Full Name" focused={false}>
+                                                <div className="flex items-center">
+                                                    <span className="pl-4 text-muted-foreground">
+                                                        <User className="w-4 h-4" />
+                                                    </span>
+                                                    <input
+                                                        type="text"
+                                                        value={name}
+                                                        onChange={(e) => setName(e.target.value)}
+                                                        required
+                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                    />
+                                                </div>
+                                            </FieldBox>
+
+                                            <div>
+                                                <div className="flex items-center justify-between mb-1.5 px-1">
+                                                    <span className="text-xs font-semibold text-muted-foreground">Email Address</span>
+                                                    <span className="text-[10px] text-muted-foreground/80 font-mono flex items-center gap-1">
+                                                        <Lock className="w-3 h-3 text-muted-foreground" /> Cannot be updated
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center bg-[#170c06] border border-border/40 rounded-2xl opacity-60 cursor-not-allowed">
+                                                    <span className="pl-4 text-muted-foreground/50">
+                                                        <Mail className="w-4 h-4" />
+                                                    </span>
+                                                    <input
+                                                        type="email"
+                                                        value={email}
+                                                        disabled
+                                                        readOnly
+                                                        title="Email address cannot be changed."
+                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm text-muted-foreground font-mono cursor-not-allowed select-none outline-none"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <FieldBox label="Phone Number" focused={false}>
+                                                <div className="flex items-center">
+                                                    <span className="pl-4 text-muted-foreground">
+                                                        <Phone className="w-4 h-4" />
+                                                    </span>
+                                                    <input
+                                                        type="text"
+                                                        value={phone}
+                                                        onChange={(e) => setPhone(e.target.value)}
+                                                        placeholder="+880 1700-000000"
+                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none font-mono text-foreground"
+                                                    />
+                                                </div>
+                                            </FieldBox>
+
+                                            <FieldBox label="Preferred Language" focused={false}>
+                                                <div className="flex items-center">
+                                                    <span className="pl-4 text-muted-foreground">
+                                                        <Globe className="w-4 h-4" />
+                                                    </span>
+                                                    <input
+                                                        type="text"
+                                                        value={language}
+                                                        onChange={(e) => setLanguage(e.target.value)}
+                                                        placeholder="e.g. English, Bengali"
+                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                    />
+                                                </div>
+                                            </FieldBox>
+
+                                            <div>
+                                                <label className="block text-xs font-semibold text-muted-foreground mb-1.5 px-1">About Me / Bio</label>
+                                                <textarea
+                                                    value={aboutme}
+                                                    onChange={(e) => setAboutme(e.target.value)}
+                                                    rows={2}
+                                                    placeholder="Write a brief intro about yourself…"
+                                                    className="w-full px-4 py-3 bg-[#170c06] border border-border/60 rounded-2xl text-sm outline-none text-foreground focus:border-primary/60 transition-colors"
+                                                />
+                                            </div>
+
+                                            {/* Address Section */}
+                                            <div className="border-t border-border/60 pt-4 flex flex-col gap-4">
+                                                <div className="flex items-center gap-2">
+                                                    <MapPin className="w-4 h-4 text-primary" />
+                                                    <span className="text-xs font-bold text-foreground uppercase tracking-wider font-mono">Address Details</span>
+                                                </div>
+
+                                                <FieldBox label="Street Address" focused={false}>
+                                                    <div className="flex items-center">
+                                                        <span className="pl-4 text-muted-foreground">
+                                                            <MapPin className="w-4 h-4" />
+                                                        </span>
+                                                        <input
+                                                            type="text"
+                                                            value={street}
+                                                            onChange={(e) => setStreet(e.target.value)}
+                                                            placeholder="House / Flat #, Road name"
+                                                            className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                        />
+                                                    </div>
+                                                </FieldBox>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <FieldBox label="City" focused={false}>
+                                                        <input
+                                                            type="text"
+                                                            value={city}
+                                                            onChange={(e) => setCity(e.target.value)}
+                                                            placeholder="Dhaka"
+                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                        />
+                                                    </FieldBox>
+                                                    <FieldBox label="State / Division" focused={false}>
+                                                        <input
+                                                            type="text"
+                                                            value={state}
+                                                            onChange={(e) => setState(e.target.value)}
+                                                            placeholder="Dhaka"
+                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                        />
+                                                    </FieldBox>
+                                                    <FieldBox label="Zip Code" focused={false}>
+                                                        <input
+                                                            type="text"
+                                                            value={zipCode}
+                                                            onChange={(e) => setZipCode(e.target.value)}
+                                                            placeholder="1212"
+                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none font-mono text-foreground"
+                                                        />
+                                                    </FieldBox>
+                                                    <FieldBox label="Country" focused={false}>
+                                                        <input
+                                                            type="text"
+                                                            value={country}
+                                                            onChange={(e) => setCountry(e.target.value)}
+                                                            placeholder="Bangladesh"
+                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                        />
+                                                    </FieldBox>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 pt-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsEditingProfile(false)}
+                                                    className="px-5 py-3 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <div className="flex-1">
+                                                    <PrimaryButton loading={profileLoading} label="Save Profile Changes" loadingLabel="Saving changes…" />
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
-
-                                    <form
-                                        onSubmit={(e) => {
-                                            e.preventDefault();
-                                            setProfileLoading(true);
-                                            setTimeout(() => setProfileLoading(false), 1200);
-                                        }}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <FieldBox label="Full Name" focused={false}>
-                                            <div className="flex items-center">
-                                                <span className="pl-4 text-muted-foreground">
-                                                    <User className="w-4 h-4" />
-                                                </span>
-                                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" />
-                                            </div>
-                                        </FieldBox>
-
-                                        <FieldBox label="Email Address" focused={false}>
-                                            <div className="flex items-center">
-                                                <span className="pl-4 text-muted-foreground">
-                                                    <Mail className="w-4 h-4" />
-                                                </span>
-                                                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" />
-                                            </div>
-                                        </FieldBox>
-
-                                        <FieldBox label="Phone Number" focused={false}>
-                                            <div className="flex items-center">
-                                                <span className="pl-4 text-muted-foreground">
-                                                    <Phone className="w-4 h-4" />
-                                                </span>
-                                                <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" />
-                                            </div>
-                                        </FieldBox>
-
-                                        <div className="pt-2">
-                                            <PrimaryButton loading={profileLoading} label="Save Profile Changes" loadingLabel="Saving changes…" />
-                                        </div>
-                                    </form>
-                                </div>
+                                )}
 
                                 {/* Change Password Panel */}
                                 <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 border-b border-border pb-4">
                                         <div className="w-10 h-10 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center">
                                             <Lock className="w-5 h-5 text-accent" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                                Update Account Password
-                                            </h3>
-                                            <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                                Change your password regularly for security
-                                            </p>
+                                            <h3 className="text-lg font-bold text-foreground">Update Account Password</h3>
+                                            <p className="text-xs text-muted-foreground">Change your password regularly for security</p>
                                         </div>
                                     </div>
 
                                     <form
-                                        onSubmit={(e) => {
+                                        onSubmit={async (e) => {
                                             e.preventDefault();
-                                            setPassLoading(true);
-                                            setTimeout(() => setPassLoading(false), 1200);
+                                            if (!currentPassword || !newPassword) {
+                                                toast.error("Please fill in all password fields");
+                                                return;
+                                            }
+                                            if (newPassword !== repeatPassword) {
+                                                toast.error("Passwords do not match");
+                                                return;
+                                            }
+                                            try {
+                                                await changePassword({ currentPassword, newPassword }).unwrap();
+                                                toast.success("Password changed successfully!");
+                                                setCurrentPassword("");
+                                                setNewPassword("");
+                                                setRepeatPassword("");
+                                            } catch (err: any) {
+                                                toast.error(err?.data?.message || err?.message || "Failed to change password");
+                                            }
                                         }}
                                         className="flex flex-col gap-4"
                                     >
@@ -608,7 +1020,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 <span className="pl-4 text-muted-foreground">
                                                     <Lock className="w-4 h-4" />
                                                 </span>
-                                                <input type="password" required placeholder="••••••••" className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" />
+                                                <input
+                                                    type="password"
+                                                    value={currentPassword}
+                                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                                    required
+                                                    placeholder="••••••••"
+                                                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                />
                                             </div>
                                         </FieldBox>
 
@@ -617,7 +1036,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 <span className="pl-4 text-muted-foreground">
                                                     <Lock className="w-4 h-4" />
                                                 </span>
-                                                <input type="password" required placeholder="Min. 8 characters" className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" />
+                                                <input
+                                                    type="password"
+                                                    value={newPassword}
+                                                    onChange={(e) => setNewPassword(e.target.value)}
+                                                    required
+                                                    placeholder="Min. 8 characters"
+                                                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                />
                                             </div>
                                         </FieldBox>
 
@@ -626,12 +1052,19 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 <span className="pl-4 text-muted-foreground">
                                                     <Lock className="w-4 h-4" />
                                                 </span>
-                                                <input type="password" required placeholder="Re-enter new password" className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" />
+                                                <input
+                                                    type="password"
+                                                    value={repeatPassword}
+                                                    onChange={(e) => setRepeatPassword(e.target.value)}
+                                                    required
+                                                    placeholder="Re-enter new password"
+                                                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
+                                                />
                                             </div>
                                         </FieldBox>
 
                                         <div className="pt-2">
-                                            <PrimaryButton loading={passLoading} label="Reset Password" loadingLabel="Saving changes…" />
+                                            <PrimaryButton loading={passLoading} label="Reset Password" loadingLabel="Resetting password…" />
                                         </div>
                                     </form>
                                 </div>

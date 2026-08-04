@@ -13,7 +13,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({
     title,
-    groupName = "Sabzi Mandi Group ⭐️",
+    groupName = "Sabzi Mandi Group",
     onAddExpense,
     onAddBill,
     children,

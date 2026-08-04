@@ -62,6 +62,7 @@ type CommonResponse<T = null> = {
 
 export type BazarEntryQueryParams = {
     filter?: string;
+    searchTerm?: string;
     startDate?: string;
     endDate?: string;
     page?: number;

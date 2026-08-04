@@ -54,6 +54,7 @@ type CommonResponse<T = null> = {
 export type BillQueryParams = {
     category?: BillCategory;
     filter?: string;
+    searchTerm?: string;
     startDate?: string;
     endDate?: string;
     page?: number;

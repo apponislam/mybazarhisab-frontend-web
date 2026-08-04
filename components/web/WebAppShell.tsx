@@ -43,11 +43,40 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const [entries, setEntries] = useState<MockBazarEntry[]>(INITIAL_ENTRIES);
     const [bills, setBills] = useState<MockBill[]>(INITIAL_BILLS);
 
-    // Search & Filter States
+    // Pagination & Search & Filter States
+    const [expensePage, setExpensePage] = useState(1);
+    const [billPage, setBillPage] = useState(1);
     const [expenseSearch, setExpenseSearch] = useState("");
     const [billSearch, setBillSearch] = useState("");
     const [expenseFilter, setExpenseFilter] = useState<"month" | "all">("month");
     const [billFilter, setBillFilter] = useState<"month" | "all">("month");
+
+    // RTK Query Hooks for Live Data Fetching & Pagination
+    const { data: bazarEntriesResponse, isLoading: bazarEntriesLoading, isFetching: bazarEntriesFetching } = useGetAllBazarEntriesQuery(
+        {
+            filter: expenseFilter === "all" ? "ALL" : undefined,
+            searchTerm: expenseSearch.trim() || undefined,
+            page: expensePage,
+            limit: 10,
+        },
+        { skip: tab !== "expenses" && tab !== "home" }
+    );
+    const { data: billsResponse, isLoading: billsLoading, isFetching: billsFetching } = useGetAllBillsQuery(
+        {
+            filter: billFilter === "all" ? "ALL" : undefined,
+            searchTerm: billSearch.trim() || undefined,
+            page: billPage,
+            limit: 10,
+        },
+        { skip: tab !== "bills" && tab !== "home" }
+    );
+
+    const [deleteBazarEntry] = useDeleteBazarEntryMutation();
+    const [deleteBill] = useDeleteBillMutation();
+
+    // Delete Confirmation Modal States
+    const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
+    const [deletingBillId, setDeletingBillId] = useState<string | null>(null);
 
     // Onboarding & Interaction Modal States
     const [showAddExpense, setShowAddExpense] = useState(false);
@@ -296,12 +325,24 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         }
     };
 
-    const handleDeleteExpense = (id: string) => {
-        setEntries((prev) => prev.filter((e) => e.id !== id));
+    const handleDeleteExpense = async (id: string) => {
+        try {
+            await deleteBazarEntry(id).unwrap();
+            toast.success("Expense entry deleted successfully!");
+            setEntries((prev) => prev.filter((e) => e.id !== id));
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to delete expense entry");
+        }
     };
 
-    const handleDeleteBill = (id: string) => {
-        setBills((prev) => prev.filter((b) => b.id !== id));
+    const handleDeleteBill = async (id: string) => {
+        try {
+            await deleteBill(id).unwrap();
+            toast.success("Monthly bill deleted successfully!");
+            setBills((prev) => prev.filter((b) => b.id !== id));
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to delete bill");
+        }
     };
 
     return (
@@ -728,7 +769,10 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                         {(["month", "all"] as const).map((f) => (
                                             <button
                                                 key={f}
-                                                onClick={() => setExpenseFilter(f)}
+                                                onClick={() => {
+                                                    setExpenseFilter(f);
+                                                    setExpensePage(1);
+                                                }}
                                                 className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
                                                 style={{
                                                     background: expenseFilter === f ? "#e8a020" : "transparent",
@@ -756,49 +800,92 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-[rgba(232,160,32,0.06)] bg-[#251508]">
-                                            {entries
-                                                .filter((e) => {
-                                                    const isThisMonth = (d: Date) => {
-                                                        const now = new Date();
-                                                        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                                                    };
-                                                    if (expenseFilter === "month" && !isThisMonth(e.date)) return false;
-                                                    const query = expenseSearch.toLowerCase();
-                                                    return e.product.name.toLowerCase().includes(query) || e.user.name.toLowerCase().includes(query) || (e.notes && e.notes.toLowerCase().includes(query));
-                                                })
-                                                .map((e) => (
-                                                    <tr key={e.id} className="hover:bg-primary/5 transition-colors">
-                                                        <td className="p-4 font-semibold flex items-center gap-2">
-                                                            <span className="text-xl">{e.product.emoji}</span>
-                                                            <div>
-                                                                <p>{e.product.name}</p>
-                                                                {e.notes && <p className="text-[10px] text-muted-foreground font-normal italic">{e.notes}</p>}
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user.id) }}>
-                                                                    {initials(e.user.name)}
-                                                                </div>
-                                                                <span>{e.user.name}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-4 text-muted-foreground font-mono text-xs">{fmtDate(e.date)}</td>
-                                                        <td className="p-4 text-right font-mono">৳{e.price.toLocaleString()}</td>
-                                                        <td className="p-4 text-right font-mono text-xs">
-                                                            {e.quantity} {e.unit}
-                                                        </td>
-                                                        <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.price * e.quantity).toLocaleString()}</td>
-                                                        <td className="p-4 text-center">
-                                                            <button onClick={() => handleDeleteExpense(e.id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer">
-                                                                <X className="w-4 h-4" />
-                                                            </button>
-                                                        </td>
+                                            {bazarEntriesLoading || (bazarEntriesFetching && (!bazarEntriesResponse?.data || bazarEntriesResponse.data.length === 0)) ? (
+                                                [1, 2, 3, 4, 5].map((i) => (
+                                                    <tr key={i} className="animate-pulse">
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-32" /></td>
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-24" /></td>
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-20" /></td>
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" /></td>
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-12 ml-auto" /></td>
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" /></td>
+                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-6 mx-auto" /></td>
                                                     </tr>
-                                                ))}
+                                                ))
+                                            ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
+                                                bazarEntriesResponse.data
+                                                    .filter((e: any) => {
+                                                        const query = expenseSearch.toLowerCase();
+                                                        const pName = e.product?.name || "";
+                                                        const uName = e.user?.name || "";
+                                                        const notes = e.notes || "";
+                                                        return pName.toLowerCase().includes(query) || uName.toLowerCase().includes(query) || notes.toLowerCase().includes(query);
+                                                    })
+                                                    .map((e: any) => (
+                                                        <tr key={e._id} className="hover:bg-primary/5 transition-colors">
+                                                            <td className="p-4 font-semibold flex items-center gap-2">
+                                                                <span className="text-xl">🛒</span>
+                                                                <div>
+                                                                    <p>{e.product?.name || "Bazar Item"}</p>
+                                                                    {e.notes && <p className="text-[10px] text-muted-foreground font-normal italic">{e.notes}</p>}
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "u") }}>
+                                                                        {initials(e.user?.name || "U")}
+                                                                    </div>
+                                                                    <span>{e.user?.name || "User"}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="p-4 text-muted-foreground font-mono text-xs">{new Date(e.date).toLocaleDateString()}</td>
+                                                            <td className="p-4 text-right font-mono">৳{e.price.toLocaleString()}</td>
+                                                            <td className="p-4 text-right font-mono text-xs">
+                                                                {e.quantity} {e.unit}
+                                                            </td>
+                                                            <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.price * e.quantity).toLocaleString()}</td>
+                                                            <td className="p-4 text-center">
+                                                                <button onClick={() => setDeletingExpenseId(e._id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Delete Expense">
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={7} className="p-12 text-center text-xs font-mono text-muted-foreground">
+                                                        No bazar entries found.
+                                                    </td>
+                                                </tr>
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
+
+                                {/* Expenses Pagination Footer */}
+                                {bazarEntriesResponse?.meta && (
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-border/60 text-xs font-mono">
+                                        <span className="text-muted-foreground">
+                                            Showing Page <span className="text-primary font-bold">{bazarEntriesResponse.meta.page}</span> of <span className="font-bold">{bazarEntriesResponse.meta.totalPages || 1}</span> (Total {bazarEntriesResponse.meta.total} entries)
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => setExpensePage((p) => Math.max(p - 1, 1))}
+                                                disabled={!bazarEntriesResponse.meta.hasPrev}
+                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                            >
+                                                ← Prev
+                                            </button>
+                                            <button
+                                                onClick={() => setExpensePage((p) => p + 1)}
+                                                disabled={!bazarEntriesResponse.meta.hasNext}
+                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                            >
+                                                Next →
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -816,7 +903,10 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                         {(["month", "all"] as const).map((f) => (
                                             <button
                                                 key={f}
-                                                onClick={() => setBillFilter(f)}
+                                                onClick={() => {
+                                                    setBillFilter(f);
+                                                    setBillPage(1);
+                                                }}
                                                 className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
                                                 style={{
                                                     background: billFilter === f ? "#e8a020" : "transparent",
@@ -831,46 +921,90 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                                 {/* Grid layout */}
                                 <div className="flex-1 overflow-y-auto">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
-                                        {bills
-                                            .filter((b) => {
-                                                const isThisMonth = (d: Date) => {
-                                                    const now = new Date();
-                                                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                                                };
-                                                if (billFilter === "month" && !isThisMonth(b.date)) return false;
-                                                const query = billSearch.toLowerCase();
-                                                return b.title.toLowerCase().includes(query) || b.user.name.toLowerCase().includes(query) || b.category.toLowerCase().includes(query);
-                                            })
-                                            .map((b) => {
-                                                const meta = BILL_META[b.category];
-                                                return (
-                                                    <div key={b.id} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden">
-                                                        <div>
-                                                            <div className="flex items-center justify-between gap-2 mb-3">
-                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
-                                                                    {meta.icon} {meta.label}
-                                                                </span>
-                                                                <button onClick={() => handleDeleteBill(b.id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer">
-                                                                    <X className="w-3.5 h-3.5" />
-                                                                </button>
-                                                            </div>
-                                                            <h4 className="text-base font-semibold text-foreground">{b.title}</h4>
-                                                            {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
-                                                        </div>
-
-                                                        <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
-                                                            <div>
-                                                                <p className="text-[10px] text-muted-foreground font-mono">Paid by: {b.user.name}</p>
-                                                                <p className="text-[9px] text-muted-foreground font-mono mt-0.5">{fmtDate(b.date)}</p>
-                                                            </div>
-                                                            <p className="text-lg font-bold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
-                                                        </div>
+                                    {billsLoading || (billsFetching && (!billsResponse?.data || billsResponse.data.length === 0)) ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
+                                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                                <div key={i} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 animate-pulse">
+                                                    <div className="space-y-3">
+                                                        <div className="h-5 bg-[#2e1a0a] rounded-lg w-24" />
+                                                        <div className="h-5 bg-[#2e1a0a] rounded-md w-3/4" />
                                                     </div>
-                                                );
-                                            })}
-                                    </div>
+                                                    <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
+                                                        <div className="h-4 bg-[#2e1a0a] rounded-md w-20" />
+                                                        <div className="h-6 bg-[#2e1a0a] rounded-md w-16" />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : billsResponse?.data && billsResponse.data.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
+                                            {billsResponse.data
+                                                .filter((b: any) => {
+                                                    const query = billSearch.toLowerCase();
+                                                    const title = b.title || "";
+                                                    const uName = b.user?.name || "";
+                                                    const cat = b.category || "";
+                                                    return title.toLowerCase().includes(query) || uName.toLowerCase().includes(query) || cat.toLowerCase().includes(query);
+                                                })
+                                                .map((b: any) => {
+                                                    const meta = BILL_META[b.category as keyof typeof BILL_META] || { icon: "📄", label: b.category, color: "#e8a020" };
+                                                    return (
+                                                        <div key={b._id} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden">
+                                                            <div>
+                                                                <div className="flex items-center justify-between gap-2 mb-3">
+                                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
+                                                                        {meta.icon} {meta.label}
+                                                                    </span>
+                                                                    <button onClick={() => setDeletingBillId(b._id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer" title="Delete Bill">
+                                                                        <X className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                </div>
+                                                                <h4 className="text-base font-semibold text-foreground">{b.title}</h4>
+                                                                {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
+                                                            </div>
+
+                                                            <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
+                                                                <div>
+                                                                    <p className="text-[10px] text-muted-foreground font-mono">Paid by: {b.user?.name || "User"}</p>
+                                                                    <p className="text-[9px] text-muted-foreground font-mono mt-0.5">{new Date(b.date).toLocaleDateString()}</p>
+                                                                </div>
+                                                                <p className="text-lg font-bold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
+                                    ) : (
+                                        <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">
+                                            No monthly bills found.
+                                        </div>
+                                    )}
                                 </div>
+
+                                {/* Bills Pagination Footer */}
+                                {billsResponse?.meta && (
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-border/60 text-xs font-mono">
+                                        <span className="text-muted-foreground">
+                                            Showing Page <span className="text-primary font-bold">{billsResponse.meta.page}</span> of <span className="font-bold">{billsResponse.meta.totalPages || 1}</span> (Total {billsResponse.meta.total} bills)
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => setBillPage((p) => Math.max(p - 1, 1))}
+                                                disabled={!billsResponse.meta.hasPrev}
+                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                            >
+                                                ← Prev
+                                            </button>
+                                            <button
+                                                onClick={() => setBillPage((p) => p + 1)}
+                                                disabled={!billsResponse.meta.hasNext}
+                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                            >
+                                                Next →
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -1631,6 +1765,62 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                 No notification messages recorded.
                             </p>
                         )}
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Website Dialog: Delete Expense Confirmation */}
+            <Modal show={Boolean(deletingExpenseId)} onClose={() => setDeletingExpenseId(null)} title="Confirm Delete Expense">
+                <div className="flex flex-col gap-4 font-sans text-left">
+                    <p className="text-sm text-foreground">
+                        Are you sure you want to delete this bazar expense record? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-3 pt-2 border-t border-border/60">
+                        <button
+                            onClick={() => setDeletingExpenseId(null)}
+                            className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={async () => {
+                                if (deletingExpenseId) {
+                                    await handleDeleteExpense(deletingExpenseId);
+                                    setDeletingExpenseId(null);
+                                }
+                            }}
+                            className="flex-1 py-2.5 bg-destructive text-destructive-foreground font-bold text-xs rounded-xl hover:bg-destructive/90 transition-all cursor-pointer shadow-md"
+                        >
+                            Confirm Delete
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Website Dialog: Delete Bill Confirmation */}
+            <Modal show={Boolean(deletingBillId)} onClose={() => setDeletingBillId(null)} title="Confirm Delete Monthly Bill">
+                <div className="flex flex-col gap-4 font-sans text-left">
+                    <p className="text-sm text-foreground">
+                        Are you sure you want to delete this monthly bill record? This action cannot be undone.
+                    </p>
+                    <div className="flex gap-3 pt-2 border-t border-border/60">
+                        <button
+                            onClick={() => setDeletingBillId(null)}
+                            className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={async () => {
+                                if (deletingBillId) {
+                                    await handleDeleteBill(deletingBillId);
+                                    setDeletingBillId(null);
+                                }
+                            }}
+                            className="flex-1 py-2.5 bg-destructive text-destructive-foreground font-bold text-xs rounded-xl hover:bg-destructive/90 transition-all cursor-pointer shadow-md"
+                        >
+                            Confirm Delete
+                        </button>
                     </div>
                 </div>
             </Modal>

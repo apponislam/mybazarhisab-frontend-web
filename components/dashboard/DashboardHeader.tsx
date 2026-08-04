@@ -13,7 +13,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({
     title,
-    groupName = "Sabzi Mandi Group",
+    groupName,
     onAddExpense,
     onAddBill,
     children,
@@ -25,9 +25,11 @@ export function DashboardHeader({
             </div>
 
             <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold font-mono">
-                    <span>{groupName}</span>
-                </div>
+                {groupName && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold font-mono">
+                        <span>{groupName}</span>
+                    </div>
+                )}
 
                 {children}
 

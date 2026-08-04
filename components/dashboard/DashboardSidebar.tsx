@@ -45,6 +45,8 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
 
     const navItems = [
         { id: "overview", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" />, href: "/dashboard" },
+        { id: "users", label: "User Accounts", icon: <Users className="w-4 h-4" />, href: "/dashboard/users" },
+        { id: "members", label: "Group Members", icon: <Users className="w-4 h-4" />, href: "/dashboard/members" },
         { id: "expenses", label: "Bazar Expenses", icon: <ShoppingBag className="w-4 h-4" />, href: "/dashboard/expenses" },
         { id: "bills", label: "All Bills", icon: <Receipt className="w-4 h-4" />, href: "/dashboard/bills" },
         { id: "products", label: "Products Catalog", icon: <Package className="w-4 h-4" />, href: "/dashboard/products" },
@@ -53,7 +55,6 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
         { id: "activities", label: "Activity Logs", icon: <Activity className="w-4 h-4" />, href: "/dashboard/activities" },
         { id: "policies", label: "Legal Policies", icon: <Shield className="w-4 h-4" />, href: "/dashboard/policies" },
         { id: "contacts", label: "Support Messages", icon: <Mail className="w-4 h-4" />, href: "/dashboard/contacts" },
-        { id: "members", label: "Group Members", icon: <Users className="w-4 h-4" />, href: "/dashboard/members" },
         { id: "settings", label: "Account Settings", icon: <Settings className="w-4 h-4" />, href: "/dashboard/settings" },
     ];
 

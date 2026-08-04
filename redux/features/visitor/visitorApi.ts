@@ -10,6 +10,20 @@ type CommonResponse<T = null> = {
     data: T;
 };
 
+type PaginatedResponse<T = any> = {
+    success: boolean;
+    message: string;
+    meta?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNext: boolean;
+        hasPrev: boolean;
+    };
+    data: T;
+};
+
 export type TrackVisitPayload = {
     path?: string;
     platform?: VisitorPlatform;
@@ -43,7 +57,18 @@ const visitorApi = baseApi.injectEndpoints({
             }),
             providesTags: ["Visitor"],
         }),
+
+        // GET /visitors/all (Admin)
+        getAllVisitors: builder.query<PaginatedResponse<any>, Record<string, any> | void>({
+            query: (params) => ({
+                url: "/visitors/all",
+                method: "GET",
+                params: params || undefined,
+            }),
+            providesTags: ["Visitor"],
+        }),
     }),
 });
 
-export const { useTrackVisitMutation, useGetVisitorStatsQuery } = visitorApi;
+export const { useTrackVisitMutation, useGetVisitorStatsQuery, useGetAllVisitorsQuery } = visitorApi;
+

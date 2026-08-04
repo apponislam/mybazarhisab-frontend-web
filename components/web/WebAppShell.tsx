@@ -1,18 +1,28 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, Camera, ShieldCheck, Globe, MapPin, LayoutDashboard, ChevronDown, Edit3 } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, Camera, ShieldCheck, Globe, MapPin, LayoutDashboard, ChevronDown, Edit3, Bell, MessageSquare, Star, Send } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@/types";
 import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
 import { PrimaryButton } from "@/components/app/ui/Shared";
 import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/redux/features/auth/authApi";
+import { useSubmitMessageMutation } from "@/redux/features/contact/contactApi";
+import { useCreateFeedbackMutation } from "@/redux/features/feedback/feedbackApi";
+import { useCreateReviewMutation } from "@/redux/features/review/reviewApi";
+import { useGetMyNotificationsQuery, useGetUnreadCountQuery, useMarkAllAsReadMutation, useDeleteAllNotificationsMutation, useDeleteNotificationMutation } from "@/redux/features/notification/notificationApi";
+import { useCreateBazarEntryMutation, useGetAllBazarEntriesQuery, useDeleteBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
+import { useCreateBillMutation, useGetAllBillsQuery, useDeleteBillMutation } from "@/redux/features/bill/billApi";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
+import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
 
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
     const router = useRouter();
     // Website Tabs
-    const [tab, setTab] = useState<"home" | "expenses" | "bills" | "profile">("home");
+    const [tab, setTab] = useState<"home" | "expenses" | "bills" | "notifications" | "profile">("home");
+    // Notification & User dropdown refs and states
+    const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+    const notifDropdownRef = useRef<HTMLDivElement>(null);
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -20,6 +30,9 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setShowUserDropdown(false);
+            }
+            if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node)) {
+                setShowNotifDropdown(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -36,9 +49,34 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const [expenseFilter, setExpenseFilter] = useState<"month" | "all">("month");
     const [billFilter, setBillFilter] = useState<"month" | "all">("month");
 
-    // Onboarding Modal States
+    // Onboarding & Interaction Modal States
     const [showAddExpense, setShowAddExpense] = useState(false);
     const [showAddBill, setShowAddBill] = useState(false);
+    const [showContact, setShowContact] = useState(false);
+    const [showFeedback, setShowFeedback] = useState(false);
+    const [showReview, setShowReview] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    // RTK Query Hooks for Interactions & Data Mutations
+    const [createBazarEntry, { isLoading: bazarLoading }] = useCreateBazarEntryMutation();
+    const [createBill, { isLoading: billMutationLoading }] = useCreateBillMutation();
+    const { data: unreadData } = useGetUnreadCountQuery();
+    const { data: notifData, isLoading: notifLoading } = useGetMyNotificationsQuery({ limit: 15 });
+    const [markAllAsRead] = useMarkAllAsReadMutation();
+    const [deleteAllNotifications] = useDeleteAllNotificationsMutation();
+    const [deleteNotification] = useDeleteNotificationMutation();
+    const [submitContact, { isLoading: contactLoading }] = useSubmitMessageMutation();
+    const [createFeedback, { isLoading: feedbackLoading }] = useCreateFeedbackMutation();
+    const [createReview, { isLoading: reviewLoading }] = useCreateReviewMutation();
+
+    // Form states for modals
+    const [contactSubject, setContactSubject] = useState("");
+    const [contactMsg, setContactMsg] = useState("");
+    const [feedbackCategory, setFeedbackCategory] = useState<"BUG" | "FEATURE_REQUEST" | "UI_UX" | "GENERAL">("GENERAL");
+    const [feedbackSubject, setFeedbackSubject] = useState("");
+    const [feedbackMsg, setFeedbackMsg] = useState("");
+    const [reviewRating, setReviewRating] = useState(5);
+    const [reviewComment, setReviewComment] = useState("");
 
     // Profile RTK Query Hooks & State
     const { data: userData } = useGetMeQuery();
@@ -192,39 +230,70 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     }, [entries, bills]);
 
     // Handlers
-    const handleAddExpense = (productName: string, price: number, quantity: number, unit: BazarUnit, dateStr: string, notes: string) => {
-        const matchedProduct = MOCK_PRODUCTS.find((p) => p.name.toLowerCase() === productName.toLowerCase()) || {
-            id: "p_" + Date.now(),
-            name: productName,
-            emoji: "🛒",
-        };
+    const handleAddExpense = async (productName: string, price: number, quantity: number, unit: BazarUnit, dateStr: string, notes: string) => {
+        try {
+            await createBazarEntry({
+                name: productName.trim(),
+                price: Number(price),
+                quantity: Number(quantity),
+                unit,
+                date: dateStr,
+                notes: notes ? notes.trim() : undefined,
+            }).unwrap();
 
-        const newEntry: MockBazarEntry = {
-            id: "e_" + Date.now(),
-            product: matchedProduct,
-            price,
-            quantity,
-            unit,
-            date: new Date(dateStr),
-            notes: notes || undefined,
-            user: MOCK_USERS[0],
-        };
+            toast.success(`Logged ${productName} expense successfully!`);
 
-        setEntries((prev) => [newEntry, ...prev]);
+            // Also update local mock copy for instant UI sync
+            const matchedProduct = MOCK_PRODUCTS.find((p) => p.name.toLowerCase() === productName.toLowerCase()) || {
+                id: "p_" + Date.now(),
+                name: productName,
+                emoji: "🛒",
+            };
+
+            const newEntry: MockBazarEntry = {
+                id: "e_" + Date.now(),
+                product: matchedProduct,
+                price,
+                quantity,
+                unit,
+                date: new Date(dateStr),
+                notes: notes || undefined,
+                user: MOCK_USERS[0],
+            };
+
+            setEntries((prev) => [newEntry, ...prev]);
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to add bazar expense");
+        }
     };
 
-    const handleAddBill = (category: BillCategory, title: string, amount: number, dateStr: string, notes: string) => {
-        const newBill: MockBill = {
-            id: "b_" + Date.now(),
-            category,
-            title,
-            amount,
-            date: new Date(dateStr),
-            notes: notes || undefined,
-            user: MOCK_USERS[0],
-        };
+    const handleAddBill = async (category: BillCategory, title: string, amount: number, dateStr: string, notes: string) => {
+        try {
+            await createBill({
+                category,
+                title: title.trim(),
+                amount: Number(amount),
+                date: dateStr,
+                notes: notes ? notes.trim() : undefined,
+            }).unwrap();
 
-        setBills((prev) => [newBill, ...prev]);
+            toast.success(`Logged ${title} bill successfully!`);
+
+            // Also update local mock copy for instant UI sync
+            const newBill: MockBill = {
+                id: "b_" + Date.now(),
+                category,
+                title,
+                amount,
+                date: new Date(dateStr),
+                notes: notes || undefined,
+                user: MOCK_USERS[0],
+            };
+
+            setBills((prev) => [newBill, ...prev]);
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to add monthly bill");
+        }
     };
 
     const handleDeleteExpense = (id: string) => {
@@ -282,7 +351,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                     {/* User profile dropdown & actions */}
                     <div className="flex items-center gap-3">
-                        {/* Quick buttons */}
+                        {/* Quick Action Trigger Buttons */}
                         <div className="hidden sm:flex items-center gap-2">
                             <button onClick={() => setShowAddExpense(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/10">
                                 <Plus className="w-3.5 h-3.5" /> Expense
@@ -290,6 +359,125 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             <button onClick={() => setShowAddBill(true)} className="flex items-center gap-1 px-3 py-1.5 border border-accent text-accent text-xs font-bold rounded-lg transition-all hover:bg-accent/10 cursor-pointer">
                                 <Plus className="w-3.5 h-3.5" /> Bill
                             </button>
+                        </div>
+
+                        {/* Notification Bell Dropdown Button */}
+                        <div className="relative" ref={notifDropdownRef}>
+                            <button
+                                onClick={() => {
+                                    setShowNotifDropdown((prev) => !prev);
+                                    if (!showNotifDropdown) {
+                                        markAllAsRead();
+                                    }
+                                }}
+                                className="p-2 rounded-full border border-border/80 hover:border-primary/50 bg-[#1a0e07] text-muted-foreground hover:text-primary transition-all relative cursor-pointer"
+                                title="Notifications"
+                            >
+                                <Bell className="w-4 h-4" />
+                                {unreadData?.data?.count ? (
+                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[9px] font-bold font-mono rounded-full flex items-center justify-center animate-pulse">
+                                        {unreadData.data.count}
+                                    </span>
+                                ) : null}
+                            </button>
+
+                            {/* Notification Dropdown Panel */}
+                            <AnimatePresence>
+                                {showNotifDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-[#251508] border border-border shadow-2xl p-4 z-50 flex flex-col gap-3 font-sans"
+                                    >
+                                        {/* Dropdown Header */}
+                                        <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
+                                            <div className="flex items-center gap-2">
+                                                <Bell className="w-4 h-4 text-primary" />
+                                                <h4 className="text-xs font-bold text-foreground">Notifications</h4>
+                                                {unreadData?.data?.count ? (
+                                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-primary/20 text-primary border border-primary/30">
+                                                        {unreadData.data.count} New
+                                                    </span>
+                                                ) : null}
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => markAllAsRead()}
+                                                    className="text-[10px] font-mono text-primary hover:underline cursor-pointer"
+                                                >
+                                                    Mark Read
+                                                </button>
+                                                <span className="text-muted-foreground/40 text-[10px]">•</span>
+                                                <button
+                                                    onClick={() => deleteAllNotifications()}
+                                                    className="text-[10px] font-mono text-destructive hover:underline cursor-pointer"
+                                                >
+                                                    Clear All
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Notifications List */}
+                                        <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+                                            {notifLoading ? (
+                                                <div className="p-6 text-center text-xs font-mono text-muted-foreground">
+                                                    Loading notifications…
+                                                </div>
+                                            ) : notifData?.data && notifData.data.length > 0 ? (
+                                                notifData.data.map((n: any) => (
+                                                    <div
+                                                        key={n._id}
+                                                        className={`p-3 rounded-xl border transition-all text-left flex items-start justify-between gap-2 ${
+                                                            !n.isRead
+                                                                ? "bg-primary/10 border-primary/30"
+                                                                : "bg-[#1a0e07] border-border/60 hover:bg-white/5"
+                                                        }`}
+                                                    >
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center justify-between gap-2 mb-0.5 font-mono text-[10px]">
+                                                                <span className="font-bold text-primary truncate">{n.title}</span>
+                                                                <span className="text-muted-foreground shrink-0 text-[9px]">
+                                                                    {new Date(n.createdAt).toLocaleDateString()}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-xs text-foreground font-sans line-clamp-2 leading-relaxed">
+                                                                {n.message}
+                                                            </p>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => deleteNotification(n._id)}
+                                                            className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors shrink-0"
+                                                            title="Delete notification"
+                                                        >
+                                                            <X className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="p-6 text-center text-xs font-mono text-muted-foreground">
+                                                    No notifications recorded yet.
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Dropdown Footer: See All Notifications Page trigger */}
+                                        <div className="border-t border-border/60 pt-2 flex items-center justify-center">
+                                            <button
+                                                onClick={() => {
+                                                    setShowNotifDropdown(false);
+                                                    setTab("notifications");
+                                                }}
+                                                className="text-xs font-bold text-primary hover:underline font-mono cursor-pointer py-1"
+                                            >
+                                                See All Notifications →
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         {/* Dynamic User Profile Avatar & Dropdown Menu */}
@@ -686,6 +874,80 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             </div>
                         )}
 
+                        {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
+                        {tab === "notifications" && (
+                            <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl font-sans">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
+                                            <Bell className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-foreground">Notifications & Activity Feed</h3>
+                                            <p className="text-xs text-muted-foreground font-mono">
+                                                All room updates, bazar entries, and account notifications
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={() => markAllAsRead()}
+                                            className="px-4 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary text-xs font-bold font-mono hover:bg-primary/25 transition-all cursor-pointer"
+                                        >
+                                            Mark All as Read
+                                        </button>
+                                        <button
+                                            onClick={() => deleteAllNotifications()}
+                                            className="px-4 py-2 rounded-xl bg-destructive/15 border border-destructive/30 text-destructive text-xs font-bold font-mono hover:bg-destructive/25 transition-all cursor-pointer"
+                                        >
+                                            Clear All Logs
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                                    {notifLoading ? (
+                                        <div className="p-12 text-center text-xs font-mono text-muted-foreground">
+                                            Fetching notifications log history…
+                                        </div>
+                                    ) : notifData?.data && notifData.data.length > 0 ? (
+                                        notifData.data.map((n: any) => (
+                                            <div
+                                                key={n._id}
+                                                className={`p-4 rounded-2xl border transition-all text-left flex items-start justify-between gap-4 ${
+                                                    !n.isRead
+                                                        ? "bg-primary/10 border-primary/40 shadow-md"
+                                                        : "bg-[#1a0e07] border-border/60 hover:bg-white/5"
+                                                }`}
+                                            >
+                                                <div className="min-w-0 flex-1 space-y-1">
+                                                    <div className="flex items-center justify-between font-mono text-xs">
+                                                        <span className="font-bold text-primary">{n.title}</span>
+                                                        <span className="text-[10px] text-muted-foreground">
+                                                            {new Date(n.createdAt).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-foreground font-sans leading-relaxed">{n.message}</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => deleteNotification(n._id)}
+                                                    className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors shrink-0 cursor-pointer"
+                                                    title="Delete notification"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">
+                                            No notifications found in your account logs.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
                         {tab === "profile" && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start font-sans">
@@ -759,6 +1021,34 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 <p className="text-foreground font-mono text-xs">
                                                     {[street, city, state, zipCode, country].filter(Boolean).join(", ") || "No address specified"}
                                                 </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Quick Actions & Support Section inside Profile */}
+                                        <div className="pt-4 border-t border-border flex flex-col gap-3">
+                                            <h4 className="text-xs font-bold text-muted-foreground font-mono uppercase tracking-wider">Help & Support Actions</h4>
+                                            <div className="grid grid-cols-3 gap-3">
+                                                <button
+                                                    onClick={() => setShowFeedback(true)}
+                                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1a0e07] border border-border/60 hover:border-primary/50 text-muted-foreground hover:text-primary transition-all cursor-pointer gap-1.5"
+                                                >
+                                                    <MessageSquare className="w-5 h-5 text-primary" />
+                                                    <span className="text-[11px] font-bold">Feedback</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowContact(true)}
+                                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1a0e07] border border-border/60 hover:border-primary/50 text-muted-foreground hover:text-primary transition-all cursor-pointer gap-1.5"
+                                                >
+                                                    <Mail className="w-5 h-5 text-primary" />
+                                                    <span className="text-[11px] font-bold">Contact</span>
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowReview(true)}
+                                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1a0e07] border border-border/60 hover:border-amber-400/50 text-muted-foreground hover:text-amber-400 transition-all cursor-pointer gap-1.5"
+                                                >
+                                                    <Star className="w-5 h-5 text-amber-400" />
+                                                    <span className="text-[11px] font-bold">Review</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -964,17 +1254,21 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-3 pt-2">
+                                            <div className="flex gap-3 pt-4 border-t border-border/60">
                                                 <button
                                                     type="button"
                                                     onClick={() => setIsEditingProfile(false)}
-                                                    className="px-5 py-3 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
+                                                    className="flex-1 py-3 border border-border text-foreground font-bold text-xs rounded-xl hover:bg-secondary transition-all cursor-pointer text-center"
                                                 >
                                                     Cancel
                                                 </button>
-                                                <div className="flex-1">
-                                                    <PrimaryButton loading={profileLoading} label="Save Profile Changes" loadingLabel="Saving changes…" />
-                                                </div>
+                                                <button
+                                                    type="submit"
+                                                    disabled={profileLoading}
+                                                    className="flex-1 py-3 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-accent transition-all cursor-pointer shadow-md shadow-primary/10 disabled:opacity-50 text-center"
+                                                >
+                                                    {profileLoading ? "Saving…" : "Save Changes"}
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
@@ -1047,7 +1341,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                             </div>
                                         </FieldBox>
 
-                                        <FieldBox label="Repeat New Password" focused={false}>
+                                        <FieldBox label="Re-enter New Password" focused={false}>
                                             <div className="flex items-center">
                                                 <span className="pl-4 text-muted-foreground">
                                                     <Lock className="w-4 h-4" />
@@ -1063,8 +1357,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                             </div>
                                         </FieldBox>
 
-                                        <div className="pt-2">
-                                            <PrimaryButton loading={passLoading} label="Reset Password" loadingLabel="Resetting password…" />
+                                        <div className="pt-4 border-t border-border/60 flex justify-end">
+                                            <button
+                                                type="submit"
+                                                disabled={passLoading}
+                                                className="w-full py-3 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-accent transition-all cursor-pointer shadow-md shadow-primary/10 disabled:opacity-50 text-center"
+                                            >
+                                                {passLoading ? "Resetting Password…" : "Reset Password"}
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -1077,6 +1377,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             {/* Website Dialog: Add Bazar Expense */}
             <Modal show={showAddExpense} onClose={() => setShowAddExpense(false)} title="Add Bazar Expense">
                 <AddExpenseForm
+                    isLoading={bazarLoading}
                     onSubmit={(prod, price, qty, unit, date, notes) => {
                         handleAddExpense(prod, price, qty, unit, date, notes);
                         setShowAddExpense(false);
@@ -1088,12 +1389,250 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             {/* Website Dialog: Add Monthly Bill */}
             <Modal show={showAddBill} onClose={() => setShowAddBill(false)} title="Add Monthly Bill">
                 <AddBillForm
+                    isLoading={billMutationLoading}
                     onSubmit={(cat, title, amount, date, notes) => {
                         handleAddBill(cat, title, amount, date, notes);
                         setShowAddBill(false);
                     }}
                     onClose={() => setShowAddBill(false)}
                 />
+            </Modal>
+
+            {/* Website Dialog: Contact Us */}
+            <Modal show={showContact} onClose={() => setShowContact(false)} title="Contact Us / Support">
+                <form
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!contactSubject || !contactMsg) return;
+                        try {
+                            await submitContact({
+                                name: currentUser?.name || "User",
+                                email: currentUser?.email || "user@example.com",
+                                subject: contactSubject,
+                                message: contactMsg,
+                            }).unwrap();
+                            toast.success("Message submitted successfully!");
+                            setContactSubject("");
+                            setContactMsg("");
+                            setShowContact(false);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || "Failed to send message");
+                        }
+                    }}
+                    className="flex flex-col gap-4 text-left"
+                >
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Subject</label>
+                        <input
+                            type="text"
+                            value={contactSubject}
+                            onChange={(e) => setContactSubject(e.target.value)}
+                            required
+                            placeholder="What can we help you with?"
+                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Message</label>
+                        <textarea
+                            value={contactMsg}
+                            onChange={(e) => setContactMsg(e.target.value)}
+                            required
+                            rows={4}
+                            placeholder="Type your message details here…"
+                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none"
+                        />
+                    </div>
+                    <div className="flex gap-3 mt-2">
+                        <button type="button" onClick={() => setShowContact(false)} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={contactLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer disabled:opacity-50">
+                            {contactLoading ? "Sending…" : "Send Message"}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Website Dialog: Give Feedback */}
+            <Modal show={showFeedback} onClose={() => setShowFeedback(false)} title="Submit Feedback">
+                <form
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!feedbackSubject || !feedbackMsg) return;
+                        try {
+                            await createFeedback({
+                                category: feedbackCategory,
+                                subject: feedbackSubject,
+                                message: feedbackMsg,
+                            }).unwrap();
+                            toast.success("Thank you! Feedback submitted.");
+                            setFeedbackSubject("");
+                            setFeedbackMsg("");
+                            setShowFeedback(false);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || "Failed to submit feedback");
+                        }
+                    }}
+                    className="flex flex-col gap-4 text-left"
+                >
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Category</label>
+                        <select
+                            value={feedbackCategory}
+                            onChange={(e) => setFeedbackCategory(e.target.value as any)}
+                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans"
+                            style={{ colorScheme: "dark" }}
+                        >
+                            <option value="GENERAL">General Feedback</option>
+                            <option value="BUG">Report a Bug</option>
+                            <option value="FEATURE_REQUEST">Feature Request</option>
+                            <option value="UI_UX">UI / UX Improvement</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Subject</label>
+                        <input
+                            type="text"
+                            value={feedbackSubject}
+                            onChange={(e) => setFeedbackSubject(e.target.value)}
+                            required
+                            placeholder="Feedback title..."
+                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Feedback Details</label>
+                        <textarea
+                            value={feedbackMsg}
+                            onChange={(e) => setFeedbackMsg(e.target.value)}
+                            required
+                            rows={4}
+                            placeholder="Tell us what you think..."
+                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none"
+                        />
+                    </div>
+                    <div className="flex gap-3 mt-2">
+                        <button type="button" onClick={() => setShowFeedback(false)} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={feedbackLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer disabled:opacity-50">
+                            {feedbackLoading ? "Submitting…" : "Submit Feedback"}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Website Dialog: Leave a Review */}
+            <Modal show={showReview} onClose={() => setShowReview(false)} title="Leave a User Review">
+                <form
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!reviewComment) return;
+                        try {
+                            await createReview({
+                                rating: reviewRating,
+                                comment: reviewComment,
+                            }).unwrap();
+                            toast.success("Review posted successfully!");
+                            setReviewComment("");
+                            setShowReview(false);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || "Failed to post review");
+                        }
+                    }}
+                    className="flex flex-col gap-4 text-left"
+                >
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Rating (1 to 5 Stars)</label>
+                        <div className="flex items-center gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setReviewRating(star)}
+                                    className="p-2 text-2xl transition-transform hover:scale-110 cursor-pointer"
+                                >
+                                    <Star className={`w-7 h-7 ${star <= reviewRating ? "text-amber-400 fill-amber-400" : "text-muted-foreground"}`} />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Your Review</label>
+                        <textarea
+                            value={reviewComment}
+                            onChange={(e) => setReviewComment(e.target.value)}
+                            required
+                            rows={4}
+                            placeholder="Share your experience using My Bazar Hisab..."
+                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none"
+                        />
+                    </div>
+                    <div className="flex gap-3 mt-2">
+                        <button type="button" onClick={() => setShowReview(false)} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={reviewLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer disabled:opacity-50">
+                            {reviewLoading ? "Posting…" : "Post Review"}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Website Dialog: Notifications Full Modal */}
+            <Modal show={showNotifications} onClose={() => setShowNotifications(false)} title="Notification History & Logs">
+                <div className="flex flex-col gap-4 font-sans text-left">
+                    <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                        <span className="text-xs font-mono text-muted-foreground">
+                            Total: <span className="font-bold text-primary">{notifData?.data?.length || 0}</span> notifications
+                        </span>
+                        {notifData?.data && notifData.data.length > 0 && (
+                            <button
+                                onClick={() => deleteAllNotifications()}
+                                className="px-3 py-1 rounded-xl bg-destructive/15 text-destructive border border-destructive/30 text-xs font-mono font-bold hover:bg-destructive/25 transition-all cursor-pointer"
+                            >
+                                Clear All Notifications
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
+                        {notifData?.data && notifData.data.length > 0 ? (
+                            notifData.data.map((n: any) => (
+                                <div
+                                    key={n._id}
+                                    className={`p-4 rounded-2xl border transition-all text-left flex items-start justify-between gap-3 ${
+                                        !n.isRead
+                                            ? "bg-primary/10 border-primary/40 shadow-sm"
+                                            : "bg-[#1a0e07] border-border/60 hover:bg-white/5"
+                                    }`}
+                                >
+                                    <div className="min-w-0 flex-1 space-y-1">
+                                        <div className="flex items-center justify-between font-mono text-xs">
+                                            <span className="font-bold text-primary">{n.title}</span>
+                                            <span className="text-[10px] text-muted-foreground">
+                                                {new Date(n.createdAt).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-foreground font-sans leading-relaxed">{n.message}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => deleteNotification(n._id)}
+                                        className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors shrink-0 cursor-pointer"
+                                        title="Delete notification"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="p-12 text-center text-xs font-mono text-muted-foreground">
+                                No notification messages recorded.
+                            </p>
+                        )}
+                    </div>
+                </div>
             </Modal>
         </div>
     );
@@ -1148,7 +1687,7 @@ function FieldBox({ label, focused, error, children }: { label: string; focused:
 }
 
 // Add forms components (using direct design matching web view)
-function AddExpenseForm({ onSubmit, onClose }: { onSubmit: (prod: string, price: number, qty: number, unit: BazarUnit, date: string, notes: string) => void; onClose: () => void }) {
+function AddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: (prod: string, price: number, qty: number, unit: BazarUnit, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
     const [product, setProduct] = useState("");
     const [price, setPrice] = useState("");
     const [quantity, setQuantity] = useState("");
@@ -1166,16 +1705,19 @@ function AddExpenseForm({ onSubmit, onClose }: { onSubmit: (prod: string, price:
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Product Name</label>
-                <input type="text" value={product} onChange={(e) => setProduct(e.target.value)} required placeholder="e.g. Rice, Hilsha Fish, Onion" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
+                <ProductSelectInput
+                    valueName={product}
+                    onSelect={(p) => setProduct(p.name)}
+                />
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Price (৳)</label>
-                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono" />
+                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                 </div>
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Quantity</label>
-                    <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="e.g. 2, 1.5" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono" />
+                    <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="e.g. 2, 1.5" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                 </div>
             </div>
             <div className="flex flex-col gap-1.5">
@@ -1200,21 +1742,21 @@ function AddExpenseForm({ onSubmit, onClose }: { onSubmit: (prod: string, price:
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Notes (optional)</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Add purchase details..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none" />
+                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Add purchase details..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none text-foreground" />
             </div>
             <div className="flex gap-3 mt-4">
                 <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl transition-all hover:bg-secondary cursor-pointer">
                     Cancel
                 </button>
-                <button type="submit" className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer">
-                    Save Entry
+                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer disabled:opacity-50">
+                    {isLoading ? "Saving Entry…" : "Save Entry"}
                 </button>
             </div>
         </form>
     );
 }
 
-function AddBillForm({ onSubmit, onClose }: { onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void; onClose: () => void }) {
+function AddBillForm({ onSubmit, onClose, isLoading }: { onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
     const [category, setCategory] = useState<BillCategory>("RENT");
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
@@ -1234,7 +1776,7 @@ function AddBillForm({ onSubmit, onClose }: { onSubmit: (cat: BillCategory, titl
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value as BillCategory)} className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans" style={{ colorScheme: "dark" }}>
+                    <select value={category} onChange={(e) => setCategory(e.target.value as BillCategory)} className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans text-foreground" style={{ colorScheme: "dark" }}>
                         {BILL_CATEGORIES_LIST.map((c) => (
                             <option key={c.key} value={c.key}>
                                 {c.label}
@@ -1244,12 +1786,12 @@ function AddBillForm({ onSubmit, onClose }: { onSubmit: (cat: BillCategory, titl
                 </div>
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Amount (৳)</label>
-                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono" />
+                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                 </div>
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Bill Title</label>
-                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. July House Rent, Wi-Fi Bill" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
+                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. July House Rent, Wi-Fi Bill" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground" />
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Billing Date</label>
@@ -1257,14 +1799,14 @@ function AddBillForm({ onSubmit, onClose }: { onSubmit: (cat: BillCategory, titl
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Notes (optional)</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Add billing details..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none" />
+                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Add billing details..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none text-foreground" />
             </div>
             <div className="flex gap-3 mt-4">
                 <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl transition-all hover:bg-secondary cursor-pointer">
                     Cancel
                 </button>
-                <button type="submit" className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer">
-                    Save Bill
+                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer disabled:opacity-50">
+                    {isLoading ? "Saving Bill…" : "Save Bill"}
                 </button>
             </div>
         </form>

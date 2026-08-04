@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search, Trash2, Eye, Receipt, User, Calendar, ShieldCheck } from "lucide-react";
+import { Search, Trash2, Eye, Edit2, Receipt, User, Calendar, ShieldCheck } from "lucide-react";
 import { TBill, BillCategory } from "@/redux/features/bill/billApi";
 
 interface BillsGridProps {
@@ -10,6 +10,7 @@ interface BillsGridProps {
     searchTerm: string;
     onSearchChange: (term: string) => void;
     onViewDetails?: (id: string) => void;
+    onEditBill?: (bill: TBill) => void;
     onDeleteBill: (bill: TBill) => void;
 }
 
@@ -33,6 +34,7 @@ export function BillsGrid({
     searchTerm,
     onSearchChange,
     onViewDetails,
+    onEditBill,
     onDeleteBill,
 }: BillsGridProps) {
     return (
@@ -93,6 +95,15 @@ export function BillsGrid({
                                                         title="View Details"
                                                     >
                                                         <Eye className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                                {onEditBill && (
+                                                    <button
+                                                        onClick={() => onEditBill(b)}
+                                                        className="text-muted-foreground hover:text-accent p-1 rounded-md transition-colors cursor-pointer"
+                                                        title="Edit Bill"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
                                                     </button>
                                                 )}
                                                 <button

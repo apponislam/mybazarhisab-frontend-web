@@ -211,7 +211,6 @@ export default function DashboardPage() {
             <AddExpenseModal
                 show={showAddExpense}
                 onClose={() => setShowAddExpense(false)}
-                onSubmit={handleAddExpense}
             />
 
             <AddBillModal

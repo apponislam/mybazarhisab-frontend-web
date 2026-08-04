@@ -8,6 +8,7 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { BillsGrid } from "@/components/dashboard/bills/BillsGrid";
 import { AddBillModal } from "@/components/dashboard/bills/AddBillModal";
+import { EditBillModal } from "@/components/dashboard/bills/EditBillModal";
 import { DeleteBillModal } from "@/components/dashboard/bills/DeleteBillModal";
 
 export default function DashboardBillsPage() {
@@ -30,6 +31,7 @@ export default function DashboardBillsPage() {
 
     // Modal state
     const [showAddBill, setShowAddBill] = useState(false);
+    const [editingBill, setEditingBill] = useState<TBill | null>(null);
     const [deletingBill, setDeletingBill] = useState<TBill | null>(null);
 
     return (
@@ -84,6 +86,7 @@ export default function DashboardBillsPage() {
                             setSearchTerm(val);
                             setPage(1);
                         }}
+                        onEditBill={(bill) => setEditingBill(bill)}
                         onDeleteBill={(bill) => setDeletingBill(bill)}
                     />
 
@@ -126,6 +129,7 @@ export default function DashboardBillsPage() {
 
             {/* Modals */}
             <AddBillModal show={showAddBill} onClose={() => setShowAddBill(false)} />
+            <EditBillModal bill={editingBill} onClose={() => setEditingBill(null)} />
             <DeleteBillModal bill={deletingBill} onClose={() => setDeletingBill(null)} />
         </div>
     );

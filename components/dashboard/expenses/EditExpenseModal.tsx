@@ -1,60 +1,71 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Plus, X } from "lucide-react";
+import { Edit2, X } from "lucide-react";
 import { toast } from "sonner";
-import { BazarUnit, useCreateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
+import { TBazarEntry, BazarUnit, useUpdateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { ProductSelectInput } from "./ProductSelectInput";
 
-interface AddExpenseModalProps {
-    show: boolean;
+interface EditExpenseModalProps {
+    entry: TBazarEntry | null;
     onClose: () => void;
 }
 
-export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
-    const [createBazarEntry, { isLoading }] = useCreateBazarEntryMutation();
+export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
+    const [updateBazarEntry, { isLoading }] = useUpdateBazarEntryMutation();
     const [productId, setProductId] = useState<string | undefined>(undefined);
-    const [productName, setProductName] = useState("");
+    const [name, setName] = useState("");
     const [price, setPrice] = useState("");
     const [quantity, setQuantity] = useState("1");
     const [unit, setUnit] = useState<BazarUnit>("KG");
-    const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+    const [date, setDate] = useState("");
     const [notes, setNotes] = useState("");
+
+    useEffect(() => {
+        if (entry) {
+            setProductId(entry.product?._id);
+            setName(entry.product?.name || "");
+            setPrice(entry.price ? String(entry.price) : "");
+            setQuantity(entry.quantity ? String(entry.quantity) : "1");
+            setUnit(entry.unit || "KG");
+            setDate(entry.date ? new Date(entry.date).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10));
+            setNotes(entry.notes || "");
+        }
+    }, [entry]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!productName.trim() || !price || !quantity) {
-            toast.error("Please select or enter product name, price, and quantity");
+        if (!entry) return;
+        if (!name.trim() || !price || !quantity) {
+            toast.error("Product name, price, and quantity are required");
             return;
         }
 
         try {
-            await createBazarEntry({
-                productId: productId || undefined,
-                name: productName.trim(),
-                price: Number(price),
-                quantity: Number(quantity),
-                unit,
-                date: date ? new Date(date).toISOString() : undefined,
-                notes: notes.trim() || undefined,
+            await updateBazarEntry({
+                id: entry._id,
+                data: {
+                    productId: productId || undefined,
+                    name: name.trim(),
+                    price: Number(price),
+                    quantity: Number(quantity),
+                    unit,
+                    date: date ? new Date(date).toISOString() : undefined,
+                    notes: notes.trim() || undefined,
+                },
             }).unwrap();
 
-            toast.success("Bazar expense created successfully!");
-            setProductId(undefined);
-            setProductName("");
-            setPrice("");
-            setQuantity("1");
-            setNotes("");
+            toast.success("Bazar expense updated successfully!");
             onClose();
         } catch (err: any) {
-            toast.error(err?.data?.message || err?.message || "Failed to create bazar expense");
+            toast.error(err?.data?.message || err?.message || "Failed to update bazar expense");
         }
     };
 
     return (
         <AnimatePresence>
-            {show && (
+            {entry && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs font-sans">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -64,10 +75,13 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
                     >
                         <div className="flex items-center justify-between border-b border-border pb-3">
                             <div className="flex items-center gap-2.5">
-                                <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-                                    <Plus className="w-5 h-5 text-primary" />
+                                <div className="w-9 h-9 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center">
+                                    <Edit2 className="w-5 h-5 text-accent" />
                                 </div>
-                                <h3 className="text-base font-bold text-foreground">Add Bazar Expense</h3>
+                                <div>
+                                    <h3 className="text-base font-bold text-foreground">Edit Bazar Expense</h3>
+                                    <p className="text-xs text-muted-foreground font-mono select-all">ID: {entry._id}</p>
+                                </div>
                             </div>
                             <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground cursor-pointer">
                                 <X className="w-5 h-5" />
@@ -80,10 +94,10 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
                                     Product Name <span className="text-destructive">*</span>
                                 </label>
                                 <ProductSelectInput
-                                    valueName={productName}
+                                    valueName={name}
                                     onSelect={(prod) => {
                                         setProductId(prod.id);
-                                        setProductName(prod.name);
+                                        setName(prod.name);
                                     }}
                                 />
                             </div>
@@ -147,11 +161,19 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
                                 />
                             </div>
                             <div className="flex gap-3 pt-2">
-                                <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs"
+                                >
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer text-xs disabled:opacity-50">
-                                    {isLoading ? "Saving…" : "Save Expense"}
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="flex-1 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:opacity-90 cursor-pointer text-xs disabled:opacity-50"
+                                >
+                                    {isLoading ? "Updating…" : "Update Expense"}
                                 </button>
                             </div>
                         </form>

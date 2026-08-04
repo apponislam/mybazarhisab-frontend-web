@@ -15,6 +15,8 @@ import { useCreateBazarEntryMutation, useGetAllBazarEntriesQuery, useDeleteBazar
 import { useCreateBillMutation, useGetAllBillsQuery, useDeleteBillMutation } from "@/redux/features/bill/billApi";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
 import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
+import { WebPagination } from "@/components/web/shell/WebPagination";
+import { WebConfirmModal } from "@/components/web/shell/WebModal";
 
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
     const router = useRouter();
@@ -864,27 +866,16 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                                 {/* Expenses Pagination Footer */}
                                 {bazarEntriesResponse?.meta && (
-                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-border/60 text-xs font-mono">
-                                        <span className="text-muted-foreground">
-                                            Showing Page <span className="text-primary font-bold">{bazarEntriesResponse.meta.page}</span> of <span className="font-bold">{bazarEntriesResponse.meta.totalPages || 1}</span> (Total {bazarEntriesResponse.meta.total} entries)
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => setExpensePage((p) => Math.max(p - 1, 1))}
-                                                disabled={!bazarEntriesResponse.meta.hasPrev}
-                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-                                            >
-                                                ← Prev
-                                            </button>
-                                            <button
-                                                onClick={() => setExpensePage((p) => p + 1)}
-                                                disabled={!bazarEntriesResponse.meta.hasNext}
-                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-                                            >
-                                                Next →
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <WebPagination
+                                        page={bazarEntriesResponse.meta.page}
+                                        totalPages={bazarEntriesResponse.meta.totalPages}
+                                        total={bazarEntriesResponse.meta.total}
+                                        itemLabel="entries"
+                                        hasPrev={bazarEntriesResponse.meta.hasPrev}
+                                        hasNext={bazarEntriesResponse.meta.hasNext}
+                                        onPrev={() => setExpensePage((p) => Math.max(p - 1, 1))}
+                                        onNext={() => setExpensePage((p) => p + 1)}
+                                    />
                                 )}
                             </div>
                         )}
@@ -983,27 +974,16 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                                 {/* Bills Pagination Footer */}
                                 {billsResponse?.meta && (
-                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-border/60 text-xs font-mono">
-                                        <span className="text-muted-foreground">
-                                            Showing Page <span className="text-primary font-bold">{billsResponse.meta.page}</span> of <span className="font-bold">{billsResponse.meta.totalPages || 1}</span> (Total {billsResponse.meta.total} bills)
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => setBillPage((p) => Math.max(p - 1, 1))}
-                                                disabled={!billsResponse.meta.hasPrev}
-                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-                                            >
-                                                ← Prev
-                                            </button>
-                                            <button
-                                                onClick={() => setBillPage((p) => p + 1)}
-                                                disabled={!billsResponse.meta.hasNext}
-                                                className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
-                                            >
-                                                Next →
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <WebPagination
+                                        page={billsResponse.meta.page}
+                                        totalPages={billsResponse.meta.totalPages}
+                                        total={billsResponse.meta.total}
+                                        itemLabel="bills"
+                                        hasPrev={billsResponse.meta.hasPrev}
+                                        hasNext={billsResponse.meta.hasNext}
+                                        onPrev={() => setBillPage((p) => Math.max(p - 1, 1))}
+                                        onNext={() => setBillPage((p) => p + 1)}
+                                    />
                                 )}
                             </div>
                         )}
@@ -1770,60 +1750,32 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             </Modal>
 
             {/* Website Dialog: Delete Expense Confirmation */}
-            <Modal show={Boolean(deletingExpenseId)} onClose={() => setDeletingExpenseId(null)} title="Confirm Delete Expense">
-                <div className="flex flex-col gap-4 font-sans text-left">
-                    <p className="text-sm text-foreground">
-                        Are you sure you want to delete this bazar expense record? This action cannot be undone.
-                    </p>
-                    <div className="flex gap-3 pt-2 border-t border-border/60">
-                        <button
-                            onClick={() => setDeletingExpenseId(null)}
-                            className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={async () => {
-                                if (deletingExpenseId) {
-                                    await handleDeleteExpense(deletingExpenseId);
-                                    setDeletingExpenseId(null);
-                                }
-                            }}
-                            className="flex-1 py-2.5 bg-destructive text-destructive-foreground font-bold text-xs rounded-xl hover:bg-destructive/90 transition-all cursor-pointer shadow-md"
-                        >
-                            Confirm Delete
-                        </button>
-                    </div>
-                </div>
-            </Modal>
+            <WebConfirmModal
+                show={Boolean(deletingExpenseId)}
+                onClose={() => setDeletingExpenseId(null)}
+                title="Confirm Delete Expense"
+                message="Are you sure you want to delete this bazar expense record? This action cannot be undone."
+                onConfirm={async () => {
+                    if (deletingExpenseId) {
+                        await handleDeleteExpense(deletingExpenseId);
+                        setDeletingExpenseId(null);
+                    }
+                }}
+            />
 
             {/* Website Dialog: Delete Bill Confirmation */}
-            <Modal show={Boolean(deletingBillId)} onClose={() => setDeletingBillId(null)} title="Confirm Delete Monthly Bill">
-                <div className="flex flex-col gap-4 font-sans text-left">
-                    <p className="text-sm text-foreground">
-                        Are you sure you want to delete this monthly bill record? This action cannot be undone.
-                    </p>
-                    <div className="flex gap-3 pt-2 border-t border-border/60">
-                        <button
-                            onClick={() => setDeletingBillId(null)}
-                            className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={async () => {
-                                if (deletingBillId) {
-                                    await handleDeleteBill(deletingBillId);
-                                    setDeletingBillId(null);
-                                }
-                            }}
-                            className="flex-1 py-2.5 bg-destructive text-destructive-foreground font-bold text-xs rounded-xl hover:bg-destructive/90 transition-all cursor-pointer shadow-md"
-                        >
-                            Confirm Delete
-                        </button>
-                    </div>
-                </div>
-            </Modal>
+            <WebConfirmModal
+                show={Boolean(deletingBillId)}
+                onClose={() => setDeletingBillId(null)}
+                title="Confirm Delete Monthly Bill"
+                message="Are you sure you want to delete this monthly bill record? This action cannot be undone."
+                onConfirm={async () => {
+                    if (deletingBillId) {
+                        await handleDeleteBill(deletingBillId);
+                        setDeletingBillId(null);
+                    }
+                }}
+            />
         </div>
     );
 }

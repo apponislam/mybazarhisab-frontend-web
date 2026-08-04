@@ -1,14 +1,24 @@
-import { baseApi } from "../../api/baseApi";
+import { baseApi } from "@/redux/api/baseApi";
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+export type TActivityUser = {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    profileImage?: string;
+};
 
-export type ActivityType = "REGISTER" | "LOGIN" | "EMAIL_VERIFY" | "PASSWORD_RESET" | "PROFILE_UPDATE" | "PASSWORD_CHANGE" | "EMAIL_UPDATE" | "USER_DELETE" | "CREATE_PRODUCT" | "UPDATE_PRODUCT" | "DELETE_PRODUCT" | "MERGE_PRODUCTS" | "CREATE_BAZAR_ENTRY" | "UPDATE_BAZAR_ENTRY" | "DELETE_BAZAR_ENTRY" | "CREATE_GROUP" | "JOIN_GROUP" | "LEAVE_GROUP" | "UPDATE_GROUP" | "CREATE_BILL" | "UPDATE_BILL" | "DELETE_BILL";
+export type TActivityGroup = {
+    _id: string;
+    name: string;
+    creator?: string;
+};
 
 export type TActivity = {
     _id: string;
-    user: { _id: string; name: string; email: string; phone?: string; profileImage?: string };
-    group?: { _id: string; name: string };
-    action: ActivityType;
+    user?: TActivityUser | string;
+    group?: TActivityGroup | string;
+    action: string;
     details: string;
     metadata?: Record<string, any>;
     isDeleted: boolean;
@@ -16,7 +26,18 @@ export type TActivity = {
     updatedAt: string;
 };
 
-export type TMeta = {
+export type ActivityQueryParams = {
+    page?: number;
+    limit?: number;
+    type?: string;
+    action?: string;
+    userId?: string;
+    groupId?: string;
+    startDate?: string;
+    endDate?: string;
+};
+
+export type ActivityMeta = {
     page: number;
     limit: number;
     total: number;
@@ -25,65 +46,73 @@ export type TMeta = {
     hasPrev: boolean;
 };
 
-type CommonResponse<T = null> = {
+type CommonResponse<T> = {
     success: boolean;
     message: string;
     data: T;
-    meta?: TMeta;
+    meta?: ActivityMeta;
 };
-
-export type ActivityQueryParams = {
-    page?: number;
-    limit?: number;
-    action?: string;
-    type?: string;
-    userId?: string;
-    groupId?: string;
-    startDate?: string;
-    endDate?: string;
-};
-
-export type ClearActivitiesParams = {
-    userId?: string;
-    groupId?: string;
-    action?: string;
-    type?: string;
-};
-
-// ── API ────────────────────────────────────────────────────────────────────────
 
 const activityApi = baseApi.injectEndpoints({
     overrideExisting: true,
     endpoints: (builder) => ({
         // GET /activities (Admin)
         getAllActivities: builder.query<CommonResponse<TActivity[]>, ActivityQueryParams | void>({
-            query: (params) => ({
-                url: "/activities",
-                method: "GET",
-                params: params || undefined,
-            }),
+            query: (params) => {
+                const queryParams = new URLSearchParams();
+                if (params) {
+                    if (params.page) queryParams.append("page", String(params.page));
+                    if (params.limit) queryParams.append("limit", String(params.limit));
+                    if (params.type) queryParams.append("type", params.type);
+                    if (params.action) queryParams.append("action", params.action);
+                    if (params.userId) queryParams.append("userId", params.userId);
+                    if (params.groupId) queryParams.append("groupId", params.groupId);
+                    if (params.startDate) queryParams.append("startDate", params.startDate);
+                    if (params.endDate) queryParams.append("endDate", params.endDate);
+                }
+                const queryString = queryParams.toString();
+                return {
+                    url: `/activities${queryString ? `?${queryString}` : ""}`,
+                    method: "GET",
+                };
+            },
             providesTags: ["Activity"],
         }),
 
-        // DELETE /activities (Admin) — clear all
-        clearActivities: builder.mutation<CommonResponse, ClearActivitiesParams | void>({
-            query: (params) => ({
-                url: "/activities",
-                method: "DELETE",
-                params: params || undefined,
-            }),
-            invalidatesTags: ["Activity"],
-        }),
-
         // DELETE /activities/:id (Admin)
-        deleteActivity: builder.mutation<CommonResponse, string>({
+        deleteActivity: builder.mutation<CommonResponse<TActivity>, string>({
             query: (id) => ({
                 url: `/activities/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["Activity"],
         }),
+
+        // DELETE /activities (Admin - Clear activities with optional filters)
+        clearActivities: builder.mutation<CommonResponse<{ message: string; count: number }>, ActivityQueryParams | void>({
+            query: (params) => {
+                const queryParams = new URLSearchParams();
+                if (params) {
+                    if (params.type) queryParams.append("type", params.type);
+                    if (params.action) queryParams.append("action", params.action);
+                    if (params.userId) queryParams.append("userId", params.userId);
+                    if (params.groupId) queryParams.append("groupId", params.groupId);
+                    if (params.startDate) queryParams.append("startDate", params.startDate);
+                    if (params.endDate) queryParams.append("endDate", params.endDate);
+                }
+                const queryString = queryParams.toString();
+                return {
+                    url: `/activities${queryString ? `?${queryString}` : ""}`,
+                    method: "DELETE",
+                };
+            },
+            invalidatesTags: ["Activity"],
+        }),
     }),
 });
 
-export const { useGetAllActivitiesQuery, useClearActivitiesMutation, useDeleteActivityMutation } = activityApi;
+export const {
+    useGetAllActivitiesQuery,
+    useDeleteActivityMutation,
+    useClearActivitiesMutation,
+} = activityApi;

@@ -14,6 +14,7 @@ import {
     Users,
     Settings,
     LogOut,
+    Activity,
 } from "lucide-react";
 
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
@@ -49,6 +50,7 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
         { id: "products", label: "Products Catalog", icon: <Package className="w-4 h-4" />, href: "/dashboard/products" },
         { id: "reviews", label: "User Reviews", icon: <Star className="w-4 h-4" />, href: "/dashboard/reviews" },
         { id: "visitors", label: "Visitor Analytics", icon: <BarChart2 className="w-4 h-4" />, href: "/dashboard/visitors" },
+        { id: "activities", label: "Activity Logs", icon: <Activity className="w-4 h-4" />, href: "/dashboard/activities" },
         { id: "policies", label: "Legal Policies", icon: <Shield className="w-4 h-4" />, href: "/dashboard/policies" },
         { id: "contacts", label: "Support Messages", icon: <Mail className="w-4 h-4" />, href: "/dashboard/contacts" },
         { id: "members", label: "Group Members", icon: <Users className="w-4 h-4" />, href: "/dashboard/members" },

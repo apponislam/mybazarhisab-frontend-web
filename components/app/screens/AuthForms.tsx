@@ -3,13 +3,21 @@ import { motion } from "motion/react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle, User, Camera, Phone } from "lucide-react";
 import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox } from "@/components/app/ui/Shared";
 import { toast } from "sonner";
-import { useLoginMutation, useRegisterMutation } from "@/redux/features/auth/authApi";
+import {
+    useLoginMutation,
+    useRegisterMutation,
+    useForgotPasswordMutation,
+    useVerifyOtpMutation,
+    useResendOtpMutation,
+    useResetPasswordMutation,
+} from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/auth/authSlice";
 
 export function AuthForms({ onLogin }: { onLogin: () => void }) {
     const [screen, setScreen] = useState<"login" | "register" | "forgot-email" | "forgot-otp" | "forgot-newpass" | "forgot-success">("login");
     const [forgotEmail, setForgotEmail] = useState("");
+    const [resetToken, setResetToken] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPw, setShowPw] = useState(false);
@@ -30,8 +38,25 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
                 }}
             />
         );
-    if (screen === "forgot-otp") return <ForgotOtpScreen email={forgotEmail} onBack={() => setScreen("forgot-email")} onNext={() => setScreen("forgot-newpass")} />;
-    if (screen === "forgot-newpass") return <ForgotNewPassScreen onBack={() => setScreen("forgot-otp")} onDone={() => setScreen("forgot-success")} />;
+    if (screen === "forgot-otp")
+        return (
+            <ForgotOtpScreen
+                email={forgotEmail}
+                onBack={() => setScreen("forgot-email")}
+                onNext={(token) => {
+                    if (token) setResetToken(token);
+                    setScreen("forgot-newpass");
+                }}
+            />
+        );
+    if (screen === "forgot-newpass")
+        return (
+            <ForgotNewPassScreen
+                resetToken={resetToken}
+                onBack={() => setScreen("forgot-otp")}
+                onDone={() => setScreen("forgot-success")}
+            />
+        );
     if (screen === "forgot-success") {
         return (
             <ScreenShell scrollable>
@@ -158,6 +183,9 @@ function RegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () => 
     const [fPh, setFPh] = useState(false);
     const [fP, setFP] = useState(false);
     const [fR, setFR] = useState(false);
+    const dispatch = useAppDispatch();
+    const [registerMutation] = useRegisterMutation();
+
     const mismatch = repeat.length > 0 && password !== repeat;
     const sl = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
     const sc = ["", "#ef4444", "#e8a020", "#22c55e"];
@@ -205,14 +233,30 @@ function RegisterScreen({ onBack, onDone }: { onBack: () => void; onDone: () => 
                     </button>
                 </div>
                 <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         if (mismatch || password.length < 8) return;
                         setLoading(true);
-                        setTimeout(() => {
-                            setLoading(false);
+                        try {
+                            const res = await registerMutation({
+                                name,
+                                email,
+                                phone: phone || undefined,
+                                password,
+                            }).unwrap();
+
+                            const userData = res?.data?.user;
+                            const token = res?.data?.accessToken;
+                            if (userData && token) {
+                                dispatch(setUser({ user: userData, token }));
+                            }
+                            toast.success(res?.message || "Account created successfully!");
                             onDone();
-                        }, 1600);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || err?.message || "Registration failed. Please try again.");
+                        } finally {
+                            setLoading(false);
+                        }
                     }}
                     className="flex flex-col gap-4"
                 >
@@ -281,6 +325,7 @@ function ForgotEmailScreen({ onBack, onNext }: { onBack: () => void; onNext: (e:
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [f, setF] = useState(false);
+    const [forgotPassword] = useForgotPasswordMutation();
 
     return (
         <ScreenShell scrollable>
@@ -299,13 +344,18 @@ function ForgotEmailScreen({ onBack, onNext }: { onBack: () => void; onNext: (e:
                     </p>
                 </div>
                 <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         setLoading(true);
-                        setTimeout(() => {
-                            setLoading(false);
+                        try {
+                            const res = await forgotPassword({ email }).unwrap();
+                            toast.success(res?.message || "OTP code sent to your email!");
                             onNext(email);
-                        }, 1500);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || err?.message || "Failed to send reset OTP");
+                        } finally {
+                            setLoading(false);
+                        }
                     }}
                     className="flex flex-col gap-5 flex-1 justify-between"
                 >
@@ -326,11 +376,13 @@ function ForgotEmailScreen({ onBack, onNext }: { onBack: () => void; onNext: (e:
     );
 }
 
-function ForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: () => void; onNext: () => void }) {
+function ForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: () => void; onNext: (token?: string) => void }) {
     const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(30);
     const refs = useRef<(HTMLInputElement | null)[]>([]);
+    const [verifyOtp] = useVerifyOtpMutation();
+    const [resendOtp] = useResendOtpMutation();
 
     useEffect(() => {
         if (timer <= 0) return;
@@ -368,6 +420,16 @@ function ForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: () 
         refs.current[Math.min(p.length, 5)]?.focus();
     }, []);
 
+    const handleResend = async () => {
+        try {
+            const res = await resendOtp({ email }).unwrap();
+            toast.success(res?.message || "OTP resent to your email!");
+            setTimer(30);
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to resend OTP");
+        }
+    };
+
     const filled = otp.every((d) => d !== "");
 
     return (
@@ -385,14 +447,20 @@ function ForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: () 
                     </p>
                 </div>
                 <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         if (!filled) return;
                         setLoading(true);
-                        setTimeout(() => {
+                        try {
+                            const res = await verifyOtp({ email, otp: otp.join("") }).unwrap();
+                            toast.success(res?.message || "OTP verified successfully!");
+                            const token = res?.data?.token;
+                            onNext(token);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || err?.message || "Invalid or expired OTP");
+                        } finally {
                             setLoading(false);
-                            onNext();
-                        }, 1500);
+                        }
                     }}
                     className="flex flex-col gap-6 flex-1 justify-between"
                 >
@@ -424,7 +492,7 @@ function ForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: () 
                                 </span>
                             </p>
                         ) : (
-                            <button type="button" onClick={() => setTimer(30)} className="text-primary text-sm font-medium hover:text-accent cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                            <button type="button" onClick={handleResend} className="text-primary text-sm font-medium hover:text-accent cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                 Resend OTP
                             </button>
                         )}
@@ -438,7 +506,7 @@ function ForgotOtpScreen({ email, onBack, onNext }: { email: string; onBack: () 
     );
 }
 
-function ForgotNewPassScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+function ForgotNewPassScreen({ resetToken, onBack, onDone }: { resetToken?: string; onBack: () => void; onDone: () => void }) {
     const [np, setNp] = useState("");
     const [rp, setRp] = useState("");
     const [sn, setSn] = useState(false);
@@ -446,6 +514,8 @@ function ForgotNewPassScreen({ onBack, onDone }: { onBack: () => void; onDone: (
     const [loading, setLoading] = useState(false);
     const [fn, setFn] = useState(false);
     const [fr, setFr] = useState(false);
+    const [resetPassword] = useResetPasswordMutation();
+
     const mm = rp.length > 0 && np !== rp;
     const sl = np.length === 0 ? 0 : np.length < 6 ? 1 : np.length < 10 ? 2 : 3;
     const sc = ["", "#ef4444", "#e8a020", "#22c55e"];
@@ -466,14 +536,19 @@ function ForgotNewPassScreen({ onBack, onDone }: { onBack: () => void; onDone: (
                     </p>
                 </div>
                 <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         if (mm || np.length < 8) return;
                         setLoading(true);
-                        setTimeout(() => {
-                            setLoading(false);
+                        try {
+                            const res = await resetPassword({ token: resetToken, newPassword: np }).unwrap();
+                            toast.success(res?.message || "Password reset successfully!");
                             onDone();
-                        }, 1500);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || err?.message || "Failed to reset password");
+                        } finally {
+                            setLoading(false);
+                        }
                     }}
                     className="flex flex-col gap-4 flex-1 justify-between"
                 >

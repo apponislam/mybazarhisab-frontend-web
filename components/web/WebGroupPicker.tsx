@@ -6,19 +6,20 @@ import { ScreenShell, PrimaryButton, SpinnerIcon } from "@/components/app/ui/Sha
 import { makeMockStats } from "@/lib/mockData";
 import { toast } from "sonner";
 import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { useCreateGroupMutation, useJoinGroupMutation } from "@/redux/features/group/groupApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { logOut } from "@/redux/features/auth/authSlice";
 
-export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: GroupStats) => void; onLogout?: () => void }) {
+export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s?: GroupStats) => void; onLogout?: () => void }) {
     const [joinCode, setJoinCode] = useState("");
     const [groupName, setGroupName] = useState("");
     const [jf, setJf] = useState(false);
     const [cf, setCf] = useState(false);
-    const [jl, setJl] = useState(false);
-    const [cl, setCl] = useState(false);
 
     const dispatch = useAppDispatch();
     const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+    const [createGroup, { isLoading: isCreating }] = useCreateGroupMutation();
+    const [joinGroup, { isLoading: isJoining }] = useJoinGroupMutation();
 
     const handleLogout = async () => {
         try {
@@ -29,6 +30,34 @@ export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: G
             dispatch(logOut());
             toast.success("Logged out successfully");
             onLogout?.();
+        }
+    };
+
+    const handleJoinGroup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!joinCode.trim()) return;
+        try {
+            const res = await joinGroup({ inviteCode: joinCode.trim() }).unwrap();
+            toast.success("Joined group successfully!");
+            const gName = res?.data?.name || "My Bazar Group";
+            onGroupReady(makeMockStats(gName));
+        } catch (err: any) {
+            const msg = err?.data?.message || err?.message || "Failed to join group. Please check the code.";
+            toast.error(msg);
+        }
+    };
+
+    const handleCreateGroup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!groupName.trim()) return;
+        try {
+            const res = await createGroup({ name: groupName.trim() }).unwrap();
+            toast.success("Group created successfully!");
+            const gName = res?.data?.name || groupName.trim();
+            onGroupReady(makeMockStats(gName));
+        } catch (err: any) {
+            const msg = err?.data?.message || err?.message || "Failed to create group.";
+            toast.error(msg);
         }
     };
 
@@ -71,18 +100,7 @@ export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: G
                                 </div>
                             </div>
 
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    if (!joinCode.trim()) return;
-                                    setJl(true);
-                                    setTimeout(() => {
-                                        setJl(false);
-                                        onGroupReady(makeMockStats("Sabzi Mandi Group"));
-                                    }, 1500);
-                                }}
-                                className="flex flex-col gap-5"
-                            >
+                            <form onSubmit={handleJoinGroup} className="flex flex-col gap-5">
                                 <div className="rounded-xl border transition-all" style={{ borderColor: jf ? "rgba(232,160,32,0.7)" : "rgba(232,160,32,0.18)", background: "#2e1a0a", boxShadow: jf ? "0 0 0 3px rgba(232,160,32,0.12)" : "none" }}>
                                     <div className="flex items-center">
                                         <span className="pl-4 text-muted-foreground">
@@ -100,7 +118,7 @@ export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: G
                                     </div>
                                 </div>
                                 <div className="mt-4">
-                                    <PrimaryButton loading={jl} label="Join Group" loadingLabel="Joining…" />
+                                    <PrimaryButton loading={isJoining} label="Join Group" loadingLabel="Joining…" />
                                 </div>
                             </form>
                         </div>
@@ -130,18 +148,7 @@ export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: G
                                 </div>
                             </div>
 
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    if (!groupName.trim()) return;
-                                    setCl(true);
-                                    setTimeout(() => {
-                                        setCl(false);
-                                        onGroupReady(makeMockStats(groupName.trim()));
-                                    }, 1500);
-                                }}
-                                className="flex flex-col gap-5"
-                            >
+                            <form onSubmit={handleCreateGroup} className="flex flex-col gap-5">
                                 <div className="rounded-xl border transition-all" style={{ borderColor: cf ? "rgba(192,96,16,0.8)" : "rgba(192,96,16,0.25)", background: "#2e1a0a", boxShadow: cf ? "0 0 0 3px rgba(192,96,16,0.12)" : "none" }}>
                                     <div className="flex items-center">
                                         <span className="pl-4 text-muted-foreground">
@@ -162,12 +169,12 @@ export function WebGroupPicker({ onGroupReady, onLogout }: { onGroupReady: (s: G
                                 <div className="mt-4">
                                     <motion.button
                                         type="submit"
-                                        disabled={cl || !groupName.trim()}
+                                        disabled={isCreating || !groupName.trim()}
                                         whileTap={{ scale: 0.97 }}
                                         className="w-full py-4 rounded-xl border text-foreground font-semibold text-base disabled:opacity-50 cursor-pointer"
                                         style={{ fontFamily: "'DM Sans', sans-serif", borderColor: "rgba(192,96,16,0.5)" }}
                                     >
-                                        {cl ? (
+                                        {isCreating ? (
                                             <span className="flex items-center justify-center gap-2 text-accent">
                                                 <SpinnerIcon />
                                                 Creating…

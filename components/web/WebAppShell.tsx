@@ -5,7 +5,7 @@ import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@
 import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
 import { PrimaryButton } from "@/components/app/ui/Shared";
 
-export function WebAppShell({ stats, onLogout }: { stats: GroupStats; onLogout: () => void }) {
+export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
     // Website Tabs
     const [tab, setTab] = useState<"home" | "expenses" | "bills" | "profile">("home");
 
@@ -177,7 +177,7 @@ export function WebAppShell({ stats, onLogout }: { stats: GroupStats; onLogout: 
                             <span className="text-lg font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                                 My Bazar <span className="text-primary">Hisab</span>
                             </span>
-                            <span className="ml-3 hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-semibold font-mono">{stats.groupName} ⭐️</span>
+                            <span className="ml-3 hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-semibold font-mono">{stats?.groupName || "My Bazar Group"} ⭐️</span>
                         </div>
                     </div>
 

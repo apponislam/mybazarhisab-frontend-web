@@ -91,31 +91,12 @@ export function HomeTab({ stats }: { stats: GroupStats }) {
             </div>
             <div className="mx-6 h-px bg-border mb-1 shrink-0" />
             <div className="flex flex-col px-6 pb-6 gap-4">
-                <SectionLabel>Overview</SectionLabel>
-                <div className="grid grid-cols-2 gap-3">
-                    <CountCard label="Group Bazar Entries" value={stats.totalGroupBazarEntries} icon={<ShoppingBag className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.05} />
-                    <CountCard label="My Bazar Entries" value={stats.totalMyBazarEntries} icon={<BookOpen className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.1} />
-                </div>
-                {/* <CountCard label="Products Created by Me" value={stats.totalProductsCreatedByMe} icon={<Package className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.15} /> */}
-                <SectionLabel>Bazar Expense</SectionLabel>
-                <div className="grid grid-cols-2 gap-3">
-                    <StatCard label={`${mn} Bazar`} value={stats.thisMonthBazarExpense} prev={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.2} />
-                    <StatCard label="Prev Month" value={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.25} />
-                    <StatCard label={`${yr} Bazar`} value={stats.thisYearBazarExpense} prev={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.3} />
-                    <StatCard label={`${yr - 1} Bazar`} value={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.35} />
-                </div>
-                <SectionLabel>Bill Expense</SectionLabel>
-                <div className="grid grid-cols-2 gap-3">
-                    <StatCard label={`${mn} Bills`} value={stats.thisMonthBillExpense} prev={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.38} accent />
-                    <StatCard label="Prev Month" value={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.41} accent />
-                    <StatCard label={`${yr} Bills`} value={stats.thisYearBillExpense} prev={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.44} accent />
-                    <StatCard label={`${yr - 1} Bills`} value={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.47} accent />
-                </div>
+                {/* 1. Total Expense */}
                 <SectionLabel>Total Expense</SectionLabel>
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
+                    transition={{ delay: 0.05 }}
                     className="rounded-2xl border border-primary/40 p-5 relative overflow-hidden"
                     style={{ background: "linear-gradient(135deg, rgba(232,160,32,0.14) 0%, rgba(192,96,16,0.08) 100%)", boxShadow: "0 4px 24px rgba(232,160,32,0.15)" }}
                 >
@@ -132,8 +113,33 @@ export function HomeTab({ stats }: { stats: GroupStats }) {
                     </div>
                 </motion.div>
                 <div className="grid grid-cols-2 gap-3">
-                    <StatCard label={`${yr} Grand Total`} value={stats.thisYearTotalExpense} prev={stats.prevYearTotalExpense} icon={<TrendingUp className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.54} />
-                    <StatCard label={`${yr - 1} Grand Total`} value={stats.prevYearTotalExpense} icon={<Minus className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.58} />
+                    <StatCard label={`${yr} Grand Total`} value={stats.thisYearTotalExpense} prev={stats.prevYearTotalExpense} icon={<TrendingUp className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.1} />
+                    <StatCard label={`${yr - 1} Grand Total`} value={stats.prevYearTotalExpense} icon={<Minus className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.15} />
+                </div>
+
+                {/* 2. Bazar Expense */}
+                <SectionLabel>Bazar Expense</SectionLabel>
+                <div className="grid grid-cols-2 gap-3">
+                    <StatCard label={`${mn} Bazar`} value={stats.thisMonthBazarExpense} prev={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.2} />
+                    <StatCard label="Prev Month" value={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.25} />
+                    <StatCard label={`${yr} Bazar`} value={stats.thisYearBazarExpense} prev={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.3} />
+                    <StatCard label={`${yr - 1} Bazar`} value={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.35} />
+                </div>
+
+                {/* 3. Bill Expense */}
+                <SectionLabel>Bill Expense</SectionLabel>
+                <div className="grid grid-cols-2 gap-3">
+                    <StatCard label={`${mn} Bills`} value={stats.thisMonthBillExpense} prev={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.38} accent />
+                    <StatCard label="Prev Month" value={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.41} accent />
+                    <StatCard label={`${yr} Bills`} value={stats.thisYearBillExpense} prev={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.44} accent />
+                    <StatCard label={`${yr - 1} Bills`} value={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.47} accent />
+                </div>
+
+                {/* 4. Group Entries */}
+                <SectionLabel>Group Entries</SectionLabel>
+                <div className="grid grid-cols-2 gap-3">
+                    <CountCard label="Group Bazar Entries" value={stats.totalGroupBazarEntries} icon={<ShoppingBag className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.5} />
+                    <CountCard label="My Bazar Entries" value={stats.totalMyBazarEntries} icon={<BookOpen className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.55} />
                 </div>
             </div>
         </div>

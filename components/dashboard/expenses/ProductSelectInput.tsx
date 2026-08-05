@@ -7,9 +7,11 @@ import { useGetAllProductsQuery, TProduct } from "@/redux/features/product/produ
 interface ProductSelectInputProps {
     valueName: string;
     onSelect: (product: { id?: string; name: string }) => void;
+    customClass?: string;
+    hideSearchIcon?: boolean;
 }
 
-export function ProductSelectInput({ valueName, onSelect }: ProductSelectInputProps) {
+export function ProductSelectInput({ valueName, onSelect, customClass, hideSearchIcon }: ProductSelectInputProps) {
     const [searchTerm, setSearchTerm] = useState(valueName);
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -65,15 +67,15 @@ export function ProductSelectInput({ valueName, onSelect }: ProductSelectInputPr
                         }
                     }}
                     required
-                    placeholder="Search catalog product or type new name…"
-                    className="w-full pl-4 pr-10 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground transition-colors"
+                    placeholder="e.g. Hilsha Fish, Rice, Onion"
+                    className={customClass || "w-full pl-4 pr-10 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground transition-colors"}
                 />
-                <Search className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                {!hideSearchIcon && <Search className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />}
             </div>
 
             {/* Dropdown Suggestions Menu */}
             {isOpen && (
-                <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[#251508] border border-border rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto font-sans">
+                <div className={`absolute ${hideSearchIcon ? "-left-10 w-[calc(100%+2.5rem)]" : "left-0 right-0"} top-full mt-2 z-50 bg-[#251508] border border-border rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto font-sans`}>
                     {isLoading ? (
                         <div className="p-3 text-center text-xs text-muted-foreground font-mono">
                             Searching catalog products…

@@ -25,29 +25,9 @@ const now = new Date();
 const thisMonth = (d: number) => new Date(now.getFullYear(), now.getMonth(), d);
 const lastMonth = (d: number) => new Date(now.getFullYear(), now.getMonth() - 1, d);
 
-export const INITIAL_ENTRIES: MockBazarEntry[] = [
-  { id: "e1", product: MOCK_PRODUCTS[4], price: 480, quantity: 1, unit: "KG", date: thisMonth(12), notes: "Fresh from Karwan Bazar", user: MOCK_USERS[0] },
-  { id: "e2", product: MOCK_PRODUCTS[3], price: 70, quantity: 5, unit: "KG", date: thisMonth(12), user: MOCK_USERS[1] },
-  { id: "e3", product: MOCK_PRODUCTS[0], price: 55, quantity: 2, unit: "KG", date: thisMonth(11), user: MOCK_USERS[2] },
-  { id: "e4", product: MOCK_PRODUCTS[5], price: 220, quantity: 1.5, unit: "KG", date: thisMonth(11), notes: "Country chicken", user: MOCK_USERS[0] },
-  { id: "e5", product: MOCK_PRODUCTS[6], price: 145, quantity: 12, unit: "PIECE", date: thisMonth(10), user: MOCK_USERS[3] },
-  { id: "e6", product: MOCK_PRODUCTS[7], price: 185, quantity: 2, unit: "PIECE", date: thisMonth(10), notes: "5L bottle", user: MOCK_USERS[1] },
-  { id: "e7", product: MOCK_PRODUCTS[2], price: 60, quantity: 1, unit: "KG", date: lastMonth(25), user: MOCK_USERS[2] },
-  { id: "e8", product: MOCK_PRODUCTS[9], price: 110, quantity: 500, unit: "GM", date: lastMonth(22), user: MOCK_USERS[0] },
-  { id: "e9", product: MOCK_PRODUCTS[1], price: 40, quantity: 3, unit: "KG", date: lastMonth(18), user: MOCK_USERS[3] },
-  { id: "e10", product: MOCK_PRODUCTS[8], price: 30, quantity: 250, unit: "GM", date: lastMonth(15), notes: "Local market", user: MOCK_USERS[1] },
-];
+export const INITIAL_ENTRIES: MockBazarEntry[] = [];
 
-export const INITIAL_BILLS: MockBill[] = [
-  { id: "b1", user: MOCK_USERS[0], category: "RENT", title: "House Rent", amount: 18000, date: thisMonth(5), notes: "Paid to landlord Alam saheb" },
-  { id: "b2", user: MOCK_USERS[1], category: "WIFI", title: "Grameenphone Broadband", amount: 1200, date: thisMonth(3) },
-  { id: "b3", user: MOCK_USERS[2], category: "ELECTRICITY", title: "DESCO Bill", amount: 2400, date: thisMonth(8), notes: "AC usage high" },
-  { id: "b4", user: MOCK_USERS[0], category: "GAS", title: "Titas Gas Bill", amount: 950, date: thisMonth(7) },
-  { id: "b5", user: MOCK_USERS[3], category: "MAID", title: "House Maid Salary", amount: 3500, date: thisMonth(1) },
-  { id: "b6", user: MOCK_USERS[1], category: "MOBILE", title: "Robi Recharge", amount: 500, date: thisMonth(6) },
-  { id: "b7", user: MOCK_USERS[2], category: "MEDICAL", title: "Square Hospital Visit", amount: 1800, date: lastMonth(20), notes: "Dr. Rahman consultation" },
-  { id: "b8", user: MOCK_USERS[0], category: "SUBSCRIPTION", title: "Netflix Monthly", amount: 399, date: lastMonth(2) },
-];
+export const INITIAL_BILLS: MockBill[] = [];
 
 export function fmt(n: number) {
   return `৳${Math.round(n).toLocaleString()}`;

@@ -52,7 +52,9 @@ export type AppSubScreen =
   | "bill-detail"
   | "bill-edit"
   | "profile-edit"
-  | "profile-change-password";
+  | "profile-change-password"
+  | "profile-group"
+  | "profile-notifications";
 
 export interface GroupStats {
   groupName: string;

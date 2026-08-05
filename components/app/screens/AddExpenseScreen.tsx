@@ -5,11 +5,13 @@ import { BazarUnit } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 import { toInputDate } from "@/lib/mockData";
 import { useCreateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
+import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
 
 export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
     const [createBazarEntry, { isLoading }] = useCreateBazarEntryMutation();
 
     const [product, setProduct] = useState("");
+    const [productId, setProductId] = useState<string | undefined>(undefined);
     const [price, setPrice] = useState("");
     const [quantity, setQuantity] = useState("");
     const [unit, setUnit] = useState<BazarUnit>("KG");
@@ -22,8 +24,13 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!product.trim()) {
+            toast.error("Please select or enter a product name");
+            return;
+        }
         try {
             await createBazarEntry({
+                productId: productId || undefined,
                 name: product.trim(),
                 price: Number(price),
                 quantity: Number(quantity) || 1,
@@ -62,14 +69,24 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                             <span className="pl-4 text-muted-foreground">
                                 <Package className="w-4 h-4" />
                             </span>
-                            <input value={product} onChange={(e) => setProduct(e.target.value)} placeholder="e.g. Hilsha Fish, Rice, Onion" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                            <div className="flex-1 relative">
+                                <ProductSelectInput
+                                    valueName={product}
+                                    onSelect={(p: any) => {
+                                        setProduct(p.name);
+                                        setProductId(p._id || p.id);
+                                    }}
+                                    customClass="w-full px-3 py-3.5 bg-transparent text-sm outline-none border-none shadow-none font-sans"
+                                    hideSearchIcon
+                                />
+                            </div>
                         </div>
                     </FieldBox>
                     <div className="grid grid-cols-2 gap-3">
                         <FieldBox label="Price (৳)" focused={fPrice}>
                             <div className="flex items-center" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
                                 <span className="pl-4 text-sm font-bold text-muted-foreground">৳</span>
-                                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" step="any" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                         <FieldBox label="Quantity" focused={fQty}>
@@ -77,7 +94,7 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                                 <span className="pl-4 text-muted-foreground">
                                     <Weight className="w-4 h-4" />
                                 </span>
-                                <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="0" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="0" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                             </div>
                         </FieldBox>
                     </div>

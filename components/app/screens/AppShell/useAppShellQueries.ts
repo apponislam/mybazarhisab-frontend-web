@@ -3,6 +3,7 @@ import { AppTab } from "@/types";
 import { useGetAllBazarEntriesQuery } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { useGetAllBillsQuery } from "@/redux/features/bill/billApi";
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
+import { useGetUserDashboardStatsQuery } from "@/redux/features/dashboard/dashboardApi";
 import { useAppShellData } from "./useAppShellData";
 
 export function useAppShellQueries(tab: AppTab) {
@@ -10,6 +11,11 @@ export function useAppShellQueries(tab: AppTab) {
     const [billPage, setBillPage] = useState(1);
     const [expenseFilter, setExpenseFilter] = useState<"month" | "all">("month");
     const [billFilter, setBillFilter] = useState<"month" | "all">("month");
+
+    // Dashboard stats query for Home tab
+    const { data: dashboardData, isLoading: isDashboardLoading } = useGetUserDashboardStatsQuery(undefined, {
+        skip: tab !== "home",
+    });
 
     // Live RTK Query hooks matching WebAppShell exactly
     const {
@@ -22,7 +28,7 @@ export function useAppShellQueries(tab: AppTab) {
             page: expensePage,
             limit: 10,
         },
-        { skip: tab !== "expenses" && tab !== "home" },
+        { skip: tab !== "expenses" },
     );
 
     const {
@@ -35,7 +41,7 @@ export function useAppShellQueries(tab: AppTab) {
             page: billPage,
             limit: 10,
         },
-        { skip: tab !== "bills" && tab !== "home" },
+        { skip: tab !== "bills" },
     );
 
     const { data: userData } = useGetMeQuery();
@@ -52,6 +58,8 @@ export function useAppShellQueries(tab: AppTab) {
         setExpenseFilter,
         billFilter,
         setBillFilter,
+        isDashboardLoading,
+        dashboardStats: dashboardData?.data,
         isBazarLoading,
         isBazarFetching,
         isBillLoading,

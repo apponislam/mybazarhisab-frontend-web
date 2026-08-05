@@ -8,6 +8,8 @@ import { BillDetailScreen } from "@/components/app/screens/BillDetailScreen";
 import { BillEditScreen } from "@/components/app/screens/BillEditScreen";
 import { EditProfileScreen } from "@/components/app/screens/EditProfileScreen";
 import { ChangePasswordScreen } from "@/components/app/screens/ChangePasswordScreen";
+import { GroupScreen } from "@/components/app/screens/GroupScreen";
+import { NotificationsScreen } from "@/components/app/screens/NotificationsScreen";
 
 export function AppSubScreenRenderer({
     subScreen,
@@ -104,6 +106,8 @@ export function AppSubScreenRenderer({
         );
     if (subScreen === "profile-edit") return <EditProfileScreen onBack={() => setSubScreen(null)} />;
     if (subScreen === "profile-change-password") return <ChangePasswordScreen onBack={() => setSubScreen(null)} />;
+    if (subScreen === "profile-group") return <GroupScreen onBack={() => setSubScreen(null)} />;
+    if (subScreen === "profile-notifications") return <NotificationsScreen onBack={() => setSubScreen(null)} />;
 
     return null;
 }

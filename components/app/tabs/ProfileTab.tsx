@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { User, Shield, Info, Bell, BellOff, Mail, Globe, MapPin, FileText, LogOut, Trash2, AlertTriangle } from "lucide-react";
+import { User, Shield, Info, Bell, BellOff, Mail, Globe, MapPin, FileText, LogOut, Trash2, AlertTriangle, Users } from "lucide-react";
 import { Toggle, SettingsRow } from "@/components/app/ui/Shared";
 import { initials, avatarColor } from "@/lib/mockData";
 import { useLogoutMutation, useGetMeQuery } from "@/redux/features/auth/authApi";
+import { useGetMyGroupQuery } from "@/redux/features/group/groupApi";
 import { logOut } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 
-export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile: () => void; onChangePassword: () => void }) {
+export function ProfileTab({ 
+    onEditProfile, 
+    onChangePassword,
+    onGroup,
+    onNotifications,
+}: { 
+    onEditProfile: () => void; 
+    onChangePassword: () => void;
+    onGroup: () => void;
+    onNotifications: () => void;
+}) {
     const dispatch = useAppDispatch();
     const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
     const { data: userData } = useGetMeQuery();
+    const { data: groupData } = useGetMyGroupQuery();
     const me = userData?.data;
+    const group = groupData?.data;
 
     const handleLogout = async () => {
         try {
@@ -41,11 +54,7 @@ export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile:
             <div className="flex flex-col px-6 pb-8 gap-5">
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border bg-card p-5 flex items-center gap-4" style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.35)" }}>
                     <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center shrink-0 font-bold text-xl text-white bg-primary" style={{ background: avatarColor(me?._id || "u1") }}>
-                        {me?.profileImage ? (
-                            <img src={me.profileImage} alt={me.name} className="w-full h-full object-cover" />
-                        ) : (
-                            initials(me?.name || "User")
-                        )}
+                        {me?.profileImage ? <img src={me.profileImage} alt={me.name} className="w-full h-full object-cover" /> : initials(me?.name || "User")}
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-base font-bold text-foreground truncate" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -68,31 +77,49 @@ export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile:
                     </div>
                     <SettingsRow icon={<User className="w-4 h-4" />} label="Edit Profile" sub="Update your name, photo, address & more" onClick={onEditProfile} />
                     <div className="h-px bg-border mx-4" />
+                    <SettingsRow
+                        icon={<Users className="w-4 h-4" />}
+                        label="My Group"
+                        sub={group ? `${group.name} · Code: ${group.inviteCode}` : "Manage group & invite code"}
+                        onClick={onGroup}
+                    />
+                    <div className="h-px bg-border mx-4" />
                     <SettingsRow icon={<Shield className="w-4 h-4" />} label="Change Password" sub="Update your account password" onClick={onChangePassword} />
+                    <div className="h-px bg-border mx-4" />
+                    <SettingsRow icon={<Bell className="w-4 h-4" />} label="Notifications" sub="View all group alerts & history" onClick={onNotifications} />
                     <div className="h-px bg-border mx-4" />
                     <SettingsRow icon={<Info className="w-4 h-4" />} label="Account Info" sub="Last login: Today · Member since Jan 2025" />
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-2xl border border-border bg-card overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.3)" }}>
-                    <div className="px-4 py-3 border-b border-border">
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-2xl border border-border bg-card overflow-hidden relative" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.3)" }}>
+                    {/* Watermark Overlay */}
+                    <div className="absolute inset-0 bg-background/75 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center gap-1.5 pointer-events-none p-4 text-center">
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-primary/40 bg-card/95 text-primary shadow-xl" style={{ boxShadow: "0 4px 20px rgba(232,160,32,0.25)" }}>
+                            <span className="text-base">🚧</span>
+                            <span className="text-xs font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                Currently Working on It
+                            </span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground font-mono font-medium tracking-wide uppercase opacity-80">
+                            Coming in Next Version
+                        </span>
+                    </div>
+
+                    <div className="px-4 py-3 border-b border-border opacity-35">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">Notifications</p>
                     </div>
-                    <SettingsRow icon={pushNotif ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />} label="Push Notifications" sub={pushNotif ? "Receive alerts for new entries" : "Notifications are off"} right={<Toggle on={pushNotif} onToggle={() => setPushNotif((v) => !v)} />} />
-                    <div className="h-px bg-border mx-4" />
-                    <SettingsRow icon={<Mail className="w-4 h-4" />} label="Email Notifications" sub={emailNotif ? "Get email summaries & alerts" : "Email notifications are off"} right={<Toggle on={emailNotif} onToggle={() => setEmailNotif((v) => !v)} />} />
+                    <div className="opacity-35">
+                        <SettingsRow icon={pushNotif ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />} label="Push Notifications" sub={pushNotif ? "Receive alerts for new entries" : "Notifications are off"} right={<Toggle on={pushNotif} onToggle={() => setPushNotif((v) => !v)} />} />
+                        <div className="h-px bg-border mx-4" />
+                        <SettingsRow icon={<Mail className="w-4 h-4" />} label="Email Notifications" sub={emailNotif ? "Get email summaries & alerts" : "Email notifications are off"} right={<Toggle on={emailNotif} onToggle={() => setEmailNotif((v) => !v)} />} />
+                    </div>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }} className="rounded-2xl border border-border bg-card overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.3)" }}>
                     <div className="px-4 py-3 border-b border-border">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">Preferences</p>
                     </div>
-                    <SettingsRow icon={<Globe className="w-4 h-4" />} label="Language" sub={me?.language || "English"} right={<span className="text-xs text-muted-foreground font-semibold font-mono">{(me?.language || "EN").slice(0, 2).toUpperCase()}</span>} />
-                    <div className="h-px bg-border mx-4" />
-                    <SettingsRow
-                        icon={<MapPin className="w-4 h-4" />}
-                        label="Address"
-                        sub={me?.address ? [me.address.street, me.address.city, me.address.state, me.address.zipCode, me.address.country].filter(Boolean).join(", ") : "No address set"}
-                    />
+                    <SettingsRow icon={<MapPin className="w-4 h-4" />} label="Address" sub={me?.address ? [me.address.street, me.address.city, me.address.state, me.address.zipCode, me.address.country].filter(Boolean).join(", ") : "No address set"} />
                     <div className="h-px bg-border mx-4" />
                     <SettingsRow icon={<FileText className="w-4 h-4" />} label="About Me" sub={me?.aboutme || "No bio added yet"} />
                 </motion.div>

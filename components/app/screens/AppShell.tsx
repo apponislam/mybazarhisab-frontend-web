@@ -18,7 +18,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
     const [subScreen, setSubScreen] = useState<AppSubScreen>(null);
 
     // Custom Hook encapsulating RTK Query endpoints & data transformers
-    const { isBazarLoading, isBillLoading, currentUser, entries, bills, expenseFilter, setExpenseFilter, billFilter, setBillFilter } = useAppShellQueries(tab);
+    const { dashboardStats, isBazarLoading, isBillLoading, currentUser, entries, bills, expenseFilter, setExpenseFilter, billFilter, setBillFilter } = useAppShellQueries(tab);
 
     const [selectedEntry, setSelectedEntry] = useState<MockBazarEntry | null>(null);
     const [selectedBill, setSelectedBill] = useState<MockBill | null>(null);
@@ -26,6 +26,28 @@ export function AppShell({ stats }: { stats: GroupStats }) {
     const showNav = subScreen === null || subScreen === "add-picker";
 
     const computedStats = React.useMemo(() => {
+        if (dashboardStats) {
+            return {
+                groupName: dashboardStats.groupName || stats?.groupName || "My Bazar Group",
+                totalMembers: dashboardStats.totalMembers ?? stats?.totalMembers ?? 1,
+                totalGroupBazarEntries: dashboardStats.totalGroupBazarAndBills ?? dashboardStats.totalGroupBazarEntries ?? entries.length,
+                totalMyBazarEntries: dashboardStats.totalMyBazarAndBills ?? dashboardStats.totalMyBazarEntries ?? entries.length,
+                totalProductsCreatedByMe: dashboardStats.totalNewProductsCreatedByMe ?? dashboardStats.totalProductsCreatedByMe ?? 0,
+                thisMonthBazarExpense: dashboardStats.thisMonthBazarExpense ?? 0,
+                prevMonthBazarExpense: dashboardStats.prevMonthBazarExpense ?? 0,
+                thisYearBazarExpense: dashboardStats.thisYearBazarExpense ?? 0,
+                prevYearBazarExpense: dashboardStats.prevYearBazarExpense ?? 0,
+                thisMonthBillExpense: dashboardStats.thisMonthBillExpense ?? 0,
+                prevMonthBillExpense: dashboardStats.prevMonthBillExpense ?? 0,
+                thisYearBillExpense: dashboardStats.thisYearBillExpense ?? 0,
+                prevYearBillExpense: dashboardStats.prevYearBillExpense ?? 0,
+                thisMonthTotalExpense: dashboardStats.thisMonthTotalExpense ?? 0,
+                prevMonthTotalExpense: dashboardStats.prevMonthTotalExpense ?? 0,
+                thisYearTotalExpense: dashboardStats.thisYearTotalExpense ?? 0,
+                prevYearTotalExpense: dashboardStats.prevYearTotalExpense ?? 0,
+            };
+        }
+
         const myUserId = currentUser?._id;
         const myEntries = entries.filter((e) => e.user.id === myUserId || !myUserId);
 
@@ -51,7 +73,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
             thisYearTotalExpense: totalBazar + totalBill,
             prevYearTotalExpense: 0,
         };
-    }, [entries, bills, stats, currentUser]);
+    }, [dashboardStats, entries, bills, stats, currentUser]);
 
     // Subscreen overlay rendering
     if (subScreen && subScreen !== "add-picker") {
@@ -97,7 +119,14 @@ export function AppShell({ stats }: { stats: GroupStats }) {
                             }}
                         />
                     )}
-                    {tab === "profile" && <ProfileTab onEditProfile={() => setSubScreen("profile-edit")} onChangePassword={() => setSubScreen("profile-change-password")} />}
+                    {tab === "profile" && (
+                        <ProfileTab
+                            onEditProfile={() => setSubScreen("profile-edit")}
+                            onChangePassword={() => setSubScreen("profile-change-password")}
+                            onGroup={() => setSubScreen("profile-group")}
+                            onNotifications={() => setSubScreen("profile-notifications")}
+                        />
+                    )}
                     {subScreen === "add-picker" && <AppAddPicker onExpense={() => setSubScreen("add-expense")} onBill={() => setSubScreen("add-bill")} onClose={() => setSubScreen(null)} />}
                 </div>
                 {showNav && (
@@ -107,7 +136,8 @@ export function AppShell({ stats }: { stats: GroupStats }) {
                             setTab(t);
                             setSubScreen(null);
                         }}
-                        onAdd={() => setSubScreen("add-picker")}
+                        onAdd={() => setSubScreen((prev) => (prev === "add-picker" ? null : "add-picker"))}
+                        isAddOpen={subScreen === "add-picker"}
                     />
                 )}
             </div>

@@ -175,15 +175,4 @@ const userApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {
-    useGetAllUsersQuery,
-    useGetUserProfileAndSummaryQuery,
-    useGetUserReviewsQuery,
-    useGetUserActivitiesQuery,
-    useGetUserProductsQuery,
-    useGetUserBazarEntriesQuery,
-    useGetUserBillsQuery,
-    useUpdateUserStatusMutation,
-    useUpdateUserRoleMutation,
-    useDeleteUserMutation,
-} = userApi;
+export const { useGetAllUsersQuery, useGetUserProfileAndSummaryQuery, useGetUserReviewsQuery, useGetUserActivitiesQuery, useGetUserProductsQuery, useGetUserBazarEntriesQuery, useGetUserBillsQuery, useUpdateUserStatusMutation, useUpdateUserRoleMutation, useDeleteUserMutation } = userApi;

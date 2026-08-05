@@ -59,12 +59,8 @@ export function MembersGrid({ groups, isLoading, searchTerm, onSearchChange }: M
                         <Users className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="text-base font-bold font-mono uppercase text-foreground tracking-wider flex items-center gap-2">
-                            All User Groups & Members (Admin)
-                        </h3>
-                        <p className="text-xs text-muted-foreground font-mono">
-                            Admin control panel to manage group rooms and roommate memberships
-                        </p>
+                        <h3 className="text-base font-bold font-mono uppercase text-foreground tracking-wider flex items-center gap-2">All User Groups & Members (Admin)</h3>
+                        <p className="text-xs text-muted-foreground font-mono">Admin control panel to manage group rooms and roommate memberships</p>
                     </div>
                 </div>
 
@@ -125,11 +121,7 @@ export function MembersGrid({ groups, isLoading, searchTerm, onSearchChange }: M
                                             </button>
                                         )}
 
-                                        <button
-                                            onClick={() => setDeletingGroup(group)}
-                                            className="p-1.5 rounded-xl border border-border bg-[#251508] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                                            title="Delete Group"
-                                        >
+                                        <button onClick={() => setDeletingGroup(group)} className="p-1.5 rounded-xl border border-border bg-[#251508] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer" title="Delete Group">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -137,22 +129,13 @@ export function MembersGrid({ groups, isLoading, searchTerm, onSearchChange }: M
 
                                 {/* Members List */}
                                 <div className="space-y-2">
-                                    <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
-                                        Members ({group.members?.length || 0})
-                                    </span>
+                                    <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">Members ({group.members?.length || 0})</span>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {group.members?.map((member) => (
                                             <div key={member._id} className="p-3 rounded-2xl bg-[#251508] border border-border/80 flex items-center justify-between gap-3">
                                                 <div className="flex items-center gap-2.5 min-w-0">
-                                                    <div
-                                                        className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md"
-                                                        style={{ background: avatarColor(member._id) }}
-                                                    >
-                                                        {member.profileImage ? (
-                                                            <img src={member.profileImage} alt={member.name} className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            initials(member.name)
-                                                        )}
+                                                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md" style={{ background: avatarColor(member._id) }}>
+                                                        {member.profileImage ? <img src={member.profileImage} alt={member.name} className="w-full h-full object-cover" /> : initials(member.name)}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <h5 className="text-xs font-semibold text-foreground truncate">{member.name}</h5>

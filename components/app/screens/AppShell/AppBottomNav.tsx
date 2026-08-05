@@ -3,17 +3,7 @@ import { motion } from "motion/react";
 import { Home, ShoppingBag, Receipt, User, Plus } from "lucide-react";
 import { AppTab } from "@/types";
 
-export function AppBottomNav({
-    tab,
-    onTab,
-    onAdd,
-    isAddOpen,
-}: {
-    tab: AppTab;
-    onTab: (t: AppTab) => void;
-    onAdd: () => void;
-    isAddOpen?: boolean;
-}) {
+export function AppBottomNav({ tab, onTab, onAdd, isAddOpen }: { tab: AppTab; onTab: (t: AppTab) => void; onAdd: () => void; isAddOpen?: boolean }) {
     const tabs: { id: AppTab; icon: React.ReactNode; label: string }[] = [
         { id: "home", icon: <Home className="w-5 h-5" strokeWidth={1.8} />, label: "Home" },
         { id: "expenses", icon: <ShoppingBag className="w-5 h-5" strokeWidth={1.8} />, label: "Expenses" },
@@ -35,13 +25,7 @@ export function AppBottomNav({
                 </button>
             ))}
             <div className="flex-1 flex flex-col items-center pb-1">
-                <motion.button
-                    onClick={onAdd}
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="w-14 h-14 rounded-full bg-primary flex items-center justify-center -mt-6 shadow-xl cursor-pointer"
-                    style={{ boxShadow: "0 4px 20px rgba(232,160,32,0.5)" }}
-                >
+                <motion.button onClick={onAdd} whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.9 }} className="w-14 h-14 rounded-full bg-primary flex items-center justify-center -mt-6 shadow-xl cursor-pointer" style={{ boxShadow: "0 4px 20px rgba(232,160,32,0.5)" }}>
                     <motion.div animate={{ rotate: isAddOpen ? 45 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
                         <Plus className="w-7 h-7 text-primary-foreground" strokeWidth={2.5} />
                     </motion.div>

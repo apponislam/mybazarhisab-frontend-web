@@ -105,10 +105,7 @@ const bazarEntryApi = baseApi.injectEndpoints({
         }),
 
         // POST /bazar-entries/bulk
-        createBulkBazarEntries: builder.mutation<
-            CommonResponse<{ count: number; entries: TBazarEntry[] }>,
-            { entries: CreateBazarEntryPayload[] }
-        >({
+        createBulkBazarEntries: builder.mutation<CommonResponse<{ count: number; entries: TBazarEntry[] }>, { entries: CreateBazarEntryPayload[] }>({
             query: (body) => ({
                 url: "/bazar-entries/bulk",
                 method: "POST",
@@ -128,10 +125,7 @@ const bazarEntryApi = baseApi.injectEndpoints({
         }),
 
         // GET /bazar-entries/stats
-        getBazarEntryStats: builder.query<
-            CommonResponse<{ totalEntries: number; totalAmount: number }>,
-            BazarEntryStatsParams | void
-        >({
+        getBazarEntryStats: builder.query<CommonResponse<{ totalEntries: number; totalAmount: number }>, BazarEntryStatsParams | void>({
             query: (params) => ({
                 url: "/bazar-entries/stats",
                 method: "GET",
@@ -191,14 +185,5 @@ const bazarEntryApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {
-    useCreateBazarEntryMutation,
-    useCreateBulkBazarEntriesMutation,
-    useGetAllBazarEntriesQuery,
-    useGetBazarEntryStatsQuery,
-    useGetBazarEntryByIdQuery,
-    useUpdateBazarEntryMutation,
-    useDeleteBazarEntryMutation,
-    useGetAllBazarEntriesByAdminQuery,
-    useGetBazarEntryByIdByAdminQuery,
-} = bazarEntryApi;
+export const { useCreateBazarEntryMutation, useCreateBulkBazarEntriesMutation, useGetAllBazarEntriesQuery, useGetBazarEntryStatsQuery, useGetBazarEntryByIdQuery, useUpdateBazarEntryMutation, useDeleteBazarEntryMutation, useGetAllBazarEntriesByAdminQuery, useGetBazarEntryByIdByAdminQuery } =
+    bazarEntryApi;

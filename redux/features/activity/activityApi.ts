@@ -111,8 +111,4 @@ const activityApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {
-    useGetAllActivitiesQuery,
-    useDeleteActivityMutation,
-    useClearActivitiesMutation,
-} = activityApi;
+export const { useGetAllActivitiesQuery, useDeleteActivityMutation, useClearActivitiesMutation } = activityApi;

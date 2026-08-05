@@ -8,43 +8,43 @@ export const TESTIMONIALS = [
         role: "Family Head • Mirpur, Dhaka",
         rating: 5,
         comment: "No more confusion about who spent how much for monthly groceries. My Bazar Hisab has saved our family from endless end-of-month tally arguments!",
-        avatar: "👨‍👩‍👧‍👦"
+        avatar: "👨‍👩‍👧‍👦",
     },
     {
         name: "Tanvir Hossain",
         role: "Bachelor Flat Manager • Uttara",
         rating: 5,
         comment: "Managing 4 mess members' daily meal & bazar money used to be a headache. Now everyone logs their own receipts right from their phones in seconds.",
-        avatar: "🏢"
+        avatar: "🏢",
     },
     {
         name: "Nusrat Jahan",
         role: "Homemaker • Chattogram",
         rating: 5,
         comment: "The yearly expense comparisons helped us realize how much we were overspending on groceries. Highly recommended app for budget control!",
-        avatar: "🏡"
+        avatar: "🏡",
     },
     {
         name: "Sajjad Rahman",
         role: "Software Engineer • Dhanmondi",
         rating: 5,
         comment: "The UI is incredibly slick and dark-mode friendly! Split bill tracking for our shared apartment has never been this smooth and transparent.",
-        avatar: "💻"
+        avatar: "💻",
     },
     {
         name: "Farhana Akter",
         role: "University Student • Sylhet",
         rating: 5,
         comment: "Super convenient to track market items with exact units (KG, GM, Litre). It keeps our joint house budget totally organized.",
-        avatar: "🎓"
+        avatar: "🎓",
     },
     {
         name: "Kazi Anisur",
         role: "Small Business Owner • Rajshahi",
         rating: 5,
         comment: "Finally a tool built specifically for Bangladeshi bazar accounting. The group ledger feature keeps everyone accountable and transparent.",
-        avatar: "🛒"
-    }
+        avatar: "🛒",
+    },
 ];
 
 export function TestimonialsSlider() {
@@ -67,36 +67,16 @@ export function TestimonialsSlider() {
     }, [nextSlide, isHovered]);
 
     // Cards visible on desktop (3 items wrapped circularly)
-    const visibleCards = [
-        TESTIMONIALS[currentIndex],
-        TESTIMONIALS[(currentIndex + 1) % total],
-        TESTIMONIALS[(currentIndex + 2) % total],
-    ];
+    const visibleCards = [TESTIMONIALS[currentIndex], TESTIMONIALS[(currentIndex + 1) % total], TESTIMONIALS[(currentIndex + 2) % total]];
 
     return (
-        <div
-            className="w-full relative group"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className="w-full relative group" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             {/* 3-Card Grid Slider (Desktop: 3 cards, Mobile: 1 card) */}
             <div className="relative">
                 <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentIndex}
-                        initial={{ opacity: 0, x: 25 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -25 }}
-                        transition={{ duration: 0.35, ease: "easeInOut" }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-8"
-                    >
+                    <motion.div key={currentIndex} initial={{ opacity: 0, x: 25 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -25 }} transition={{ duration: 0.35, ease: "easeInOut" }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {visibleCards.map((rev, i) => (
-                            <div
-                                key={`${rev.name}-${i}`}
-                                className={`p-8 rounded-3xl bg-card/40 border border-primary/10 hover:border-primary/30 hover:bg-card/70 transition-all duration-300 shadow-xl flex flex-col justify-between ${
-                                    i > 0 ? "hidden md:flex" : "flex"
-                                }`}
-                            >
+                            <div key={`${rev.name}-${i}`} className={`p-8 rounded-3xl bg-card/40 border border-primary/10 hover:border-primary/30 hover:bg-card/70 transition-all duration-300 shadow-xl flex flex-col justify-between ${i > 0 ? "hidden md:flex" : "flex"}`}>
                                 <div>
                                     <div className="flex items-center gap-1 mb-4">
                                         {Array.from({ length: rev.rating }).map((_, starIdx) => (
@@ -139,7 +119,7 @@ export function TestimonialsSlider() {
                             style={{
                                 width: idx === currentIndex ? 26 : 8,
                                 height: 8,
-                                backgroundColor: idx === currentIndex ? "#e8a020" : "rgba(232,160,32,0.2)"
+                                backgroundColor: idx === currentIndex ? "#e8a020" : "rgba(232,160,32,0.2)",
                             }}
                         />
                     ))}

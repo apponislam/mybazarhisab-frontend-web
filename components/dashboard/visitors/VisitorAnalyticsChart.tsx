@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { BarChart2, Globe, Smartphone, ShieldCheck } from "lucide-react";
 
 interface VisitorAnalyticsChartProps {
@@ -10,7 +9,7 @@ interface VisitorAnalyticsChartProps {
 
 export function VisitorAnalyticsChart({ stats, days }: VisitorAnalyticsChartProps) {
     const total = stats?.totalVisits ?? 0;
-    
+
     const breakdown = stats?.allTimePlatformBreakdown || stats?.todayPlatformBreakdown || {};
     const web = breakdown?.WEB?.visits ?? 0;
     const android = breakdown?.ANDROID?.visits ?? 0;
@@ -43,7 +42,9 @@ export function VisitorAnalyticsChart({ stats, days }: VisitorAnalyticsChartProp
                             <span className="flex items-center gap-2 text-foreground font-semibold">
                                 <Globe className="w-4 h-4 text-blue-400" /> Web Browser
                             </span>
-                            <span className="text-blue-400 font-bold">{web.toLocaleString()} ({webPct}%)</span>
+                            <span className="text-blue-400 font-bold">
+                                {web.toLocaleString()} ({webPct}%)
+                            </span>
                         </div>
                         <div className="w-full h-3 bg-[#1a0e07] border border-border rounded-full overflow-hidden">
                             <div className="h-full bg-blue-400 transition-all duration-500" style={{ width: `${webPct}%` }} />
@@ -56,7 +57,9 @@ export function VisitorAnalyticsChart({ stats, days }: VisitorAnalyticsChartProp
                             <span className="flex items-center gap-2 text-foreground font-semibold">
                                 <Smartphone className="w-4 h-4 text-green-400" /> Android App
                             </span>
-                            <span className="text-green-400 font-bold">{(android + app).toLocaleString()} ({androidPct}%)</span>
+                            <span className="text-green-400 font-bold">
+                                {(android + app).toLocaleString()} ({androidPct}%)
+                            </span>
                         </div>
                         <div className="w-full h-3 bg-[#1a0e07] border border-border rounded-full overflow-hidden">
                             <div className="h-full bg-green-400 transition-all duration-500" style={{ width: `${androidPct}%` }} />
@@ -69,7 +72,9 @@ export function VisitorAnalyticsChart({ stats, days }: VisitorAnalyticsChartProp
                             <span className="flex items-center gap-2 text-foreground font-semibold">
                                 <Smartphone className="w-4 h-4 text-accent" /> iOS App
                             </span>
-                            <span className="text-accent font-bold">{ios.toLocaleString()} ({iosPct}%)</span>
+                            <span className="text-accent font-bold">
+                                {ios.toLocaleString()} ({iosPct}%)
+                            </span>
                         </div>
                         <div className="w-full h-3 bg-[#1a0e07] border border-border rounded-full overflow-hidden">
                             <div className="h-full bg-accent transition-all duration-500" style={{ width: `${iosPct}%` }} />
@@ -85,9 +90,7 @@ export function VisitorAnalyticsChart({ stats, days }: VisitorAnalyticsChartProp
                 </h3>
 
                 {dailyTrend.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-muted-foreground font-mono bg-[#1a0e07] border border-border rounded-2xl">
-                        No visitor trend logs recorded yet for this timeframe.
-                    </div>
+                    <div className="p-8 text-center text-xs text-muted-foreground font-mono bg-[#1a0e07] border border-border rounded-2xl">No visitor trend logs recorded yet for this timeframe.</div>
                 ) : (
                     <div className="space-y-3 font-mono text-xs max-h-64 overflow-y-auto pr-1">
                         {dailyTrend.map((item: any, idx: number) => (

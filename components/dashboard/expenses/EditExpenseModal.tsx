@@ -67,12 +67,7 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
         <AnimatePresence>
             {entry && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs font-sans">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5">
                         <div className="flex items-center justify-between border-b border-border pb-3">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-9 h-9 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center">
@@ -104,35 +99,15 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Price (৳)</label>
-                                    <input
-                                        type="number"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                        required
-                                        placeholder="0"
-                                        className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
-                                    />
+                                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0" className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Quantity</label>
-                                    <input
-                                        type="number"
-                                        step="any"
-                                        value={quantity}
-                                        onChange={(e) => setQuantity(e.target.value)}
-                                        required
-                                        placeholder="1"
-                                        className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
-                                    />
+                                    <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="1" className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Unit</label>
-                                    <select
-                                        value={unit}
-                                        onChange={(e) => setUnit(e.target.value as BazarUnit)}
-                                        className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
-                                        style={{ colorScheme: "dark" }}
-                                    >
+                                    <select value={unit} onChange={(e) => setUnit(e.target.value as BazarUnit)} className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" style={{ colorScheme: "dark" }}>
                                         <option value="KG">KG</option>
                                         <option value="GM">GM</option>
                                         <option value="PIECE">Piece</option>
@@ -141,38 +116,17 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1">Date</label>
-                                <input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    required
-                                    className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
-                                    style={{ colorScheme: "dark" }}
-                                />
+                                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" style={{ colorScheme: "dark" }} />
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1">Notes (optional)</label>
-                                <input
-                                    type="text"
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Add note…"
-                                    className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground"
-                                />
+                                <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add note…" className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground" />
                             </div>
                             <div className="flex gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs"
-                                >
+                                <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs">
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="flex-1 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:opacity-90 cursor-pointer text-xs disabled:opacity-50"
-                                >
+                                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-accent text-accent-foreground font-bold rounded-xl hover:opacity-90 cursor-pointer text-xs disabled:opacity-50">
                                     {isLoading ? "Updating…" : "Update Expense"}
                                 </button>
                             </div>

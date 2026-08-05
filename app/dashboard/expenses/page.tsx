@@ -20,7 +20,12 @@ export default function DashboardExpensesPage() {
     const [limit, setLimit] = useState(10);
 
     // RTK Query Admin Hook
-    const { data: responseData, isLoading, isFetching, refetch } = useGetAllBazarEntriesByAdminQuery({
+    const {
+        data: responseData,
+        isLoading,
+        isFetching,
+        refetch,
+    } = useGetAllBazarEntriesByAdminQuery({
         searchTerm: searchTerm || undefined,
         page,
         limit,
@@ -42,11 +47,7 @@ export default function DashboardExpensesPage() {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 relative">
                 <DashboardHeader title="Bazar Expenses Management (Admin)" onAddExpense={() => setShowAddExpense(true)}>
-                    <button
-                        onClick={() => refetch()}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh expenses"
-                    >
+                    <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh expenses">
                         <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
                 </DashboardHeader>
@@ -54,9 +55,7 @@ export default function DashboardExpensesPage() {
                 <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
                     {/* Controls Bar */}
                     <div className="bg-[#251508] border border-border rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 shrink-0">
-                        <p className="text-xs text-muted-foreground font-mono">
-                            Admin view of all bazar expense logs across the system
-                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">Admin view of all bazar expense logs across the system</p>
 
                         <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -94,9 +93,7 @@ export default function DashboardExpensesPage() {
                     {meta && (
                         <div className="bg-[#251508] border border-border rounded-2xl px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground font-mono shadow-xl">
                             <div>
-                                Showing <span className="font-bold text-foreground">{entries.length}</span> of{" "}
-                                <span className="font-bold text-foreground">{meta.total}</span> expenses (Page{" "}
-                                <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
+                                Showing <span className="font-bold text-foreground">{entries.length}</span> of <span className="font-bold text-foreground">{meta.total}</span> expenses (Page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
                             </div>
 
                             <div className="flex items-center gap-2">

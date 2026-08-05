@@ -13,14 +13,7 @@ interface ExpensesTableProps {
     onDeleteExpense: (entry: TBazarEntry) => void;
 }
 
-export function ExpensesTable({
-    entries,
-    isLoading,
-    searchTerm,
-    onSearchChange,
-    onEditExpense,
-    onDeleteExpense,
-}: ExpensesTableProps) {
+export function ExpensesTable({ entries, isLoading, searchTerm, onSearchChange, onEditExpense, onDeleteExpense }: ExpensesTableProps) {
     const AVATAR_COLORS = ["#c06010", "#8b6914", "#3d7a5c", "#5a4a8a", "#7a3d3d"];
 
     function avatarColor(id: string) {
@@ -117,15 +110,8 @@ export function ExpensesTable({
                                         </td>
                                         <td className="p-4">
                                             <div className="flex items-center gap-2">
-                                                <div
-                                                    className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0"
-                                                    style={{ background: avatarColor(e.user?._id || "") }}
-                                                >
-                                                    {e.user?.profileImage ? (
-                                                        <img src={e.user.profileImage} alt={userName} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        initials(userName)
-                                                    )}
+                                                <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "") }}>
+                                                    {e.user?.profileImage ? <img src={e.user.profileImage} alt={userName} className="w-full h-full object-cover" /> : initials(userName)}
                                                 </div>
                                                 <div>
                                                     <p className="text-xs font-semibold">{userName}</p>
@@ -133,31 +119,19 @@ export function ExpensesTable({
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="p-4 text-muted-foreground font-mono text-xs">
-                                            {new Date(e.date || e.createdAt).toLocaleDateString()}
-                                        </td>
+                                        <td className="p-4 text-muted-foreground font-mono text-xs">{new Date(e.date || e.createdAt).toLocaleDateString()}</td>
                                         <td className="p-4 text-right font-mono">৳{e.price.toLocaleString()}</td>
                                         <td className="p-4 text-right font-mono text-xs">
                                             {e.quantity} {e.unit || "KG"}
                                         </td>
-                                        <td className="p-4 text-right font-bold text-primary font-mono">
-                                            ৳{totalPrice.toLocaleString()}
-                                        </td>
+                                        <td className="p-4 text-right font-bold text-primary font-mono">৳{totalPrice.toLocaleString()}</td>
                                         <td className="p-4 text-right">
                                             <div className="flex items-center justify-end gap-1.5">
-                                                <button
-                                                    onClick={() => onEditExpense(e)}
-                                                    className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-accent/50 text-muted-foreground hover:text-accent transition-colors cursor-pointer"
-                                                    title="Edit Expense"
-                                                >
+                                                <button onClick={() => onEditExpense(e)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-accent/50 text-muted-foreground hover:text-accent transition-colors cursor-pointer" title="Edit Expense">
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
 
-                                                <button
-                                                    onClick={() => onDeleteExpense(e)}
-                                                    className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                                                    title="Delete Expense"
-                                                >
+                                                <button onClick={() => onDeleteExpense(e)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer" title="Delete Expense">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>

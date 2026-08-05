@@ -111,7 +111,12 @@ export function SettingsRow({ icon, label, sub, right, onClick, danger }: { icon
     const Tag = onClick ? "button" : "div";
     return (
         <Tag type={onClick ? "button" : undefined} onClick={onClick} className={`w-full flex items-center gap-3 p-4 text-left transition-all group ${onClick ? "hover:bg-primary/5 active:bg-primary/10 cursor-pointer" : ""}`}>
-            <motion.div whileHover={{ scale: 1.15, rotate: 6 }} transition={{ type: "spring", stiffness: 350, damping: 15 }} className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: danger ? "rgba(212,24,61,0.12)" : "rgba(232,160,32,0.1)", color: danger ? "#d4183d" : "#e8a020" }}>
+            <motion.div
+                whileHover={{ scale: 1.15, rotate: 6 }}
+                transition={{ type: "spring", stiffness: 350, damping: 15 }}
+                className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: danger ? "rgba(212,24,61,0.12)" : "rgba(232,160,32,0.1)", color: danger ? "#d4183d" : "#e8a020" }}
+            >
                 {icon}
             </motion.div>
             <div className="flex-1 min-w-0">
@@ -124,11 +129,12 @@ export function SettingsRow({ icon, label, sub, right, onClick, danger }: { icon
                     </p>
                 )}
             </div>
-            {right ?? (onClick && !danger && (
-                <motion.div className="group-hover:translate-x-1 transition-transform">
-                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                </motion.div>
-            ))}
+            {right ??
+                (onClick && !danger && (
+                    <motion.div className="group-hover:translate-x-1 transition-transform">
+                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                    </motion.div>
+                ))}
         </Tag>
     );
 }

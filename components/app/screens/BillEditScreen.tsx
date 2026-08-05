@@ -89,15 +89,7 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                         </div>
                     </FieldBox>
                     <FieldBox label="Notes (optional)" focused={fNotes}>
-                        <textarea
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            onFocus={() => setFNotes(true)}
-                            onBlur={() => setFNotes(false)}
-                            rows={3}
-                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none resize-none"
-                            style={{ fontFamily: "'DM Sans', sans-serif" }}
-                        />
+                        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} onFocus={() => setFNotes(true)} onBlur={() => setFNotes(false)} rows={3} className="w-full px-4 py-3.5 bg-transparent text-sm outline-none resize-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                     </FieldBox>
                     <div className="mt-2">
                         <PrimaryButton loading={loading} label="Save Changes" loadingLabel="Saving…" />

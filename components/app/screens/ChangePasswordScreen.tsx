@@ -68,14 +68,7 @@ export function ChangePasswordScreen({ onBack }: { onBack: () => void }) {
                                         <span className="pl-4 text-muted-foreground">
                                             <Lock className="w-4 h-4" />
                                         </span>
-                                        <input
-                                            type={field.show ? "text" : "password"}
-                                            value={field.value}
-                                            onChange={(e) => field.set(e.target.value)}
-                                            className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none"
-                                            style={{ fontFamily: "'DM Sans', sans-serif" }}
-                                            placeholder="••••••••"
-                                        />
+                                        <input type={field.show ? "text" : "password"} value={field.value} onChange={(e) => field.set(e.target.value)} className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} placeholder="••••••••" />
                                         <button type="button" tabIndex={-1} onClick={() => field.setShow(!field.show)} className="pr-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                                             {field.show ? <EyeOff className="w-4 h-4" strokeWidth={1.8} /> : <Eye className="w-4 h-4" strokeWidth={1.8} />}
                                         </button>

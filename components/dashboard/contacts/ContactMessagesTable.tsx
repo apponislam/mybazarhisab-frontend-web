@@ -12,13 +12,7 @@ interface ContactMessagesTableProps {
     onDelete: (contact: TContact) => void;
 }
 
-export function ContactMessagesTable({
-    messages,
-    isLoading,
-    onViewDetails,
-    onReply,
-    onDelete,
-}: ContactMessagesTableProps) {
+export function ContactMessagesTable({ messages, isLoading, onViewDetails, onReply, onDelete }: ContactMessagesTableProps) {
     return (
         <div className="overflow-x-auto flex-1">
             <table className="w-full border-collapse text-left text-sm">
@@ -72,9 +66,7 @@ export function ContactMessagesTable({
                                 </td>
 
                                 {/* Message Snippet */}
-                                <td className="p-4 max-w-xs truncate text-xs text-muted-foreground">
-                                    {contact.message}
-                                </td>
+                                <td className="p-4 max-w-xs truncate text-xs text-muted-foreground">{contact.message}</td>
 
                                 {/* Status */}
                                 <td className="p-4 text-center">
@@ -90,34 +82,20 @@ export function ContactMessagesTable({
                                 </td>
 
                                 {/* Date */}
-                                <td className="p-4 text-center text-xs text-muted-foreground font-mono">
-                                    {new Date(contact.createdAt).toLocaleDateString()}
-                                </td>
+                                <td className="p-4 text-center text-xs text-muted-foreground font-mono">{new Date(contact.createdAt).toLocaleDateString()}</td>
 
                                 {/* Actions */}
                                 <td className="p-4 text-right">
                                     <div className="flex items-center justify-end gap-1.5">
-                                        <button
-                                            onClick={() => onViewDetails(contact._id)}
-                                            className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-primary/50 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                                            title="View Message Details"
-                                        >
+                                        <button onClick={() => onViewDetails(contact._id)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-primary/50 text-muted-foreground hover:text-primary transition-colors cursor-pointer" title="View Message Details">
                                             <Eye className="w-4 h-4" />
                                         </button>
 
-                                        <button
-                                            onClick={() => onReply(contact)}
-                                            className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-accent/50 text-muted-foreground hover:text-accent transition-colors cursor-pointer"
-                                            title="Reply to Message"
-                                        >
+                                        <button onClick={() => onReply(contact)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-accent/50 text-muted-foreground hover:text-accent transition-colors cursor-pointer" title="Reply to Message">
                                             <Reply className="w-4 h-4" />
                                         </button>
 
-                                        <button
-                                            onClick={() => onDelete(contact)}
-                                            className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                                            title="Delete Message"
-                                        >
+                                        <button onClick={() => onDelete(contact)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer" title="Delete Message">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>

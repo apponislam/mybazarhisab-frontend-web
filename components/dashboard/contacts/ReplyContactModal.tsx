@@ -46,12 +46,7 @@ export function ReplyContactModal({ contact, onClose }: ReplyContactModalProps) 
         <AnimatePresence>
             {contact && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5">
                         <div className="flex items-center justify-between border-b border-border pb-3">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-9 h-9 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center">
@@ -69,7 +64,9 @@ export function ReplyContactModal({ contact, onClose }: ReplyContactModalProps) 
 
                         <div className="bg-[#1a0e07] border border-border rounded-xl p-3.5 flex flex-col gap-1 text-xs">
                             <div className="flex justify-between font-mono text-muted-foreground">
-                                <span>To: {contact.name} ({contact.email})</span>
+                                <span>
+                                    To: {contact.name} ({contact.email})
+                                </span>
                                 <span>Subject: {contact.subject}</span>
                             </div>
                             <p className="text-foreground italic mt-1 font-sans">"{contact.message}"</p>
@@ -91,18 +88,10 @@ export function ReplyContactModal({ contact, onClose }: ReplyContactModalProps) 
                             </div>
 
                             <div className="flex items-center justify-end gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
-                                >
+                                <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer">
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-accent-foreground font-bold text-xs hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer shadow-md"
-                                >
+                                <button type="submit" disabled={isLoading} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-accent-foreground font-bold text-xs hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer shadow-md">
                                     <Send className="w-4 h-4" />
                                     <span>{isLoading ? "Sending Reply…" : "Send Reply"}</span>
                                 </button>

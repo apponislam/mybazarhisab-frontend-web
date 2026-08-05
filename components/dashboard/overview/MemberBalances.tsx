@@ -43,11 +43,7 @@ export function MemberBalances({ memberSplits }: MemberBalancesProps) {
                         <div key={s.user.id} className="p-4 rounded-2xl border border-[rgba(232,160,32,0.08)] bg-[#1a0e07] flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center font-bold text-white shadow-inner text-xs shrink-0" style={{ background: avatarColor(s.user.id) }}>
-                                    {s.user.profileImage ? (
-                                        <img src={s.user.profileImage} alt={s.user.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        initials(s.user.name)
-                                    )}
+                                    {s.user.profileImage ? <img src={s.user.profileImage} alt={s.user.name} className="w-full h-full object-cover" /> : initials(s.user.name)}
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-semibold">{s.user.name}</h4>
@@ -56,7 +52,8 @@ export function MemberBalances({ memberSplits }: MemberBalancesProps) {
                             </div>
                             <div className="text-right">
                                 <p className={`text-sm font-bold font-mono ${isPositive ? "text-green-400" : "text-destructive"}`}>
-                                    {isPositive ? "+" : ""}{fmtFull(s.balance)}
+                                    {isPositive ? "+" : ""}
+                                    {fmtFull(s.balance)}
                                 </p>
                                 <p className="text-[9px] text-muted-foreground">{isPositive ? "Owed" : "Owes"}</p>
                             </div>

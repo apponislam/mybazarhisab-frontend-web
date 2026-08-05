@@ -122,15 +122,8 @@ export function ActivitiesTable({ activities, isLoading }: ActivitiesTableProps)
                                         {/* User Column */}
                                         <td className="p-4">
                                             <div className="flex items-center gap-2.5">
-                                                <div
-                                                    className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md"
-                                                    style={{ background: avatarColor(userObj?._id || "") }}
-                                                >
-                                                    {userObj?.profileImage ? (
-                                                        <img src={userObj.profileImage} alt={userName} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        initials(userName)
-                                                    )}
+                                                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md" style={{ background: avatarColor(userObj?._id || "") }}>
+                                                    {userObj?.profileImage ? <img src={userObj.profileImage} alt={userName} className="w-full h-full object-cover" /> : initials(userName)}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="text-xs font-semibold text-foreground truncate">{userName}</p>
@@ -141,11 +134,7 @@ export function ActivitiesTable({ activities, isLoading }: ActivitiesTableProps)
 
                                         {/* Action Badge */}
                                         <td className="p-4">
-                                            <span
-                                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold font-mono border uppercase tracking-wider ${getActionBadgeColor(
-                                                    log.action
-                                                )}`}
-                                            >
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold font-mono border uppercase tracking-wider ${getActionBadgeColor(log.action)}`}>
                                                 {getActionIcon(log.action)}
                                                 <span>{log.action}</span>
                                             </span>
@@ -154,18 +143,12 @@ export function ActivitiesTable({ activities, isLoading }: ActivitiesTableProps)
                                         {/* Details Description */}
                                         <td className="p-4">
                                             <p className="text-xs text-foreground font-sans max-w-md line-clamp-2">{log.details}</p>
-                                            {log.metadata && Object.keys(log.metadata).length > 0 && (
-                                                <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5 truncate">
-                                                    Meta: {JSON.stringify(log.metadata)}
-                                                </p>
-                                            )}
+                                            {log.metadata && Object.keys(log.metadata).length > 0 && <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5 truncate">Meta: {JSON.stringify(log.metadata)}</p>}
                                         </td>
 
                                         {/* Group */}
                                         <td className="p-4">
-                                            <span className="text-xs font-mono text-muted-foreground bg-[#1a0e07] px-2.5 py-1 rounded-lg border border-border/60">
-                                                {groupName}
-                                            </span>
+                                            <span className="text-xs font-mono text-muted-foreground bg-[#1a0e07] px-2.5 py-1 rounded-lg border border-border/60">{groupName}</span>
                                         </td>
 
                                         {/* Timestamp */}
@@ -178,11 +161,7 @@ export function ActivitiesTable({ activities, isLoading }: ActivitiesTableProps)
 
                                         {/* Delete Action Button */}
                                         <td className="p-4 text-center">
-                                            <button
-                                                onClick={() => setSelectedActivity(log)}
-                                                className="p-1.5 rounded-lg border border-border bg-[#1a0e07] text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors cursor-pointer"
-                                                title="Delete Activity Log Record"
-                                            >
+                                            <button onClick={() => setSelectedActivity(log)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors cursor-pointer" title="Delete Activity Log Record">
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
                                         </td>

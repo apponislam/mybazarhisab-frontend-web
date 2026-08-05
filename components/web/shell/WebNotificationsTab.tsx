@@ -3,19 +3,7 @@
 import React from "react";
 import { Bell, X } from "lucide-react";
 
-export function WebNotificationsTab({
-    markAllAsRead,
-    deleteAllNotifications,
-    notifLoading,
-    notifData,
-    deleteNotification,
-}: {
-    markAllAsRead: () => void;
-    deleteAllNotifications: () => void;
-    notifLoading: boolean;
-    notifData?: any;
-    deleteNotification: (id: string) => void;
-}) {
+export function WebNotificationsTab({ markAllAsRead, deleteAllNotifications, notifLoading, notifData, deleteNotification }: { markAllAsRead: () => void; deleteAllNotifications: () => void; notifLoading: boolean; notifData?: any; deleteNotification: (id: string) => void }) {
     return (
         <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6 font-sans">
             <div className="flex items-center justify-between border-b border-border pb-4">

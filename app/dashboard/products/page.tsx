@@ -2,17 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-    Package,
-    Plus,
-    Search,
-    GitMerge,
-    ChevronLeft,
-    ChevronRight,
-    X,
-    RefreshCw,
-    SlidersHorizontal,
-} from "lucide-react";
+import { Plus, Search, GitMerge, ChevronLeft, ChevronRight, X, RefreshCw, SlidersHorizontal } from "lucide-react";
 import { TProduct, useGetAllProductsQuery } from "@/redux/features/product/productApi";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { CreateProductModal } from "@/components/dashboard/products/CreateProductModal";
@@ -32,7 +22,12 @@ export default function DashboardProductsPage() {
     const [limit, setLimit] = useState(10);
 
     // RTK Query hook
-    const { data: responseData, isLoading, isFetching, refetch } = useGetAllProductsQuery({
+    const {
+        data: responseData,
+        isLoading,
+        isFetching,
+        refetch,
+    } = useGetAllProductsQuery({
         searchTerm: searchTerm || undefined,
         page,
         limit,
@@ -75,26 +70,16 @@ export default function DashboardProductsPage() {
                             <span>Sabzi Mandi Group</span>
                         </div>
 
-                        <button
-                            onClick={() => refetch()}
-                            className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                            title="Refresh products"
-                        >
+                        <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh products">
                             <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                         </button>
 
-                        <button
-                            onClick={() => setShowMergeModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 border border-accent text-accent text-sm font-semibold rounded-xl transition-all hover:bg-accent/10 cursor-pointer shadow-md"
-                        >
+                        <button onClick={() => setShowMergeModal(true)} className="flex items-center gap-2 px-4 py-2 border border-accent text-accent text-sm font-semibold rounded-xl transition-all hover:bg-accent/10 cursor-pointer shadow-md">
                             <GitMerge className="w-4 h-4" />
                             <span>Merge Products</span>
                         </button>
 
-                        <button
-                            onClick={() => setShowCreateModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/20"
-                        >
+                        <button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/20">
                             <Plus className="w-4 h-4" />
                             <span>Add Product</span>
                         </button>
@@ -163,22 +148,13 @@ export default function DashboardProductsPage() {
 
                     {/* Products Table Container */}
                     <div className="bg-[#251508] border border-border rounded-2xl shadow-xl overflow-hidden flex flex-col flex-1">
-                        <ProductTable
-                            products={products}
-                            isLoading={isLoading}
-                            searchTerm={searchTerm}
-                            onViewDetails={(id) => setViewingProductId(id)}
-                            onEdit={(prod) => setEditingProduct(prod)}
-                            onDelete={(prod) => setDeletingProduct(prod)}
-                        />
+                        <ProductTable products={products} isLoading={isLoading} searchTerm={searchTerm} onViewDetails={(id) => setViewingProductId(id)} onEdit={(prod) => setEditingProduct(prod)} onDelete={(prod) => setDeletingProduct(prod)} />
 
                         {/* Pagination Footer */}
                         {meta && (
                             <div className="bg-[#2e1a0a] border-t border-[rgba(232,160,32,0.1)] px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground font-mono">
                                 <div>
-                                    Showing <span className="font-bold text-foreground">{products.length}</span> of{" "}
-                                    <span className="font-bold text-foreground">{meta.total}</span> products (Page{" "}
-                                    <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
+                                    Showing <span className="font-bold text-foreground">{products.length}</span> of <span className="font-bold text-foreground">{meta.total}</span> products (Page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
                                 </div>
 
                                 <div className="flex items-center gap-2">

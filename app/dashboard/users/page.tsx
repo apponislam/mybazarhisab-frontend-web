@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw, Search, Filter, SlidersHorizontal, ChevronLeft, ChevronRight, Users, ShieldCheck, UserCheck } from "lucide-react";
+import { RefreshCw, Search, SlidersHorizontal, ChevronLeft, ChevronRight, ShieldCheck, UserCheck } from "lucide-react";
 import { useGetAllUsersQuery, UserQueryParams } from "@/redux/features/user/userApi";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -33,11 +33,7 @@ export default function DashboardUsersPage() {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 relative">
                 <DashboardHeader title="Registered Users & Account Control">
-                    <button
-                        onClick={() => refetch()}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh user list"
-                    >
+                    <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh user list">
                         <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
                 </DashboardHeader>
@@ -63,11 +59,7 @@ export default function DashboardUsersPage() {
                             <div className="flex items-center gap-1.5 bg-[#1a0e07] border border-border rounded-2xl px-3 py-2 text-xs">
                                 <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
                                 <span className="text-muted-foreground font-mono">Role:</span>
-                                <select
-                                    value={queryParams.role || ""}
-                                    onChange={(e) => handleFilterChange({ role: e.target.value || undefined, page: 1 })}
-                                    className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono"
-                                >
+                                <select value={queryParams.role || ""} onChange={(e) => handleFilterChange({ role: e.target.value || undefined, page: 1 })} className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono">
                                     <option value="">All Roles</option>
                                     <option value="ADMIN">ADMIN</option>
                                     <option value="USER">USER</option>
@@ -99,11 +91,7 @@ export default function DashboardUsersPage() {
                             <div className="flex items-center gap-1.5 bg-[#1a0e07] border border-border rounded-2xl px-3 py-2 text-xs">
                                 <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
                                 <span className="text-muted-foreground font-mono">Rows:</span>
-                                <select
-                                    value={queryParams.limit || 10}
-                                    onChange={(e) => handleFilterChange({ limit: Number(e.target.value), page: 1 })}
-                                    className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono"
-                                >
+                                <select value={queryParams.limit || 10} onChange={(e) => handleFilterChange({ limit: Number(e.target.value), page: 1 })} className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono">
                                     <option value={10}>10</option>
                                     <option value={20}>20</option>
                                     <option value={50}>50</option>
@@ -119,9 +107,7 @@ export default function DashboardUsersPage() {
                     {meta && (
                         <div className="bg-[#251508] border border-border rounded-2xl px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground font-mono shadow-xl shrink-0">
                             <div>
-                                Showing <span className="font-bold text-foreground">{users.length}</span> of{" "}
-                                <span className="font-bold text-foreground">{meta.total}</span> users (Page{" "}
-                                <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
+                                Showing <span className="font-bold text-foreground">{users.length}</span> of <span className="font-bold text-foreground">{meta.total}</span> users (Page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
                             </div>
 
                             <div className="flex items-center gap-2">

@@ -28,7 +28,9 @@ export function RecentActivityFeed({ entries }: RecentActivityFeedProps) {
                         </div>
                         <div className="text-right shrink-0">
                             <p className="text-xs font-bold text-primary font-mono">৳{(e.price * e.quantity).toLocaleString()}</p>
-                            <p className="text-[9px] text-muted-foreground font-mono">{e.quantity} {e.unit}</p>
+                            <p className="text-[9px] text-muted-foreground font-mono">
+                                {e.quantity} {e.unit}
+                            </p>
                         </div>
                     </div>
                 ))}

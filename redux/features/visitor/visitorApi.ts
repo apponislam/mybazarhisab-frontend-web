@@ -71,4 +71,3 @@ const visitorApi = baseApi.injectEndpoints({
 });
 
 export const { useTrackVisitMutation, useGetVisitorStatsQuery, useGetAllVisitorsQuery } = visitorApi;
-

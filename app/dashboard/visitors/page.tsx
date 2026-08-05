@@ -54,11 +54,7 @@ export default function DashboardVisitorsPage() {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 relative">
                 <DashboardHeader title="Visitor Analytics & Telemetry">
-                    <button
-                        onClick={handleRefreshAll}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh visitor stats & logs"
-                    >
+                    <button onClick={handleRefreshAll} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh visitor stats & logs">
                         <RefreshCw className={`w-4 h-4 ${statsFetching || logsFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
                 </DashboardHeader>
@@ -89,4 +85,3 @@ export default function DashboardVisitorsPage() {
         </div>
     );
 }
-

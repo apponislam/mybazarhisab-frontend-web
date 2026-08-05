@@ -11,13 +11,7 @@ interface DashboardHeaderProps {
     children?: React.ReactNode;
 }
 
-export function DashboardHeader({
-    title,
-    groupName,
-    onAddExpense,
-    onAddBill,
-    children,
-}: DashboardHeaderProps) {
+export function DashboardHeader({ title, groupName, onAddExpense, onAddBill, children }: DashboardHeaderProps) {
     return (
         <header className="h-20 border-b border-[rgba(232,160,32,0.1)] px-8 flex items-center justify-between shrink-0 bg-[#251508]/30">
             <div>
@@ -34,19 +28,13 @@ export function DashboardHeader({
                 {children}
 
                 {onAddExpense && (
-                    <button
-                        onClick={onAddExpense}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/20"
-                    >
+                    <button onClick={onAddExpense} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/20">
                         <Plus className="w-4 h-4" /> Add Expense
                     </button>
                 )}
 
                 {onAddBill && (
-                    <button
-                        onClick={onAddBill}
-                        className="flex items-center gap-2 px-4 py-2 border border-accent text-accent text-sm font-semibold rounded-xl transition-all hover:bg-accent/10 cursor-pointer shadow-md"
-                    >
+                    <button onClick={onAddBill} className="flex items-center gap-2 px-4 py-2 border border-accent text-accent text-sm font-semibold rounded-xl transition-all hover:bg-accent/10 cursor-pointer shadow-md">
                         <Plus className="w-4 h-4" /> Add Bill
                     </button>
                 )}

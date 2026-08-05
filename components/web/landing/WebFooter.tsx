@@ -17,9 +17,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                                 My Bazar <span className="text-primary font-sans font-extrabold">Hisab</span>
                             </span>
                         </div>
-                        <p className="text-muted-foreground text-xs leading-relaxed max-w-md">
-                            The modern collaborative spending ledger for families and shared households. Track daily groceries, utility bills, and monthly budgets effortlessly.
-                        </p>
+                        <p className="text-muted-foreground text-xs leading-relaxed max-w-md">The modern collaborative spending ledger for families and shared households. Track daily groceries, utility bills, and monthly budgets effortlessly.</p>
                         <div className="flex items-center gap-2 pt-2 text-[11px] text-muted-foreground font-mono">
                             <Shield className="w-3.5 h-3.5 text-primary" />
                             <span>Private & Encrypted Accounts</span>
@@ -46,19 +44,13 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
                         <h4 className="text-xs uppercase tracking-widest text-primary font-mono font-bold">Legal & Support</h4>
                         <ul className="space-y-2.5 text-xs text-muted-foreground">
                             <li>
-                                <Link
-                                    href="/privacy-policy"
-                                    className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
-                                >
+                                <Link href="/privacy-policy" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
                                     Privacy Policy
                                 </Link>
                             </li>
                             <li>
-                                <Link
-                                    href="/terms-and-conditions"
-                                    className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer"
-                                >
+                                <Link href="/terms-and-conditions" className="hover:text-primary transition-colors text-xs flex items-center gap-1.5 cursor-pointer">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
                                     Terms & Conditions
                                 </Link>
@@ -81,9 +73,7 @@ export function WebFooter({ onSignIn }: { onSignIn: () => void }) {
 
                 {/* Bottom Bar */}
                 <div className="pt-8 text-center text-xs text-muted-foreground">
-                    <p className="font-mono text-[11px]">
-                        © {new Date().getFullYear()} My Bazar Hisab. All rights reserved.
-                    </p>
+                    <p className="font-mono text-[11px]">© {new Date().getFullYear()} My Bazar Hisab. All rights reserved.</p>
                 </div>
             </div>
         </footer>

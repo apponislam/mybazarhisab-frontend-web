@@ -30,9 +30,7 @@ export function ContactSection() {
                     <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Contact & Support
                     </h2>
-                    <p className="text-muted-foreground text-sm">
-                        Have questions, feature requests, or need support for your family group account? Send us a message below.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Have questions, feature requests, or need support for your family group account? Send us a message below.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 max-w-5xl mx-auto">
@@ -72,9 +70,7 @@ export function ContactSection() {
                                 <h4 className="text-sm font-bold text-foreground mb-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                     Head Office
                                 </h4>
-                                <p className="text-xs text-muted-foreground leading-relaxed">
-                                    Level 5, Mirpur Commercial Plaza, Mirpur-10, Dhaka-1216, Bangladesh.
-                                </p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">Level 5, Mirpur Commercial Plaza, Mirpur-10, Dhaka-1216, Bangladesh.</p>
                             </div>
                         </div>
                     </div>
@@ -89,9 +85,7 @@ export function ContactSection() {
                                 <h3 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                     Message Sent!
                                 </h3>
-                                <p className="text-xs text-muted-foreground max-w-sm">
-                                    Thank you for contacting My Bazar Hisab. Our support team will get back to you shortly.
-                                </p>
+                                <p className="text-xs text-muted-foreground max-w-sm">Thank you for contacting My Bazar Hisab. Our support team will get back to you shortly.</p>
                                 <button
                                     onClick={() => {
                                         setSubmitted(false);

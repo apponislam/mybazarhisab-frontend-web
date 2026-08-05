@@ -89,11 +89,7 @@ export function PasswordSettingsForm() {
                         className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground focus:border-accent/60 transition-colors"
                     />
                 </div>
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full py-3 bg-accent text-accent-foreground font-bold text-xs rounded-xl hover:opacity-90 transition-all cursor-pointer shadow-md disabled:opacity-50 mt-2"
-                >
+                <button type="submit" disabled={isLoading} className="w-full py-3 bg-accent text-accent-foreground font-bold text-xs rounded-xl hover:opacity-90 transition-all cursor-pointer shadow-md disabled:opacity-50 mt-2">
                     {isLoading ? "Updating Password…" : "Update Password"}
                 </button>
             </form>

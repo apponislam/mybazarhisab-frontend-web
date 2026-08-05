@@ -28,10 +28,7 @@ export function HeroSection({ onSignIn }: { onSignIn: () => void }) {
                         Get Started Now
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </button>
-                    <a
-                        href="#features"
-                        className="w-full sm:w-auto px-8 py-4 border border-border/60 bg-[#2e1a0a]/30 text-foreground font-semibold text-base rounded-xl hover:bg-[#2e1a0a]/60 hover:border-primary/30 transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
+                    <a href="#features" className="w-full sm:w-auto px-8 py-4 border border-border/60 bg-[#2e1a0a]/30 text-foreground font-semibold text-base rounded-xl hover:bg-[#2e1a0a]/60 hover:border-primary/30 transition-all duration-300 flex items-center justify-center gap-1.5 cursor-pointer">
                         Learn More <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
                     </a>
                 </motion.div>

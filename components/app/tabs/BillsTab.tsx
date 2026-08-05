@@ -48,19 +48,7 @@ function BillRow({ bill, onClick }: { bill: MockBill; onClick: () => void }) {
     );
 }
 
-export function BillsTab({
-    bills,
-    onDetail,
-    isLoading,
-    filter = "month",
-    setFilter,
-}: {
-    bills: MockBill[];
-    onDetail: (b: MockBill) => void;
-    isLoading?: boolean;
-    filter?: "month" | "all";
-    setFilter?: (f: "month" | "all") => void;
-}) {
+export function BillsTab({ bills, onDetail, isLoading, filter = "month", setFilter }: { bills: MockBill[]; onDetail: (b: MockBill) => void; isLoading?: boolean; filter?: "month" | "all"; setFilter?: (f: "month" | "all") => void }) {
     const [localFilter, setLocalFilter] = useState<"month" | "all">("month");
     const activeFilter = setFilter ? filter : localFilter;
     const handleFilterChange = setFilter || setLocalFilter;
@@ -71,7 +59,7 @@ export function BillsTab({
 
     return (
         <div className="flex flex-col flex-1 min-h-0">
-            <div className="px-6 pt-12 pb-4 shrink-0">
+            <div className="px-6 pt-4 pb-4 shrink-0">
                 <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                     Monthly <span className="text-primary">Bills</span>
                 </h2>

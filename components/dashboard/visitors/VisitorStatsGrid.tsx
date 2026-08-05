@@ -13,7 +13,7 @@ interface VisitorStatsGridProps {
 export function VisitorStatsGrid({ days, onDaysChange, stats, isLoading }: VisitorStatsGridProps) {
     const totalVisits = stats?.totalVisits ?? 0;
     const uniqueVisitors = stats?.totalUniqueVisitors ?? 0;
-    
+
     const platformData = stats?.allTimePlatformBreakdown || stats?.todayPlatformBreakdown || {};
     const webVisits = platformData?.WEB?.visits ?? 0;
     const appVisits = (platformData?.APP?.visits ?? 0) + (platformData?.ANDROID?.visits ?? 0) + (platformData?.IOS?.visits ?? 0);
@@ -30,8 +30,7 @@ export function VisitorStatsGrid({ days, onDaysChange, stats, isLoading }: Visit
                     <div>
                         <h3 className="text-sm font-bold text-foreground">Traffic Insights Overview</h3>
                         <p className="text-xs text-muted-foreground font-mono">
-                            Today: <span className="text-primary font-bold">{todayTotal}</span> visits (
-                            <span className="text-accent font-bold">{todayUnique}</span> unique)
+                            Today: <span className="text-primary font-bold">{todayTotal}</span> visits (<span className="text-accent font-bold">{todayUnique}</span> unique)
                         </p>
                     </div>
                 </div>
@@ -64,9 +63,7 @@ export function VisitorStatsGrid({ days, onDaysChange, stats, isLoading }: Visit
                             <Eye className="w-5 h-5" />
                         </div>
                     </div>
-                    <h4 className="text-3xl font-extrabold font-mono text-primary mt-3">
-                        {isLoading ? "…" : totalVisits.toLocaleString()}
-                    </h4>
+                    <h4 className="text-3xl font-extrabold font-mono text-primary mt-3">{isLoading ? "…" : totalVisits.toLocaleString()}</h4>
                     <p className="text-[10px] text-muted-foreground font-mono mt-1">Recorded over last {days} days</p>
                 </div>
 
@@ -77,9 +74,7 @@ export function VisitorStatsGrid({ days, onDaysChange, stats, isLoading }: Visit
                             <Users className="w-5 h-5" />
                         </div>
                     </div>
-                    <h4 className="text-3xl font-extrabold font-mono text-accent mt-3">
-                        {isLoading ? "…" : uniqueVisitors.toLocaleString()}
-                    </h4>
+                    <h4 className="text-3xl font-extrabold font-mono text-accent mt-3">{isLoading ? "…" : uniqueVisitors.toLocaleString()}</h4>
                     <p className="text-[10px] text-muted-foreground font-mono mt-1">Distinct user devices & IPs</p>
                 </div>
 
@@ -90,9 +85,7 @@ export function VisitorStatsGrid({ days, onDaysChange, stats, isLoading }: Visit
                             <Globe className="w-5 h-5" />
                         </div>
                     </div>
-                    <h4 className="text-3xl font-extrabold font-mono text-blue-400 mt-3">
-                        {isLoading ? "…" : webVisits.toLocaleString()}
-                    </h4>
+                    <h4 className="text-3xl font-extrabold font-mono text-blue-400 mt-3">{isLoading ? "…" : webVisits.toLocaleString()}</h4>
                     <p className="text-[10px] text-muted-foreground font-mono mt-1">Desktop & browser visitors</p>
                 </div>
 
@@ -103,9 +96,7 @@ export function VisitorStatsGrid({ days, onDaysChange, stats, isLoading }: Visit
                             <Smartphone className="w-5 h-5" />
                         </div>
                     </div>
-                    <h4 className="text-3xl font-extrabold font-mono text-green-400 mt-3">
-                        {isLoading ? "…" : appVisits.toLocaleString()}
-                    </h4>
+                    <h4 className="text-3xl font-extrabold font-mono text-green-400 mt-3">{isLoading ? "…" : appVisits.toLocaleString()}</h4>
                     <p className="text-[10px] text-muted-foreground font-mono mt-1">Android & iOS mobile visits</p>
                 </div>
             </div>

@@ -47,12 +47,7 @@ export function MergeProductsModal({ show, products, onClose }: MergeProductsMod
         <AnimatePresence>
             {show && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-6"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-6">
                         <div className="flex items-center justify-between border-b border-border pb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
@@ -75,12 +70,7 @@ export function MergeProductsModal({ show, products, onClose }: MergeProductsMod
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
                                     Source Product (Will be merged & removed) <span className="text-destructive">*</span>
                                 </label>
-                                <select
-                                    value={sourceProductId}
-                                    onChange={(e) => setSourceProductId(e.target.value)}
-                                    required
-                                    className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground cursor-pointer"
-                                >
+                                <select value={sourceProductId} onChange={(e) => setSourceProductId(e.target.value)} required className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground cursor-pointer">
                                     <option value="">-- Select Source Product --</option>
                                     {products.map((p) => (
                                         <option key={`src_${p._id}`} value={p._id} disabled={p._id === targetProductId}>
@@ -100,12 +90,7 @@ export function MergeProductsModal({ show, products, onClose }: MergeProductsMod
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
                                     Target Product (Will retain merged data) <span className="text-destructive">*</span>
                                 </label>
-                                <select
-                                    value={targetProductId}
-                                    onChange={(e) => setTargetProductId(e.target.value)}
-                                    required
-                                    className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground cursor-pointer"
-                                >
+                                <select value={targetProductId} onChange={(e) => setTargetProductId(e.target.value)} required className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground cursor-pointer">
                                     <option value="">-- Select Target Product --</option>
                                     {products.map((p) => (
                                         <option key={`tgt_${p._id}`} value={p._id} disabled={p._id === sourceProductId}>
@@ -116,18 +101,10 @@ export function MergeProductsModal({ show, products, onClose }: MergeProductsMod
                             </div>
 
                             <div className="flex items-center justify-end gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
-                                >
+                                <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer">
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading || !sourceProductId || !targetProductId}
-                                    className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-accent transition-all disabled:opacity-50 cursor-pointer shadow-md"
-                                >
+                                <button type="submit" disabled={isLoading || !sourceProductId || !targetProductId} className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-accent transition-all disabled:opacity-50 cursor-pointer shadow-md">
                                     {isLoading ? "Merging…" : "Merge Products"}
                                 </button>
                             </div>

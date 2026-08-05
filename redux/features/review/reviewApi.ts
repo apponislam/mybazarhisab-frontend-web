@@ -114,11 +114,4 @@ const reviewApi = baseApi.injectEndpoints({
     }),
 });
 
-export const {
-    useCreateReviewMutation,
-    useGetMyReviewQuery,
-    useGetReviewSummaryStatsQuery,
-    useGetAllReviewsQuery,
-    useToggleReviewVisibilityMutation,
-    useDeleteReviewMutation,
-} = reviewApi;
+export const { useCreateReviewMutation, useGetMyReviewQuery, useGetReviewSummaryStatsQuery, useGetAllReviewsQuery, useToggleReviewVisibilityMutation, useDeleteReviewMutation } = reviewApi;

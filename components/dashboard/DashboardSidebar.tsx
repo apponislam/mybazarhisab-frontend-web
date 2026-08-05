@@ -2,20 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-    LayoutDashboard,
-    ShoppingBag,
-    Receipt,
-    Package,
-    Mail,
-    Star,
-    BarChart2,
-    Shield,
-    Users,
-    Settings,
-    LogOut,
-    Activity,
-} from "lucide-react";
+import { LayoutDashboard, ShoppingBag, Receipt, Package, Mail, Star, BarChart2, Shield, Users, Settings, LogOut, Activity } from "lucide-react";
 
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
 
@@ -101,21 +88,13 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
             {/* User Details Footer */}
             <div className="p-4 border-t border-[rgba(232,160,32,0.1)] flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0 shadow-md">
-                    {profileImage ? (
-                        <img src={profileImage} alt={userName} className="w-full h-full object-cover" />
-                    ) : (
-                        initials(userName)
-                    )}
+                    {profileImage ? <img src={profileImage} alt={userName} className="w-full h-full object-cover" /> : initials(userName)}
                 </div>
                 <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-bold truncate text-foreground">{userName}</h4>
                     <p className="text-[10px] text-muted-foreground truncate font-mono">{userEmail}</p>
                 </div>
-                <button
-                    onClick={() => router.push("/login")}
-                    className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer"
-                    title="Logout"
-                >
+                <button onClick={() => router.push("/login")} className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Logout">
                     <LogOut className="w-4 h-4" />
                 </button>
             </div>

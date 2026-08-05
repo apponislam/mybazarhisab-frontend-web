@@ -3,14 +3,7 @@ import { motion } from "motion/react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle, User, Camera, Phone } from "lucide-react";
 import { ScreenShell, PrimaryButton, BackButton, StepDots, FieldBox } from "@/components/app/ui/Shared";
 import { toast } from "sonner";
-import {
-    useLoginMutation,
-    useRegisterMutation,
-    useForgotPasswordMutation,
-    useVerifyOtpMutation,
-    useResendOtpMutation,
-    useResetPasswordMutation,
-} from "@/redux/features/auth/authApi";
+import { useLoginMutation, useRegisterMutation, useForgotPasswordMutation, useVerifyOtpMutation, useResendOtpMutation, useResetPasswordMutation } from "@/redux/features/auth/authApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/auth/authSlice";
 
@@ -49,14 +42,7 @@ export function AuthForms({ onLogin }: { onLogin: () => void }) {
                 }}
             />
         );
-    if (screen === "forgot-newpass")
-        return (
-            <ForgotNewPassScreen
-                resetToken={resetToken}
-                onBack={() => setScreen("forgot-otp")}
-                onDone={() => setScreen("forgot-success")}
-            />
-        );
+    if (screen === "forgot-newpass") return <ForgotNewPassScreen resetToken={resetToken} onBack={() => setScreen("forgot-otp")} onDone={() => setScreen("forgot-success")} />;
     if (screen === "forgot-success") {
         return (
             <ScreenShell scrollable>

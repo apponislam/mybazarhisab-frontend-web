@@ -14,9 +14,7 @@ export function RatingsSection() {
                     <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Loved by Families & Roommates
                     </h2>
-                    <p className="text-muted-foreground text-sm">
-                        Here is what households across Bangladesh say about managing their daily market expenses with My Bazar Hisab.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Here is what households across Bangladesh say about managing their daily market expenses with My Bazar Hisab.</p>
                 </div>
 
                 <TestimonialsSlider />

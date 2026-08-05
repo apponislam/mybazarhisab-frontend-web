@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, ShieldCheck, Globe, MapPin, ChevronDown, Edit3, Bell, MessageSquare, Star } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@/types";
-import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
+import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmtFull, fmtDate } from "@/lib/mockData";
 import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/redux/features/auth/authApi";
 import { useSubmitMessageMutation } from "@/redux/features/contact/contactApi";
 import { useCreateFeedbackMutation } from "@/redux/features/feedback/feedbackApi";
@@ -12,13 +12,12 @@ import { useCreateReviewMutation, useGetMyReviewQuery } from "@/redux/features/r
 import { useGetMyNotificationsQuery, useGetUnreadCountQuery, useMarkAllAsReadMutation, useDeleteAllNotificationsMutation, useDeleteNotificationMutation } from "@/redux/features/notification/notificationApi";
 import { useCreateBazarEntryMutation, useGetAllBazarEntriesQuery, useDeleteBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { useCreateBillMutation, useGetAllBillsQuery, useDeleteBillMutation } from "@/redux/features/bill/billApi";
-import { ImageUpload } from "@/components/dashboard/ImageUpload";
 import { WebPagination } from "@/components/web/shell/WebPagination";
 import { WebConfirmModal } from "@/components/web/shell/WebModal";
 import { WebHeader } from "@/components/web/shell/WebHeader";
 import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
 import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
-import { WebDialogModal as Modal, WebFieldBox as FieldBox, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent } from "@/components/web/shell/WebDialogs";
+import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent } from "@/components/web/shell/WebDialogs";
 import { WebMetricCard as MetricCard, avatarColor, initials } from "@/components/web/shell/WebMetricCard";
 
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
@@ -761,15 +760,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                         )}
 
                         {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
-                        {tab === "notifications" && (
-                            <WebNotificationsTab
-                                markAllAsRead={markAllAsRead}
-                                deleteAllNotifications={deleteAllNotifications}
-                                notifLoading={notifLoading}
-                                notifData={notifData}
-                                deleteNotification={deleteNotification}
-                            />
-                        )}
+                        {tab === "notifications" && <WebNotificationsTab markAllAsRead={markAllAsRead} deleteAllNotifications={deleteAllNotifications} notifLoading={notifLoading} notifData={notifData} deleteNotification={deleteNotification} />}
 
                         {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
                         {tab === "profile" && (

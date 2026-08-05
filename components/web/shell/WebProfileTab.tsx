@@ -4,12 +4,7 @@ import { toast } from "sonner";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
 import { WebFieldBox as FieldBox } from "@/components/web/shell/WebDialogs";
 import { initials } from "@/components/web/shell/WebMetricCard";
-import {
-    useGetMyGroupQuery,
-    useUpdateGroupMutation,
-    useGenerateInviteCodeMutation,
-    useLeaveGroupMutation,
-} from "@/redux/features/group/groupApi";
+import { useGetMyGroupQuery, useUpdateGroupMutation, useGenerateInviteCodeMutation, useLeaveGroupMutation } from "@/redux/features/group/groupApi";
 
 function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
     const { data: groupResponse, isLoading } = useGetMyGroupQuery();
@@ -88,13 +83,7 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
             <div className="p-5 rounded-2xl bg-[#1a0e07] border border-border/60 flex flex-col gap-4">
                 {isEditingName ? (
                     <form onSubmit={handleUpdateName} className="flex gap-2">
-                        <input
-                            value={groupName}
-                            onChange={(e) => setGroupName(e.target.value)}
-                            placeholder="Group Name"
-                            className="flex-1 px-3 py-2 bg-[#2a170a] border border-primary/50 rounded-xl text-sm text-foreground outline-none font-bold"
-                            autoFocus
-                        />
+                        <input value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group Name" className="flex-1 px-3 py-2 bg-[#2a170a] border border-primary/50 rounded-xl text-sm text-foreground outline-none font-bold" autoFocus />
                         <button type="button" onClick={() => setIsEditingName(false)} className="px-3 py-2 rounded-xl border border-border text-xs text-muted-foreground">
                             Cancel
                         </button>
@@ -106,9 +95,7 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                     <div className="flex items-center justify-between">
                         <div>
                             <h3 className="text-base font-bold text-foreground">{group?.name || (isLoading ? "Loading group..." : "My Group")}</h3>
-                            <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                                Created by {typeof group?.creator === "object" ? group.creator?.name : currentUser?.name || "Admin"}
-                            </p>
+                            <p className="text-xs text-muted-foreground font-mono mt-0.5">Created by {typeof group?.creator === "object" ? group.creator?.name : currentUser?.name || "Admin"}</p>
                         </div>
                         {showLeaveConfirm ? (
                             <div className="flex items-center gap-2">
@@ -120,10 +107,7 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                                 </button>
                             </div>
                         ) : (
-                            <button
-                                onClick={() => setShowLeaveConfirm(true)}
-                                className="px-3 py-1.5 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                            >
+                            <button onClick={() => setShowLeaveConfirm(true)} className="px-3 py-1.5 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5">
                                 <LogOut className="w-3.5 h-3.5" />
                                 <span>Leave</span>
                             </button>
@@ -138,20 +122,12 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                         <span className="text-lg font-bold font-mono text-primary tracking-wider">{group?.inviteCode || "BAZAR-XXXXXX"}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={handleCopyCode}
-                            className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        >
+                        <button onClick={handleCopyCode} className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer">
                             {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                             <span>{copied ? "Copied!" : "Copy Code"}</span>
                         </button>
                         {isCreator && (
-                            <button
-                                onClick={handleRegenerateCode}
-                                disabled={isGenerating}
-                                className="p-1.5 rounded-lg border border-border bg-secondary/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                                title="Regenerate Code"
-                            >
+                            <button onClick={handleRegenerateCode} disabled={isGenerating} className="p-1.5 rounded-lg border border-border bg-secondary/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer" title="Regenerate Code">
                                 <RefreshCw className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`} />
                             </button>
                         )}
@@ -160,9 +136,7 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
 
                 {/* Group Members List */}
                 <div className="space-y-2 pt-1">
-                    <span className="text-[11px] font-bold font-mono text-muted-foreground uppercase tracking-wider block">
-                        Members ({group?.members?.length || 0})
-                    </span>
+                    <span className="text-[11px] font-bold font-mono text-muted-foreground uppercase tracking-wider block">Members ({group?.members?.length || 0})</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {group?.members?.map((m: any) => {
                             const memberIsCreator = typeof group.creator === "string" ? group.creator === m._id : group.creator?._id === m._id;

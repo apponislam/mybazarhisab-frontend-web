@@ -44,19 +44,7 @@ function ExpenseRow({ entry, onClick }: { entry: MockBazarEntry; onClick: () => 
     );
 }
 
-export function ExpensesTab({
-    entries,
-    onDetail,
-    isLoading,
-    filter = "month",
-    setFilter,
-}: {
-    entries: MockBazarEntry[];
-    onDetail: (e: MockBazarEntry) => void;
-    isLoading?: boolean;
-    filter?: "month" | "all";
-    setFilter?: (f: "month" | "all") => void;
-}) {
+export function ExpensesTab({ entries, onDetail, isLoading, filter = "month", setFilter }: { entries: MockBazarEntry[]; onDetail: (e: MockBazarEntry) => void; isLoading?: boolean; filter?: "month" | "all"; setFilter?: (f: "month" | "all") => void }) {
     const [localFilter, setLocalFilter] = useState<"month" | "all">("month");
     const activeFilter = setFilter ? filter : localFilter;
     const handleFilterChange = setFilter || setLocalFilter;
@@ -67,7 +55,7 @@ export function ExpensesTab({
 
     return (
         <div className="flex flex-col flex-1 min-h-0">
-            <div className="px-6 pt-12 pb-4 shrink-0">
+            <div className="px-6 pt-4 pb-4 shrink-0">
                 <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                     Bazar <span className="text-primary">Expenses</span>
                 </h2>

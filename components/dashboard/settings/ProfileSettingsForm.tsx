@@ -88,16 +88,8 @@ export function ProfileSettingsForm() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    {currentUser?.role && (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-primary/15 text-primary border border-primary/30">
-                            {currentUser.role}
-                        </span>
-                    )}
-                    {currentUser?.isEmailVerified && (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-green-500/15 text-green-400 border border-green-500/30">
-                            Verified
-                        </span>
-                    )}
+                    {currentUser?.role && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-primary/15 text-primary border border-primary/30">{currentUser.role}</span>}
+                    {currentUser?.isEmailVerified && <span className="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-green-500/15 text-green-400 border border-green-500/30">Verified</span>}
                 </div>
             </div>
 
@@ -110,13 +102,7 @@ export function ProfileSettingsForm() {
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                     {/* Profile Picture Upload Section (Full Round & Centered) */}
                     <div className="flex flex-col items-center justify-center text-center pb-2">
-                        <ImageUpload
-                            label="Profile Avatar Photo"
-                            variant="circle"
-                            value={profileImage}
-                            onChange={(url) => setProfileImage(url)}
-                            onRemove={() => setProfileImage("")}
-                        />
+                        <ImageUpload label="Profile Avatar Photo" variant="circle" value={profileImage} onChange={(url) => setProfileImage(url)} onRemove={() => setProfileImage("")} />
                     </div>
 
                     {/* Basic Info Section */}
@@ -144,14 +130,7 @@ export function ProfileSettingsForm() {
                                 </span>
                             </div>
                             <div className="relative">
-                                <input
-                                    type="email"
-                                    value={email}
-                                    disabled
-                                    readOnly
-                                    title="Email address cannot be changed."
-                                    className="w-full pl-4 pr-10 py-3 bg-[#170c06] border border-border/40 rounded-xl text-sm text-muted-foreground opacity-60 cursor-not-allowed font-mono select-none"
-                                />
+                                <input type="email" value={email} disabled readOnly title="Email address cannot be changed." className="w-full pl-4 pr-10 py-3 bg-[#170c06] border border-border/40 rounded-xl text-sm text-muted-foreground opacity-60 cursor-not-allowed font-mono select-none" />
                                 <Mail className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none" />
                             </div>
                         </div>
@@ -190,13 +169,7 @@ export function ProfileSettingsForm() {
                         <label className="block text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1.5">
                             <FileText className="w-4 h-4 text-primary" /> About Me / Bio
                         </label>
-                        <textarea
-                            value={aboutme}
-                            onChange={(e) => setAboutme(e.target.value)}
-                            rows={3}
-                            placeholder="Write a brief intro about yourself…"
-                            className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground"
-                        />
+                        <textarea value={aboutme} onChange={(e) => setAboutme(e.target.value)} rows={3} placeholder="Write a brief intro about yourself…" className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground" />
                     </div>
 
                     {/* Address Section */}
@@ -207,64 +180,30 @@ export function ProfileSettingsForm() {
 
                         <div>
                             <label className="block text-xs font-semibold text-muted-foreground mb-1">Street Address</label>
-                            <input
-                                type="text"
-                                value={street}
-                                onChange={(e) => setStreet(e.target.value)}
-                                placeholder="House / Flat #, Road name"
-                                className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground"
-                            />
+                            <input type="text" value={street} onChange={(e) => setStreet(e.target.value)} placeholder="House / Flat #, Road name" className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none text-foreground" />
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1">City</label>
-                                <input
-                                    type="text"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    placeholder="Dhaka"
-                                    className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground"
-                                />
+                                <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Dhaka" className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground" />
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1">State / Division</label>
-                                <input
-                                    type="text"
-                                    value={state}
-                                    onChange={(e) => setState(e.target.value)}
-                                    placeholder="Dhaka"
-                                    className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground"
-                                />
+                                <input type="text" value={state} onChange={(e) => setState(e.target.value)} placeholder="Dhaka" className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground" />
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1">Zip Code</label>
-                                <input
-                                    type="text"
-                                    value={zipCode}
-                                    onChange={(e) => setZipCode(e.target.value)}
-                                    placeholder="1205"
-                                    className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground font-mono"
-                                />
+                                <input type="text" value={zipCode} onChange={(e) => setZipCode(e.target.value)} placeholder="1205" className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground font-mono" />
                             </div>
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1">Country</label>
-                                <input
-                                    type="text"
-                                    value={country}
-                                    onChange={(e) => setCountry(e.target.value)}
-                                    placeholder="Bangladesh"
-                                    className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground"
-                                />
+                                <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Bangladesh" className="w-full px-3 py-2.5 bg-[#1a0e07] border border-border rounded-xl text-xs outline-none text-foreground" />
                             </div>
                         </div>
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={isUpdating}
-                        className="w-full py-3.5 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-accent transition-all cursor-pointer shadow-md disabled:opacity-50 mt-2"
-                    >
+                    <button type="submit" disabled={isUpdating} className="w-full py-3.5 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-accent transition-all cursor-pointer shadow-md disabled:opacity-50 mt-2">
                         {isUpdating ? "Saving Complete Profile…" : "Save Complete Profile"}
                     </button>
                 </form>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw, ChevronLeft, ChevronRight, Activity, ShieldCheck } from "lucide-react";
+import { RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetAllActivitiesQuery, ActivityQueryParams } from "@/redux/features/activity/activityApi";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -46,23 +46,14 @@ export default function DashboardActivitiesPage() {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 relative">
                 <DashboardHeader title="System Audit & Activity Logs">
-                    <button
-                        onClick={() => refetch()}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh activity audit logs"
-                    >
+                    <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh activity audit logs">
                         <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
                 </DashboardHeader>
 
                 <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
                     {/* Activity Filter Toolbar */}
-                    <ActivityFilterToolbar
-                        filters={queryParams}
-                        onFilterChange={handleFilterChange}
-                        onResetFilters={handleResetFilters}
-                        onOpenClearModal={() => setIsClearModalOpen(true)}
-                    />
+                    <ActivityFilterToolbar filters={queryParams} onFilterChange={handleFilterChange} onResetFilters={handleResetFilters} onOpenClearModal={() => setIsClearModalOpen(true)} />
 
                     {/* Activities Table */}
                     <ActivitiesTable activities={activities} isLoading={isLoading} />
@@ -71,9 +62,7 @@ export default function DashboardActivitiesPage() {
                     {meta && (
                         <div className="bg-[#251508] border border-border rounded-2xl px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground font-mono shadow-xl shrink-0">
                             <div>
-                                Showing <span className="font-bold text-foreground">{activities.length}</span> of{" "}
-                                <span className="font-bold text-foreground">{meta.total}</span> activity records (Page{" "}
-                                <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
+                                Showing <span className="font-bold text-foreground">{activities.length}</span> of <span className="font-bold text-foreground">{meta.total}</span> activity records (Page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -105,11 +94,7 @@ export default function DashboardActivitiesPage() {
             </main>
 
             {/* Clear Activities Modal */}
-            <ClearActivitiesModal
-                isOpen={isClearModalOpen}
-                filters={queryParams}
-                onClose={() => setIsClearModalOpen(false)}
-            />
+            <ClearActivitiesModal isOpen={isClearModalOpen} filters={queryParams} onClose={() => setIsClearModalOpen(false)} />
         </div>
     );
 }

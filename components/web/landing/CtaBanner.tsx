@@ -19,9 +19,7 @@ export function CtaBanner({ onSignIn }: { onSignIn: () => void }) {
                             <h3 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                 Ready to Simplify Your Household & Family Expenses?
                             </h3>
-                            <p className="text-muted-foreground text-sm leading-relaxed">
-                                Join households keeping clean, transparent bazar records and monthly budget tracking.
-                            </p>
+                            <p className="text-muted-foreground text-sm leading-relaxed">Join households keeping clean, transparent bazar records and monthly budget tracking.</p>
                         </div>
 
                         <motion.button

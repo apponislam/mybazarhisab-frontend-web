@@ -3,14 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, User, Mail, Phone, ShoppingBag, Receipt, Star, Activity, Package } from "lucide-react";
-import {
-    useGetUserProfileAndSummaryQuery,
-    useGetUserBazarEntriesQuery,
-    useGetUserBillsQuery,
-    useGetUserReviewsQuery,
-    useGetUserProductsQuery,
-    useGetUserActivitiesQuery,
-} from "@/redux/features/user/userApi";
+import { useGetUserProfileAndSummaryQuery, useGetUserBazarEntriesQuery, useGetUserBillsQuery, useGetUserReviewsQuery, useGetUserProductsQuery, useGetUserActivitiesQuery } from "@/redux/features/user/userApi";
 
 interface UserDetailModalProps {
     userId: string | null;
@@ -50,12 +43,7 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
         <AnimatePresence>
             {userId && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs font-sans">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-2xl shadow-2xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-2xl shadow-2xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between border-b border-border pb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
@@ -81,31 +69,13 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
                                 {/* Header Card */}
                                 <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl bg-[#1a0e07] border border-border/80">
                                     <div className="w-14 h-14 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-lg text-primary-foreground shrink-0 shadow-lg border-2 border-primary/40">
-                                        {user.profileImage ? (
-                                            <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
-                                        ) : (
-                                            initials(user.name)
-                                        )}
+                                        {user.profileImage ? <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" /> : initials(user.name)}
                                     </div>
                                     <div className="flex-1 min-w-0 text-center sm:text-left">
                                         <div className="flex items-center justify-center sm:justify-start gap-2">
                                             <h4 className="text-base font-bold text-foreground truncate">{user.name}</h4>
-                                            <span
-                                                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${
-                                                    user.role === "ADMIN"
-                                                        ? "bg-primary/20 text-primary border-primary/40"
-                                                        : "bg-white/10 text-muted-foreground border-white/20"
-                                                }`}
-                                            >
-                                                {user.role || "USER"}
-                                            </span>
-                                            <span
-                                                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${
-                                                    user.isActive !== false
-                                                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                                                        : "bg-destructive/15 text-destructive border-destructive/30"
-                                                }`}
-                                            >
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${user.role === "ADMIN" ? "bg-primary/20 text-primary border-primary/40" : "bg-white/10 text-muted-foreground border-white/20"}`}>{user.role || "USER"}</span>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${user.isActive !== false ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : "bg-destructive/15 text-destructive border-destructive/30"}`}>
                                                 {user.isActive !== false ? "Active" : "Suspended"}
                                             </span>
                                         </div>
@@ -134,9 +104,7 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
                                             key={t.id}
                                             onClick={() => setSubTab(t.id as any)}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
-                                                subTab === t.id
-                                                    ? "bg-primary text-primary-foreground border-primary shadow-md"
-                                                    : "bg-[#1a0e07] text-muted-foreground border-border/60 hover:text-foreground hover:bg-white/5"
+                                                subTab === t.id ? "bg-primary text-primary-foreground border-primary shadow-md" : "bg-[#1a0e07] text-muted-foreground border-border/60 hover:text-foreground hover:bg-white/5"
                                             }`}
                                         >
                                             {t.icon}
@@ -246,9 +214,7 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
                                             activitiesData.data.map((act: any) => (
                                                 <div key={act._id} className="p-3 rounded-2xl bg-[#1a0e07] border border-border/60 flex items-center justify-between text-xs font-mono">
                                                     <div>
-                                                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase">
-                                                            {act.action}
-                                                        </span>
+                                                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase">{act.action}</span>
                                                         <p className="text-foreground mt-1 text-[11px] font-sans">{act.details}</p>
                                                     </div>
                                                     <span className="text-[10px] text-muted-foreground shrink-0">{new Date(act.createdAt).toLocaleDateString()}</span>
@@ -263,10 +229,7 @@ export function UserDetailModal({ userId, onClose }: UserDetailModalProps) {
                         )}
 
                         <div className="flex justify-end pt-2 border-t border-border/60">
-                            <button
-                                onClick={onClose}
-                                className="px-5 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-accent transition-all cursor-pointer"
-                            >
+                            <button onClick={onClose} className="px-5 py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-accent transition-all cursor-pointer">
                                 Close Explorer
                             </button>
                         </div>

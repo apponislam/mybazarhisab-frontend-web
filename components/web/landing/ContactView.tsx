@@ -6,20 +6,20 @@ import { ArrowLeft, Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Help
 const FAQS = [
     {
         q: "How do I create and share a family household group?",
-        a: "After signing in, click 'Create Group', set your household name and monthly budget limit. You will receive a unique group code that you can copy and send to family members or flatmates."
+        a: "After signing in, click 'Create Group', set your household name and monthly budget limit. You will receive a unique group code that you can copy and send to family members or flatmates.",
     },
     {
         q: "How many members can join a single household group?",
-        a: "Each My Bazar Hisab group supports up to 20 members, allowing all family members and roommates to log daily market expenses simultaneously."
+        a: "Each My Bazar Hisab group supports up to 20 members, allowing all family members and roommates to log daily market expenses simultaneously.",
     },
     {
         q: "How do unit quantities work for groceries?",
-        a: "When logging daily bazar items, you can specify exact units such as KG, GM, Litre, Piece, or Packet along with the total price to maintain clear inventory logs."
+        a: "When logging daily bazar items, you can specify exact units such as KG, GM, Litre, Piece, or Packet along with the total price to maintain clear inventory logs.",
     },
     {
         q: "Is our family spending data private and secure?",
-        a: "Yes. All transactions are encrypted. Only individuals who enter your secret household group invitation code can view or contribute entries."
-    }
+        a: "Yes. All transactions are encrypted. Only individuals who enter your secret household group invitation code can view or contribute entries.",
+    },
 ];
 
 export function ContactView({ onBack }: { onBack?: () => void }) {
@@ -46,17 +46,11 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
             <header className="sticky top-0 z-50 w-full bg-[#130a04]/90 border-b border-border backdrop-blur-sm select-none">
                 <div className="container mx-auto px-6 max-w-5xl h-16 flex items-center justify-between">
                     {onBack ? (
-                        <button
-                            onClick={onBack}
-                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
+                        <button onClick={onBack} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                             <ArrowLeft className="w-4 h-4" /> Back to Home
                         </button>
                     ) : (
-                        <Link
-                            href="/web"
-                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
+                        <Link href="/web" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                             <ArrowLeft className="w-4 h-4" /> Back to Home
                         </Link>
                     )}
@@ -72,9 +66,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                     <h1 className="text-3xl md:text-5xl font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Contact Support & Help Center
                     </h1>
-                    <p className="text-sm text-muted-foreground max-w-2xl">
-                        Have questions about managing your family group or need technical assistance? Send us a message below.
-                    </p>
+                    <p className="text-sm text-muted-foreground max-w-2xl">Have questions about managing your family group or need technical assistance? Send us a message below.</p>
                 </div>
 
                 {/* Grid Section: Contact Details + Form */}
@@ -110,9 +102,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                                 <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                                 <div>
                                     <h4 className="font-bold text-foreground text-sm">Office Location</h4>
-                                    <p className="mt-0.5 leading-relaxed">
-                                        Level 5, Mirpur Commercial Plaza, Mirpur-10, Dhaka-1216, Bangladesh.
-                                    </p>
+                                    <p className="mt-0.5 leading-relaxed">Level 5, Mirpur Commercial Plaza, Mirpur-10, Dhaka-1216, Bangladesh.</p>
                                 </div>
                             </div>
                         </div>
@@ -128,9 +118,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                                 <h3 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                     Thank You!
                                 </h3>
-                                <p className="text-xs text-muted-foreground max-w-sm">
-                                    Your support ticket has been logged. Our customer care team will reply to your email shortly.
-                                </p>
+                                <p className="text-xs text-muted-foreground max-w-sm">Your support ticket has been logged. Our customer care team will reply to your email shortly.</p>
                                 <button
                                     onClick={() => {
                                         setSubmitted(false);
@@ -199,11 +187,7 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                                     />
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full py-3.5 rounded-xl bg-primary text-[#1a0e07] font-bold text-sm hover:bg-accent transition-all cursor-pointer shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-                                >
+                                <button type="submit" disabled={loading} className="w-full py-3.5 rounded-xl bg-primary text-[#1a0e07] font-bold text-sm hover:bg-accent transition-all cursor-pointer shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
                                     {loading ? (
                                         "Sending Message..."
                                     ) : (
@@ -231,18 +215,11 @@ export function ContactView({ onBack }: { onBack?: () => void }) {
                             const isOpen = openFaq === idx;
                             return (
                                 <div key={idx} className="rounded-xl border border-border bg-card overflow-hidden">
-                                    <button
-                                        onClick={() => setOpenFaq(isOpen ? null : idx)}
-                                        className="w-full p-4 text-left flex items-center justify-between font-semibold text-sm text-foreground hover:bg-primary/5 transition-colors cursor-pointer"
-                                    >
+                                    <button onClick={() => setOpenFaq(isOpen ? null : idx)} className="w-full p-4 text-left flex items-center justify-between font-semibold text-sm text-foreground hover:bg-primary/5 transition-colors cursor-pointer">
                                         <span>{faq.q}</span>
                                         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180 text-primary" : ""}`} />
                                     </button>
-                                    {isOpen && (
-                                        <div className="px-4 pb-4 pt-1 text-xs text-muted-foreground leading-relaxed border-t border-border/40">
-                                            {faq.a}
-                                        </div>
-                                    )}
+                                    {isOpen && <div className="px-4 pb-4 pt-1 text-xs text-muted-foreground leading-relaxed border-t border-border/40">{faq.a}</div>}
                                 </div>
                             );
                         })}

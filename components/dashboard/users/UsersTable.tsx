@@ -1,15 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Users, ShieldCheck, ShieldAlert, Eye, Trash2, CheckCircle2, XCircle, Mail, Phone, Calendar } from "lucide-react";
+import { Users, ShieldCheck, Eye, Trash2, CheckCircle2, XCircle, Mail, Phone, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { TUser } from "@/redux/features/auth/authSlice";
-import {
-    useUpdateUserRoleMutation,
-    useUpdateUserStatusMutation,
-    useDeleteUserMutation,
-} from "@/redux/features/user/userApi";
+import { useUpdateUserRoleMutation, useUpdateUserStatusMutation, useDeleteUserMutation } from "@/redux/features/user/userApi";
 
 interface UsersTableProps {
     users: TUser[];
@@ -121,17 +116,11 @@ export function UsersTable({ users, isLoading }: UsersTableProps) {
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-9 h-9 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0 shadow-sm border border-primary/30">
-                                                    {u.profileImage ? (
-                                                        <img src={u.profileImage} alt={u.name} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        initials(u.name)
-                                                    )}
+                                                    {u.profileImage ? <img src={u.profileImage} alt={u.name} className="w-full h-full object-cover" /> : initials(u.name)}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <h5 className="text-xs font-bold text-foreground truncate">{u.name}</h5>
-                                                    <span className="text-[10px] text-muted-foreground/80 font-mono truncate block">
-                                                        ID: {u._id}
-                                                    </span>
+                                                    <span className="text-[10px] text-muted-foreground/80 font-mono truncate block">ID: {u._id}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -158,17 +147,11 @@ export function UsersTable({ users, isLoading }: UsersTableProps) {
                                                 onClick={() => handleRoleToggle(u)}
                                                 disabled={roleLoading}
                                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold font-mono border uppercase tracking-wider transition-all cursor-pointer ${
-                                                    u.role === "ADMIN"
-                                                        ? "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30"
-                                                        : "bg-white/10 text-muted-foreground border-white/20 hover:bg-white/15"
+                                                    u.role === "ADMIN" ? "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30" : "bg-white/10 text-muted-foreground border-white/20 hover:bg-white/15"
                                                 }`}
                                                 title="Click to toggle ADMIN vs USER role"
                                             >
-                                                {u.role === "ADMIN" ? (
-                                                    <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                                                ) : (
-                                                    <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                                                )}
+                                                {u.role === "ADMIN" ? <ShieldCheck className="w-3.5 h-3.5 text-primary" /> : <Users className="w-3.5 h-3.5 text-muted-foreground" />}
                                                 <span>{u.role || "USER"}</span>
                                             </button>
                                         </td>
@@ -179,17 +162,11 @@ export function UsersTable({ users, isLoading }: UsersTableProps) {
                                                 onClick={() => handleStatusToggle(u)}
                                                 disabled={statusLoading}
                                                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-bold font-mono border uppercase tracking-wider transition-all cursor-pointer ${
-                                                    !isSuspended
-                                                        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25"
-                                                        : "bg-destructive/15 text-destructive border-destructive/30 hover:bg-destructive/25"
+                                                    !isSuspended ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25" : "bg-destructive/15 text-destructive border-destructive/30 hover:bg-destructive/25"
                                                 }`}
                                                 title="Click to toggle Active vs Suspended"
                                             >
-                                                {!isSuspended ? (
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                                                ) : (
-                                                    <XCircle className="w-3.5 h-3.5 text-destructive" />
-                                                )}
+                                                {!isSuspended ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <XCircle className="w-3.5 h-3.5 text-destructive" />}
                                                 <span>{!isSuspended ? "Active" : "Suspended"}</span>
                                             </button>
                                         </td>

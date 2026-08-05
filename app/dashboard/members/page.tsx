@@ -17,7 +17,12 @@ export default function DashboardMembersPage() {
     const [limit, setLimit] = useState(6);
 
     // RTK Query Admin Hook
-    const { data: responseData, isLoading, isFetching, refetch } = useGetAllGroupsAdminQuery({
+    const {
+        data: responseData,
+        isLoading,
+        isFetching,
+        refetch,
+    } = useGetAllGroupsAdminQuery({
         searchTerm: searchTerm || undefined,
         page,
         limit,
@@ -34,11 +39,7 @@ export default function DashboardMembersPage() {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 relative">
                 <DashboardHeader title="Group Members & Roommates Management">
-                    <button
-                        onClick={() => refetch()}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh groups"
-                    >
+                    <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh groups">
                         <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
                 </DashboardHeader>
@@ -46,9 +47,7 @@ export default function DashboardMembersPage() {
                 <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
                     {/* Controls Bar */}
                     <div className="bg-[#251508] border border-border rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 shrink-0">
-                        <p className="text-xs text-muted-foreground font-mono">
-                            Admin view of all roommate groups and active memberships
-                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">Admin view of all roommate groups and active memberships</p>
 
                         <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -84,9 +83,7 @@ export default function DashboardMembersPage() {
                     {meta && (
                         <div className="bg-[#251508] border border-border rounded-2xl px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground font-mono shadow-xl">
                             <div>
-                                Showing <span className="font-bold text-foreground">{groups.length}</span> of{" "}
-                                <span className="font-bold text-foreground">{meta.total}</span> groups (Page{" "}
-                                <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
+                                Showing <span className="font-bold text-foreground">{groups.length}</span> of <span className="font-bold text-foreground">{meta.total}</span> groups (Page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
                             </div>
 
                             <div className="flex items-center gap-2">

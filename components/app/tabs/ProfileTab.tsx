@@ -8,17 +8,7 @@ import { useGetMyGroupQuery } from "@/redux/features/group/groupApi";
 import { logOut } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 
-export function ProfileTab({ 
-    onEditProfile, 
-    onChangePassword,
-    onGroup,
-    onNotifications,
-}: { 
-    onEditProfile: () => void; 
-    onChangePassword: () => void;
-    onGroup: () => void;
-    onNotifications: () => void;
-}) {
+export function ProfileTab({ onEditProfile, onChangePassword, onGroup, onNotifications }: { onEditProfile: () => void; onChangePassword: () => void; onGroup: () => void; onNotifications: () => void }) {
     const dispatch = useAppDispatch();
     const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
     const { data: userData } = useGetMeQuery();
@@ -41,7 +31,7 @@ export function ProfileTab({
 
     return (
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
-            <div className="px-6 pt-12 pb-4 shrink-0">
+            <div className="px-6 pt-4 pb-4 shrink-0">
                 <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                     My <span className="text-primary">Profile</span>
                 </h2>
@@ -77,12 +67,7 @@ export function ProfileTab({
                     </div>
                     <SettingsRow icon={<User className="w-4 h-4" />} label="Edit Profile" sub="Update your name, photo, address & more" onClick={onEditProfile} />
                     <div className="h-px bg-border mx-4" />
-                    <SettingsRow
-                        icon={<Users className="w-4 h-4" />}
-                        label="My Group"
-                        sub={group ? `${group.name} · Code: ${group.inviteCode}` : "Manage group & invite code"}
-                        onClick={onGroup}
-                    />
+                    <SettingsRow icon={<Users className="w-4 h-4" />} label="My Group" sub={group ? `${group.name} · Code: ${group.inviteCode}` : "Manage group & invite code"} onClick={onGroup} />
                     <div className="h-px bg-border mx-4" />
                     <SettingsRow icon={<Shield className="w-4 h-4" />} label="Change Password" sub="Update your account password" onClick={onChangePassword} />
                     <div className="h-px bg-border mx-4" />
@@ -100,9 +85,7 @@ export function ProfileTab({
                                 Currently Working on It
                             </span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-mono font-medium tracking-wide uppercase opacity-80">
-                            Coming in Next Version
-                        </span>
+                        <span className="text-[10px] text-muted-foreground font-mono font-medium tracking-wide uppercase opacity-80">Coming in Next Version</span>
                     </div>
 
                     <div className="px-4 py-3 border-b border-border opacity-35">

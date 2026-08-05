@@ -37,18 +37,11 @@ export default function DashboardReviewsPage() {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col min-w-0 relative">
                 <DashboardHeader title="User Reviews & Ratings">
-                    <button
-                        onClick={() => refetch()}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh reviews"
-                    >
+                    <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh reviews">
                         <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
 
-                    <button
-                        onClick={() => setShowCreateModal(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/20"
-                    >
+                    <button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/20">
                         <Plus className="w-4 h-4" /> Post Review
                     </button>
                 </DashboardHeader>
@@ -59,9 +52,7 @@ export default function DashboardReviewsPage() {
 
                     {/* Controls Bar */}
                     <div className="bg-[#251508] border border-border rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 shrink-0">
-                        <p className="text-xs text-muted-foreground font-mono">
-                            Manage user rating submissions and landing page visibility
-                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">Manage user rating submissions and landing page visibility</p>
 
                         <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -83,19 +74,13 @@ export default function DashboardReviewsPage() {
                     </div>
 
                     {/* Reviews Table */}
-                    <ReviewsTable
-                        reviews={reviews}
-                        isLoading={isLoading}
-                        onDeleteReview={(rev) => setDeletingReview(rev)}
-                    />
+                    <ReviewsTable reviews={reviews} isLoading={isLoading} onDeleteReview={(rev) => setDeletingReview(rev)} />
 
                     {/* Pagination Footer */}
                     {meta && (
                         <div className="bg-[#251508] border border-border rounded-2xl px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground font-mono shadow-xl">
                             <div>
-                                Showing <span className="font-bold text-foreground">{reviews.length}</span> of{" "}
-                                <span className="font-bold text-foreground">{meta.total}</span> reviews (Page{" "}
-                                <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
+                                Showing <span className="font-bold text-foreground">{reviews.length}</span> of <span className="font-bold text-foreground">{meta.total}</span> reviews (Page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1})
                             </div>
 
                             <div className="flex items-center gap-2">

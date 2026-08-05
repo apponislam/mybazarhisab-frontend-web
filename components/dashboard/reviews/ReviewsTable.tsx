@@ -89,15 +89,8 @@ export function ReviewsTable({ reviews, isLoading, onDeleteReview }: ReviewsTabl
                                     {/* User Info */}
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md"
-                                                style={{ background: avatarColor(rev.user?._id || "") }}
-                                            >
-                                                {rev.user?.profileImage ? (
-                                                    <img src={rev.user.profileImage} alt={rev.user.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    initials(rev.user?.name || "User")
-                                                )}
+                                            <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center font-bold text-xs text-white shrink-0 shadow-md" style={{ background: avatarColor(rev.user?._id || "") }}>
+                                                {rev.user?.profileImage ? <img src={rev.user.profileImage} alt={rev.user.name} className="w-full h-full object-cover" /> : initials(rev.user?.name || "User")}
                                             </div>
                                             <div>
                                                 <h4 className="font-semibold text-foreground">{rev.user?.name || "Anonymous User"}</h4>
@@ -113,12 +106,7 @@ export function ReviewsTable({ reviews, isLoading, onDeleteReview }: ReviewsTabl
                                     <td className="p-4">
                                         <div className="flex items-center gap-1">
                                             {[1, 2, 3, 4, 5].map((star) => (
-                                                <Star
-                                                    key={star}
-                                                    className={`w-4 h-4 ${
-                                                        star <= rev.rating ? "text-primary fill-primary" : "text-muted-foreground/30"
-                                                    }`}
-                                                />
+                                                <Star key={star} className={`w-4 h-4 ${star <= rev.rating ? "text-primary fill-primary" : "text-muted-foreground/30"}`} />
                                             ))}
                                             <span className="ml-1 text-xs font-bold font-mono text-primary">{rev.rating}/5</span>
                                         </div>
@@ -143,9 +131,7 @@ export function ReviewsTable({ reviews, isLoading, onDeleteReview }: ReviewsTabl
                                     </td>
 
                                     {/* Date */}
-                                    <td className="p-4 text-center text-xs text-muted-foreground font-mono">
-                                        {new Date(rev.createdAt).toLocaleDateString()}
-                                    </td>
+                                    <td className="p-4 text-center text-xs text-muted-foreground font-mono">{new Date(rev.createdAt).toLocaleDateString()}</td>
 
                                     {/* Actions */}
                                     <td className="p-4 text-right">
@@ -159,11 +145,7 @@ export function ReviewsTable({ reviews, isLoading, onDeleteReview }: ReviewsTabl
                                                 {rev.isPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4 text-primary" />}
                                             </button>
 
-                                            <button
-                                                onClick={() => onDeleteReview(rev)}
-                                                className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-                                                title="Delete Review"
-                                            >
+                                            <button onClick={() => onDeleteReview(rev)} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-destructive/50 text-muted-foreground hover:text-destructive transition-colors cursor-pointer" title="Delete Review">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>

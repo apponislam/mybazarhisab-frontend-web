@@ -77,17 +77,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
 
     // Subscreen overlay rendering
     if (subScreen && subScreen !== "add-picker") {
-        return (
-            <AppSubScreenRenderer
-                subScreen={subScreen}
-                setSubScreen={setSubScreen}
-                selectedEntry={selectedEntry}
-                setSelectedEntry={setSelectedEntry}
-                selectedBill={selectedBill}
-                setSelectedBill={setSelectedBill}
-                setTab={setTab}
-            />
-        );
+        return <AppSubScreenRenderer subScreen={subScreen} setSubScreen={setSubScreen} selectedEntry={selectedEntry} setSelectedEntry={setSelectedEntry} selectedBill={selectedBill} setSelectedBill={setSelectedBill} setTab={setTab} />;
     }
 
     return (
@@ -119,14 +109,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
                             }}
                         />
                     )}
-                    {tab === "profile" && (
-                        <ProfileTab
-                            onEditProfile={() => setSubScreen("profile-edit")}
-                            onChangePassword={() => setSubScreen("profile-change-password")}
-                            onGroup={() => setSubScreen("profile-group")}
-                            onNotifications={() => setSubScreen("profile-notifications")}
-                        />
-                    )}
+                    {tab === "profile" && <ProfileTab onEditProfile={() => setSubScreen("profile-edit")} onChangePassword={() => setSubScreen("profile-change-password")} onGroup={() => setSubScreen("profile-group")} onNotifications={() => setSubScreen("profile-notifications")} />}
                     {subScreen === "add-picker" && <AppAddPicker onExpense={() => setSubScreen("add-expense")} onBill={() => setSubScreen("add-bill")} onClose={() => setSubScreen(null)} />}
                 </div>
                 {showNav && (

@@ -22,10 +22,7 @@ export function ProductSelectInput({ valueName, onSelect, customClass, hideSearc
     }, [valueName]);
 
     // Live product search query
-    const { data: productsData, isLoading } = useGetAllProductsQuery(
-        { searchTerm: searchTerm.trim() || undefined, limit: 10 },
-        { skip: !isOpen }
-    );
+    const { data: productsData, isLoading } = useGetAllProductsQuery({ searchTerm: searchTerm.trim() || undefined, limit: 10 }, { skip: !isOpen });
 
     const products = productsData?.data || [];
 
@@ -77,9 +74,7 @@ export function ProductSelectInput({ valueName, onSelect, customClass, hideSearc
             {isOpen && (
                 <div className={`absolute ${hideSearchIcon ? "-left-10 w-[calc(100%+2.5rem)]" : "left-0 right-0"} top-full mt-2 z-50 bg-[#251508] border border-border rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto font-sans`}>
                     {isLoading ? (
-                        <div className="p-3 text-center text-xs text-muted-foreground font-mono">
-                            Searching catalog products…
-                        </div>
+                        <div className="p-3 text-center text-xs text-muted-foreground font-mono">Searching catalog products…</div>
                     ) : products.length === 0 ? (
                         <div
                             onClick={() => {
@@ -103,26 +98,14 @@ export function ProductSelectInput({ valueName, onSelect, customClass, hideSearc
                             {products.map((prod) => {
                                 const isSelected = valueName.toLowerCase() === prod.name.toLowerCase();
                                 return (
-                                    <div
-                                        key={prod._id}
-                                        onClick={() => handleSelectProduct(prod)}
-                                        className={`px-3 py-2.5 flex items-center justify-between gap-3 hover:bg-primary/15 cursor-pointer transition-colors ${
-                                            isSelected ? "bg-primary/10 text-primary" : "text-foreground"
-                                        }`}
-                                    >
+                                    <div key={prod._id} onClick={() => handleSelectProduct(prod)} className={`px-3 py-2.5 flex items-center justify-between gap-3 hover:bg-primary/15 cursor-pointer transition-colors ${isSelected ? "bg-primary/10 text-primary" : "text-foreground"}`}>
                                         <div className="flex items-center gap-2.5 min-w-0">
                                             <div className="w-7 h-7 rounded-lg bg-[#1a0e07] border border-border flex items-center justify-center overflow-hidden shrink-0">
-                                                {prod.photo ? (
-                                                    <img src={prod.photo} alt={prod.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <Package className="w-3.5 h-3.5 text-primary/70" />
-                                                )}
+                                                {prod.photo ? <img src={prod.photo} alt={prod.name} className="w-full h-full object-cover" /> : <Package className="w-3.5 h-3.5 text-primary/70" />}
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="text-xs font-semibold truncate">{prod.name}</p>
-                                                {prod.description && (
-                                                    <p className="text-[10px] text-muted-foreground truncate">{prod.description}</p>
-                                                )}
+                                                {prod.description && <p className="text-[10px] text-muted-foreground truncate">{prod.description}</p>}
                                             </div>
                                         </div>
                                         {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}

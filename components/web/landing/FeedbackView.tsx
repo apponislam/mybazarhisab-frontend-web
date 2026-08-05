@@ -28,17 +28,11 @@ export function FeedbackView({ onBack }: { onBack?: () => void }) {
             <header className="sticky top-0 z-50 w-full bg-[#130a04]/90 border-b border-border backdrop-blur-sm select-none">
                 <div className="container mx-auto px-6 max-w-4xl h-16 flex items-center justify-between">
                     {onBack ? (
-                        <button
-                            onClick={onBack}
-                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
+                        <button onClick={onBack} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                             <ArrowLeft className="w-4 h-4" /> Back to Home
                         </button>
                     ) : (
-                        <Link
-                            href="/web"
-                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
+                        <Link href="/web" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                             <ArrowLeft className="w-4 h-4" /> Back to Home
                         </Link>
                     )}
@@ -58,9 +52,7 @@ export function FeedbackView({ onBack }: { onBack?: () => void }) {
                     <h1 className="text-3xl md:text-5xl font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         Give Feedback & Review
                     </h1>
-                    <p className="text-sm text-muted-foreground">
-                        Your feedback helps us improve My Bazar Hisab for thousands of households across Bangladesh.
-                    </p>
+                    <p className="text-sm text-muted-foreground">Your feedback helps us improve My Bazar Hisab for thousands of households across Bangladesh.</p>
                 </div>
 
                 {/* Form Card */}
@@ -73,9 +65,7 @@ export function FeedbackView({ onBack }: { onBack?: () => void }) {
                             <h3 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                 Feedback Submitted!
                             </h3>
-                            <p className="text-xs text-muted-foreground max-w-sm">
-                                Thank you for rating and sharing your feedback! Your review helps us continuously upgrade the app.
-                            </p>
+                            <p className="text-xs text-muted-foreground max-w-sm">Thank you for rating and sharing your feedback! Your review helps us continuously upgrade the app.</p>
                             <button
                                 onClick={() => {
                                     setFbSubmitted(false);
@@ -99,19 +89,12 @@ export function FeedbackView({ onBack }: { onBack?: () => void }) {
                                     {Array.from({ length: 5 }).map((_, i) => {
                                         const starVal = i + 1;
                                         return (
-                                            <button
-                                                key={starVal}
-                                                type="button"
-                                                onClick={() => setFbRating(starVal)}
-                                                className="p-1 cursor-pointer transition-transform hover:scale-110"
-                                            >
+                                            <button key={starVal} type="button" onClick={() => setFbRating(starVal)} className="p-1 cursor-pointer transition-transform hover:scale-110">
                                                 <Star className={`w-7 h-7 ${starVal <= fbRating ? "text-primary fill-primary" : "text-muted-foreground/30"}`} />
                                             </button>
                                         );
                                     })}
-                                    <span className="text-sm font-mono text-primary font-bold ml-2">
-                                        {fbRating} / 5 Stars
-                                    </span>
+                                    <span className="text-sm font-mono text-primary font-bold ml-2">{fbRating} / 5 Stars</span>
                                 </div>
                             </div>
 
@@ -129,11 +112,7 @@ export function FeedbackView({ onBack }: { onBack?: () => void }) {
                                 </div>
                                 <div className="space-y-1.5 text-left">
                                     <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Feedback Category</label>
-                                    <select
-                                        value={fbCategory}
-                                        onChange={(e) => setFbCategory(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border border-border bg-[#170c05] text-sm text-foreground outline-none focus:border-primary transition-all font-sans cursor-pointer"
-                                    >
+                                    <select value={fbCategory} onChange={(e) => setFbCategory(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-border bg-[#170c05] text-sm text-foreground outline-none focus:border-primary transition-all font-sans cursor-pointer">
                                         <option value="App Review">App Review & Rating</option>
                                         <option value="Feature Suggestion">Feature Suggestion</option>
                                         <option value="Bug Report">Bug Report</option>
@@ -179,11 +158,7 @@ export function FeedbackView({ onBack }: { onBack?: () => void }) {
                                 />
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={fbLoading}
-                                className="w-full py-3.5 rounded-xl bg-primary text-[#1a0e07] font-bold text-sm hover:bg-accent transition-all cursor-pointer shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-                            >
+                            <button type="submit" disabled={fbLoading} className="w-full py-3.5 rounded-xl bg-primary text-[#1a0e07] font-bold text-sm hover:bg-accent transition-all cursor-pointer shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
                                 {fbLoading ? (
                                     "Submitting Review..."
                                 ) : (

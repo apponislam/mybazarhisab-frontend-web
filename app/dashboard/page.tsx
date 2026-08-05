@@ -182,11 +182,7 @@ export default function DashboardPage() {
             <DashboardSidebar activeTab="overview" onTabChange={(t) => router.push(`/dashboard/${t === "overview" ? "" : t}`)} />
 
             <main className="flex-1 flex flex-col min-w-0 relative">
-                <DashboardHeader
-                    title="Dashboard Overview"
-                    onAddExpense={() => setShowAddExpense(true)}
-                    onAddBill={() => setShowAddBill(true)}
-                />
+                <DashboardHeader title="Dashboard Overview" onAddExpense={() => setShowAddExpense(true)} onAddBill={() => setShowAddBill(true)} />
 
                 <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
                     {/* Stats Summary Row */}
@@ -208,15 +204,9 @@ export default function DashboardPage() {
                 </div>
             </main>
 
-            <AddExpenseModal
-                show={showAddExpense}
-                onClose={() => setShowAddExpense(false)}
-            />
+            <AddExpenseModal show={showAddExpense} onClose={() => setShowAddExpense(false)} />
 
-            <AddBillModal
-                show={showAddBill}
-                onClose={() => setShowAddBill(false)}
-            />
+            <AddBillModal show={showAddBill} onClose={() => setShowAddBill(false)} />
         </div>
     );
 }

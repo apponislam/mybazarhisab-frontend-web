@@ -37,9 +37,7 @@ export function ReviewStatsSummary({ summary }: ReviewStatsSummaryProps) {
 
             {/* Rating Breakdown Distribution */}
             <div className="bg-[#251508] border border-border rounded-3xl p-5 shadow-xl flex flex-col justify-center gap-1.5">
-                <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider mb-1">
-                    Rating Distribution
-                </span>
+                <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Rating Distribution</span>
                 {[5, 4, 3, 2, 1].map((stars) => {
                     const count = dist[String(stars)] || 0;
                     const pct = total > 0 ? (count / total) * 100 : 0;

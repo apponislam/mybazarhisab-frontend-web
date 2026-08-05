@@ -45,10 +45,7 @@ export function WebConfirmModal({ show, onClose, onConfirm, title, message, conf
             <div className="flex flex-col gap-4 font-sans text-left">
                 <p className="text-sm text-foreground">{message}</p>
                 <div className="flex gap-3 pt-2 border-t border-border/60">
-                    <button
-                        onClick={onClose}
-                        className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer"
-                    >
+                    <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 transition-colors cursor-pointer">
                         Cancel
                     </button>
                     <button

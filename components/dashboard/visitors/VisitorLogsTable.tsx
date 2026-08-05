@@ -1,17 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-    Search,
-    Globe,
-    Smartphone,
-    Monitor,
-    ChevronLeft,
-    ChevronRight,
-    User as UserIcon,
-    Shield,
-    Clock,
-} from "lucide-react";
+import { Search, Globe, Smartphone, Monitor, ChevronLeft, ChevronRight, User as UserIcon, Shield, Clock } from "lucide-react";
 
 interface VisitorLogsTableProps {
     visitors: any[];
@@ -27,19 +17,7 @@ interface VisitorLogsTableProps {
     setDateFilter: (date: string) => void;
 }
 
-export function VisitorLogsTable({
-    visitors,
-    meta,
-    isLoading,
-    page,
-    setPage,
-    platformFilter,
-    setPlatformFilter,
-    searchTerm,
-    setSearchTerm,
-    dateFilter,
-    setDateFilter,
-}: VisitorLogsTableProps) {
+export function VisitorLogsTable({ visitors, meta, isLoading, page, setPage, platformFilter, setPlatformFilter, searchTerm, setSearchTerm, dateFilter, setDateFilter }: VisitorLogsTableProps) {
     return (
         <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl flex flex-col gap-6 font-sans">
             {/* Header & Controls Bar */}
@@ -48,9 +26,7 @@ export function VisitorLogsTable({
                     <h3 className="text-base font-bold text-foreground flex items-center gap-2">
                         <Shield className="w-5 h-5 text-primary" /> Detailed Visitor Audit Logs
                     </h3>
-                    <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                        Real-time incoming client requests, IP tracking & user session logs
-                    </p>
+                    <p className="text-xs text-muted-foreground font-mono mt-0.5">Real-time incoming client requests, IP tracking & user session logs</p>
                 </div>
 
                 {/* Filters & Search */}
@@ -151,50 +127,32 @@ export function VisitorLogsTable({
                                                     platform === "WEB"
                                                         ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
                                                         : platform === "ANDROID"
-                                                        ? "bg-green-500/15 text-green-400 border-green-500/30"
-                                                        : platform === "IOS"
-                                                        ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                                                        : "bg-purple-500/15 text-purple-400 border-purple-500/30"
+                                                          ? "bg-green-500/15 text-green-400 border-green-500/30"
+                                                          : platform === "IOS"
+                                                            ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                                                            : "bg-purple-500/15 text-purple-400 border-purple-500/30"
                                                 }`}
                                             >
-                                                {platform === "WEB" ? (
-                                                    <Globe className="w-3 h-3" />
-                                                ) : platform === "ANDROID" || platform === "IOS" ? (
-                                                    <Smartphone className="w-3 h-3" />
-                                                ) : (
-                                                    <Monitor className="w-3 h-3" />
-                                                )}
+                                                {platform === "WEB" ? <Globe className="w-3 h-3" /> : platform === "ANDROID" || platform === "IOS" ? <Smartphone className="w-3 h-3" /> : <Monitor className="w-3 h-3" />}
                                                 {platform}
                                             </span>
                                         </td>
 
                                         {/* IP Address */}
-                                        <td className="p-3.5 font-bold text-foreground">
-                                            {v.ipAddress || "Unknown"}
-                                        </td>
+                                        <td className="p-3.5 font-bold text-foreground">{v.ipAddress || "Unknown"}</td>
 
                                         {/* User Info */}
                                         <td className="p-3.5">
                                             {userObj ? (
                                                 <div className="flex items-center gap-2">
                                                     {userObj.profileImage ? (
-                                                        <img
-                                                            src={userObj.profileImage}
-                                                            alt={userObj.name}
-                                                            className="w-6 h-6 rounded-full object-cover border border-primary/30"
-                                                        />
+                                                        <img src={userObj.profileImage} alt={userObj.name} className="w-6 h-6 rounded-full object-cover border border-primary/30" />
                                                     ) : (
-                                                        <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-[10px]">
-                                                            {userObj.name?.[0] || "U"}
-                                                        </div>
+                                                        <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-[10px]">{userObj.name?.[0] || "U"}</div>
                                                     )}
                                                     <div>
-                                                        <p className="font-bold text-foreground text-xs leading-tight">
-                                                            {userObj.name}
-                                                        </p>
-                                                        <p className="text-[10px] text-muted-foreground">
-                                                            {userObj.email}
-                                                        </p>
+                                                        <p className="font-bold text-foreground text-xs leading-tight">{userObj.name}</p>
+                                                        <p className="text-[10px] text-muted-foreground">{userObj.email}</p>
                                                     </div>
                                                 </div>
                                             ) : (
@@ -211,9 +169,7 @@ export function VisitorLogsTable({
 
                                         {/* Hit Count */}
                                         <td className="p-3.5 text-center font-bold text-foreground">
-                                            <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15 text-[11px]">
-                                                {v.count || 1}
-                                            </span>
+                                            <span className="px-2 py-0.5 rounded bg-white/10 border border-white/15 text-[11px]">{v.count || 1}</span>
                                         </td>
 
                                         {/* User Agent */}
@@ -225,11 +181,7 @@ export function VisitorLogsTable({
                                         <td className="p-3.5 text-right text-muted-foreground text-[11px]">
                                             <div className="flex items-center justify-end gap-1">
                                                 <Clock className="w-3 h-3 text-muted-foreground/70" />
-                                                <span>
-                                                    {v.lastVisitedAt
-                                                        ? new Date(v.lastVisitedAt).toLocaleString()
-                                                        : v.date}
-                                                </span>
+                                                <span>{v.lastVisitedAt ? new Date(v.lastVisitedAt).toLocaleString() : v.date}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -250,8 +202,7 @@ export function VisitorLogsTable({
             {meta && (
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-muted-foreground">
                     <div>
-                        Showing page <span className="font-bold text-primary">{meta.page}</span> of{" "}
-                        {meta.totalPages || 1} ({meta.total} total visitor records)
+                        Showing page <span className="font-bold text-primary">{meta.page}</span> of {meta.totalPages || 1} ({meta.total} total visitor records)
                     </div>
                     <div className="flex items-center gap-2">
                         <button

@@ -48,12 +48,7 @@ export function CreateProductModal({ show, onClose }: CreateProductModalProps) {
         <AnimatePresence>
             {show && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-6"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-6">
                         <div className="flex items-center justify-between border-b border-border pb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
@@ -86,12 +81,7 @@ export function CreateProductModal({ show, onClose }: CreateProductModalProps) {
                                 />
                             </div>
 
-                            <ImageUpload
-                                value={formData.photo}
-                                onChange={(url) => setFormData({ ...formData, photo: url })}
-                                onRemove={() => setFormData({ ...formData, photo: "" })}
-                                label="Product Photo (Cloudinary Upload)"
-                            />
+                            <ImageUpload value={formData.photo} onChange={(url) => setFormData({ ...formData, photo: url })} onRemove={() => setFormData({ ...formData, photo: "" })} label="Product Photo (Cloudinary Upload)" />
 
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Description</label>
@@ -104,16 +94,8 @@ export function CreateProductModal({ show, onClose }: CreateProductModalProps) {
                                 />
                             </div>
 
-                            <div
-                                className="flex items-center gap-3 p-3.5 bg-[#1a0e07] border border-border rounded-xl cursor-pointer"
-                                onClick={() => setFormData({ ...formData, is18Plus: !formData.is18Plus })}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={Boolean(formData.is18Plus)}
-                                    onChange={(e) => setFormData({ ...formData, is18Plus: e.target.checked })}
-                                    className="w-4 h-4 rounded border-border text-primary focus:ring-0 cursor-pointer"
-                                />
+                            <div className="flex items-center gap-3 p-3.5 bg-[#1a0e07] border border-border rounded-xl cursor-pointer" onClick={() => setFormData({ ...formData, is18Plus: !formData.is18Plus })}>
+                                <input type="checkbox" checked={Boolean(formData.is18Plus)} onChange={(e) => setFormData({ ...formData, is18Plus: e.target.checked })} className="w-4 h-4 rounded border-border text-primary focus:ring-0 cursor-pointer" />
                                 <div>
                                     <p className="text-xs font-bold text-foreground">18+ Restricted Product</p>
                                     <p className="text-[10px] text-muted-foreground">Mark if item requires age verification</p>
@@ -121,18 +103,10 @@ export function CreateProductModal({ show, onClose }: CreateProductModalProps) {
                             </div>
 
                             <div className="flex items-center justify-end gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
-                                >
+                                <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer">
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-accent transition-all disabled:opacity-50 cursor-pointer shadow-md"
-                                >
+                                <button type="submit" disabled={isLoading} className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-xs hover:bg-accent transition-all disabled:opacity-50 cursor-pointer shadow-md">
                                     {isLoading ? "Creating…" : "Save Product"}
                                 </button>
                             </div>

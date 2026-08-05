@@ -42,12 +42,7 @@ export function CreateReviewModal({ show, onClose }: CreateReviewModalProps) {
         <AnimatePresence>
             {show && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs font-sans">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5"
-                    >
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[#251508] border border-border rounded-3xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-5">
                         <div className="flex items-center justify-between border-b border-border pb-3">
                             <div className="flex items-center gap-2.5">
                                 <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
@@ -65,17 +60,8 @@ export function CreateReviewModal({ show, onClose }: CreateReviewModalProps) {
                                 <label className="block text-xs font-semibold text-muted-foreground mb-2">Rating</label>
                                 <div className="flex items-center gap-2">
                                     {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            type="button"
-                                            onClick={() => setRating(star)}
-                                            className="p-1 cursor-pointer transition-transform hover:scale-110"
-                                        >
-                                            <Star
-                                                className={`w-7 h-7 ${
-                                                    star <= rating ? "text-primary fill-primary" : "text-muted-foreground/30"
-                                                }`}
-                                            />
+                                        <button key={star} type="button" onClick={() => setRating(star)} className="p-1 cursor-pointer transition-transform hover:scale-110">
+                                            <Star className={`w-7 h-7 ${star <= rating ? "text-primary fill-primary" : "text-muted-foreground/30"}`} />
                                         </button>
                                     ))}
                                     <span className="ml-2 text-sm font-bold font-mono text-primary">{rating} / 5</span>
@@ -95,18 +81,10 @@ export function CreateReviewModal({ show, onClose }: CreateReviewModalProps) {
                             </div>
 
                             <div className="flex gap-3 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs"
-                                >
+                                <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-white/5 cursor-pointer text-xs">
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer text-xs disabled:opacity-50"
-                                >
+                                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer text-xs disabled:opacity-50">
                                     {isLoading ? "Submitting…" : "Post Review"}
                                 </button>
                             </div>

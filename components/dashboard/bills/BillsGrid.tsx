@@ -28,15 +28,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     OTHERS: "#94a3b8",
 };
 
-export function BillsGrid({
-    bills,
-    isLoading,
-    searchTerm,
-    onSearchChange,
-    onViewDetails,
-    onEditBill,
-    onDeleteBill,
-}: BillsGridProps) {
+export function BillsGrid({ bills, isLoading, searchTerm, onSearchChange, onViewDetails, onEditBill, onDeleteBill }: BillsGridProps) {
     return (
         <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
             {/* Search Toolbar */}
@@ -75,42 +67,24 @@ export function BillsGrid({
                         {bills.map((b) => {
                             const catColor = CATEGORY_COLORS[b.category] || "#e8a020";
                             return (
-                                <div
-                                    key={b._id}
-                                    className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden group hover:border-primary/40 transition-all shadow-md"
-                                >
+                                <div key={b._id} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden group hover:border-primary/40 transition-all shadow-md">
                                     <div>
                                         <div className="flex items-center justify-between gap-2 mb-3">
-                                            <span
-                                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border"
-                                                style={{ background: `${catColor}15`, color: catColor, borderColor: `${catColor}30` }}
-                                            >
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border" style={{ background: `${catColor}15`, color: catColor, borderColor: `${catColor}30` }}>
                                                 <Receipt className="w-3 h-3" /> {b.category}
                                             </span>
                                             <div className="flex items-center gap-1">
                                                 {onViewDetails && (
-                                                    <button
-                                                        onClick={() => onViewDetails(b._id)}
-                                                        className="text-muted-foreground hover:text-primary p-1 rounded-md transition-colors cursor-pointer"
-                                                        title="View Details"
-                                                    >
+                                                    <button onClick={() => onViewDetails(b._id)} className="text-muted-foreground hover:text-primary p-1 rounded-md transition-colors cursor-pointer" title="View Details">
                                                         <Eye className="w-4 h-4" />
                                                     </button>
                                                 )}
                                                 {onEditBill && (
-                                                    <button
-                                                        onClick={() => onEditBill(b)}
-                                                        className="text-muted-foreground hover:text-accent p-1 rounded-md transition-colors cursor-pointer"
-                                                        title="Edit Bill"
-                                                    >
+                                                    <button onClick={() => onEditBill(b)} className="text-muted-foreground hover:text-accent p-1 rounded-md transition-colors cursor-pointer" title="Edit Bill">
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                 )}
-                                                <button
-                                                    onClick={() => onDeleteBill(b)}
-                                                    className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer"
-                                                    title="Delete Bill"
-                                                >
+                                                <button onClick={() => onDeleteBill(b)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer" title="Delete Bill">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>

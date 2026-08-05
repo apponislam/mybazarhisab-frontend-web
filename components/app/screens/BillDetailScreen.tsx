@@ -20,13 +20,23 @@ export function BillDetailScreen({ bill, onBack, onEdit, onDelete }: { bill: Moc
                         <button type="button" onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/40 text-primary text-sm font-medium hover:bg-primary/10 transition-all cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                             <Edit3 className="w-3.5 h-3.5" /> Edit
                         </button>
-                        <button type="button" onClick={() => setConfirmDelete(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/10 transition-all cursor-pointer" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                        <button
+                            type="button"
+                            onClick={() => setConfirmDelete(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/10 transition-all cursor-pointer"
+                            style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        >
                             <Trash2 className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 </div>
 
-                <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} className="rounded-3xl border p-6 mb-5 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${meta.color}18 0%, ${meta.color}06 100%)`, borderColor: `${meta.color}40`, boxShadow: `0 4px 24px ${meta.color}25` }}>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="rounded-3xl border p-6 mb-5 relative overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${meta.color}18 0%, ${meta.color}06 100%)`, borderColor: `${meta.color}40`, boxShadow: `0 4px 24px ${meta.color}25` }}
+                >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 border" style={{ background: `${meta.color}25`, borderColor: `${meta.color}50`, color: meta.color }}>
                         <span className="scale-150">{meta.icon}</span>
                     </div>

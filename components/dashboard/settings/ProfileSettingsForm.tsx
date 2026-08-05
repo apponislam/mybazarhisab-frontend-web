@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { User, Lock, Mail, Phone, ShieldCheck, MapPin, Globe, FileText, Camera } from "lucide-react";
+import { User, Lock, Mail, Phone, MapPin, Globe, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useGetMeQuery, useUpdateProfileMutation } from "@/redux/features/auth/authApi";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";

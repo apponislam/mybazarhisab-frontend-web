@@ -188,10 +188,14 @@ export function DeleteConfirm({ label, onConfirm, onCancel }: { label: string; o
     );
 }
 
-export function Avatar({ user, size = 36 }: { user: MockUser; size?: number }) {
+export function Avatar({ user, size = 36 }: { user: { id?: string; name: string; email?: string; phone?: string; profileImage?: string }; size?: number }) {
     return (
-        <div className="rounded-full flex items-center justify-center shrink-0 font-semibold text-white" style={{ width: size, height: size, background: avatarColor(user.id), fontSize: size * 0.36 }}>
-            {initials(user.name)}
+        <div className="rounded-full overflow-hidden flex items-center justify-center shrink-0 font-semibold text-white shadow-sm" style={{ width: size, height: size, background: avatarColor(user.id || user.name), fontSize: size * 0.36 }}>
+            {user.profileImage ? (
+                <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+                initials(user.name)
+            )}
         </div>
     );
 }

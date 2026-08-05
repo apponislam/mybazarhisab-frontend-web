@@ -1,6 +1,5 @@
 import React from "react";
 import { MockBazarEntry, MockBill } from "@/types";
-import { INITIAL_ENTRIES, INITIAL_BILLS } from "@/lib/mockData";
 
 export function useAppShellData(bazarData: any, billData: any) {
     const entries: MockBazarEntry[] = React.useMemo(() => {
@@ -23,6 +22,7 @@ export function useAppShellData(bazarData: any, billData: any) {
                 id: item.user?._id || item.user || "u1",
                 name: item.user?.name || "User",
                 email: item.user?.email || "",
+                profileImage: item.user?.profileImage,
             },
         }));
     }, [bazarData]);
@@ -42,6 +42,7 @@ export function useAppShellData(bazarData: any, billData: any) {
                 id: item.user?._id || item.user || "u1",
                 name: item.user?.name || "User",
                 email: item.user?.email || "",
+                profileImage: item.user?.profileImage,
             },
         }));
     }, [billData]);

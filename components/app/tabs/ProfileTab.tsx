@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { User, Shield, Info, Bell, BellOff, Mail, Globe, MapPin, FileText, LogOut, Trash2, AlertTriangle, Users } from "lucide-react";
+import { User, Shield, Info, Bell, BellOff, Mail, MapPin, FileText, LogOut, Trash2, AlertTriangle, Users } from "lucide-react";
 import { Toggle, SettingsRow } from "@/components/app/ui/Shared";
 import { initials, avatarColor } from "@/lib/mockData";
 import { useLogoutMutation, useGetMeQuery } from "@/redux/features/auth/authApi";

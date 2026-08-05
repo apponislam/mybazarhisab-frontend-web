@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Search, Trash2, Eye, Edit2, Receipt, User, Calendar, ShieldCheck } from "lucide-react";
-import { TBill, BillCategory } from "@/redux/features/bill/billApi";
+import { TBill } from "@/redux/features/bill/billApi";
 
 interface BillsGridProps {
     bills: TBill[];

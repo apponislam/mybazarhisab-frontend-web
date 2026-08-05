@@ -140,7 +140,7 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
                             const memberIsCreator = typeof group.creator === "string" ? group.creator === member._id : group.creator?._id === member._id;
                             return (
                                 <div key={member._id} className="p-4 flex items-center gap-3">
-                                    <Avatar user={{ id: member._id, name: member.name, email: member.email, phone: member.phone || "" }} size={42} />
+                                    <Avatar user={{ id: member._id, name: member.name, email: member.email, phone: member.phone || "", profileImage: member.profileImage }} size={42} />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-bold text-foreground truncate" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                             {member.name}

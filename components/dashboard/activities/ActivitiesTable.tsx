@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Activity, Trash2, User, Users, ShoppingBag, Receipt, Shield, Key, Clock } from "lucide-react";
+import { Activity, Trash2, Users, ShoppingBag, Receipt, Key, Clock } from "lucide-react";
 import { TActivity } from "@/redux/features/activity/activityApi";
 import { DeleteActivityModal } from "./DeleteActivityModal";
 

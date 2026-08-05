@@ -10,7 +10,8 @@ export interface MockUser {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
+  profileImage?: string;
 }
 
 export interface MockProduct {

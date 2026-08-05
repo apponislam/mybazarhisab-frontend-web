@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Bell, CheckCheck, Trash2, Calendar } from "lucide-react";
+import { CheckCheck, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { ScreenShell, BackButton, Avatar } from "@/components/app/ui/Shared";
 import { fmtDate } from "@/lib/mockData";

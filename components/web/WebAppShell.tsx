@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Search, X } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, Star, Calendar, TrendingUp, Minus, BookOpen, Package, BarChart2 } from "lucide-react";
 import { toast } from "sonner";
-import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@/types";
-import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmtFull, fmtDate } from "@/lib/mockData";
+import { BazarUnit, BillCategory, GroupStats } from "@/types";
+import { BILL_META, fmt } from "@/lib/mockData";
+import { useGetUserDashboardStatsQuery } from "@/redux/features/dashboard/dashboardApi";
 import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/redux/features/auth/authApi";
 import { useSubmitMessageMutation } from "@/redux/features/contact/contactApi";
 import { useCreateFeedbackMutation } from "@/redux/features/feedback/feedbackApi";
@@ -18,7 +19,51 @@ import { WebHeader } from "@/components/web/shell/WebHeader";
 import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
 import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
 import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent } from "@/components/web/shell/WebDialogs";
-import { WebMetricCard as MetricCard, avatarColor, initials } from "@/components/web/shell/WebMetricCard";
+import { avatarColor, initials } from "@/components/web/shell/WebMetricCard";
+
+// ─── Helper Components for Dashboard Stats ─────────────────────────────────
+
+const now = new Date();
+const mn = now.toLocaleString("default", { month: "long" });
+const yr = now.getFullYear();
+
+function WebDelta({ current, prev }: { current: number; prev: number }) {
+    if (prev === 0) return null;
+    const pct = Math.round(((current - prev) / prev) * 100);
+    const up = pct >= 0;
+    return (
+        <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold font-mono px-1.5 py-0.5 rounded-md" style={{ color: up ? "#22c55e" : "#ef4444", background: up ? "rgba(34,197,94,0.1)" : "rgba(239,68,68,0.1)" }}>
+            {up ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {Math.abs(pct)}%
+        </span>
+    );
+}
+
+function WebLoadingDots({ currency = true, size = "md" }: { currency?: boolean; size?: "sm" | "md" | "lg" }) {
+    const dotSize = size === "lg" ? "w-2 h-2" : size === "sm" ? "w-1 h-1" : "w-1.5 h-1.5";
+    return (
+        <span className="inline-flex items-center gap-1 font-mono font-bold">
+            {currency && <span>৳</span>}
+            <span className={`${dotSize} rounded-full bg-primary animate-bounce`} style={{ animationDelay: "0ms" }} />
+            <span className={`${dotSize} rounded-full bg-primary animate-bounce`} style={{ animationDelay: "150ms" }} />
+            <span className={`${dotSize} rounded-full bg-primary animate-bounce`} style={{ animationDelay: "300ms" }} />
+        </span>
+    );
+}
+
+function ExpenseRow({ label, value, prev, isLoading, color = "text-foreground" }: { label: string; value: number; prev?: number; isLoading: boolean; color?: string }) {
+    return (
+        <div className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/[0.02] transition-colors">
+            <span className="text-sm text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+            <div className="flex items-center gap-3">
+                {!isLoading && prev !== undefined && <WebDelta current={value} prev={prev} />}
+                <span className={`text-sm font-bold font-mono ${color}`}>
+                    {isLoading ? <WebLoadingDots currency size="sm" /> : fmt(value)}
+                </span>
+            </div>
+        </div>
+    );
+}
 
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
     const router = useRouter();
@@ -42,10 +87,6 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
-
-    // Core App States (Independent copies for the web shell)
-    const [entries, setEntries] = useState<MockBazarEntry[]>(INITIAL_ENTRIES);
-    const [bills, setBills] = useState<MockBill[]>(INITIAL_BILLS);
 
     // Pagination & Search & Filter States
     const [expensePage, setExpensePage] = useState(1);
@@ -85,6 +126,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
     const [deleteBazarEntry] = useDeleteBazarEntryMutation();
     const [deleteBill] = useDeleteBillMutation();
+
+    // Dashboard stats for home tab (same API as /app)
+    const { data: dashboardData, isLoading: isDashboardLoading } = useGetUserDashboardStatsQuery(undefined, {
+        skip: tab !== "home",
+    });
+    const dashboardStats = dashboardData?.data;
 
     // Delete Confirmation Modal States
     const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
@@ -188,97 +235,6 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         }
     }, [currentUser]);
 
-    // Calculations
-    const calculations = useMemo(() => {
-        const isThisMonth = (d: Date) => {
-            const now = new Date();
-            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-        };
-
-        // Filtered entries
-        const monthEntries = entries.filter((e) => isThisMonth(e.date));
-        const monthBills = bills.filter((b) => isThisMonth(b.date));
-
-        const totalBazar = monthEntries.reduce((sum, e) => sum + e.price * e.quantity, 0);
-        const totalBills = monthBills.reduce((sum, b) => sum + b.amount, 0);
-        const grandTotal = totalBazar + totalBills;
-
-        // Member-wise spending
-        const memberSpendMap: Record<string, number> = {};
-        MOCK_USERS.forEach((u) => {
-            memberSpendMap[u.id] = 0;
-        });
-
-        entries.forEach((e) => {
-            if (memberSpendMap[e.user.id] !== undefined) {
-                memberSpendMap[e.user.id] += e.price * e.quantity;
-            }
-        });
-
-        bills.forEach((b) => {
-            if (memberSpendMap[b.user.id] !== undefined) {
-                memberSpendMap[b.user.id] += b.amount;
-            }
-        });
-
-        const averageSpend = grandTotal / MOCK_USERS.length;
-
-        const memberSplits = MOCK_USERS.map((u) => {
-            const spent = memberSpendMap[u.id] || 0;
-            const balance = spent - averageSpend;
-            return {
-                user: u,
-                spent,
-                balance,
-            };
-        });
-
-        // Calculate settlements (who owes whom)
-        const debtors: { id: string; name: string; amount: number }[] = [];
-        const creditors: { id: string; name: string; amount: number }[] = [];
-
-        memberSplits.forEach((s) => {
-            if (s.balance < -0.01) {
-                debtors.push({ id: s.user.id, name: s.user.name, amount: Math.abs(s.balance) });
-            } else if (s.balance > 0.01) {
-                creditors.push({ id: s.user.id, name: s.user.name, amount: s.balance });
-            }
-        });
-
-        const settlements: { from: string; to: string; amount: number }[] = [];
-        let dIdx = 0,
-            cIdx = 0;
-
-        while (dIdx < debtors.length && cIdx < creditors.length) {
-            const debtor = debtors[dIdx];
-            const creditor = creditors[cIdx];
-            const amount = Math.min(debtor.amount, creditor.amount);
-
-            settlements.push({
-                from: debtor.name,
-                to: creditor.name,
-                amount: amount,
-            });
-
-            debtor.amount -= amount;
-            creditor.amount -= amount;
-
-            if (debtor.amount < 0.01) dIdx++;
-            if (creditor.amount < 0.01) cIdx++;
-        }
-
-        return {
-            totalBazar,
-            totalBills,
-            grandTotal,
-            averageSpend,
-            memberSplits,
-            settlements,
-            monthEntriesCount: monthEntries.length,
-            monthBillsCount: monthBills.length,
-        };
-    }, [entries, bills]);
-
     // Handlers
     const handleAddExpense = async (productName: string, price: number, quantity: number, unit: BazarUnit, dateStr: string, notes: string) => {
         try {
@@ -292,26 +248,6 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             }).unwrap();
 
             toast.success(`Logged ${productName} expense successfully!`);
-
-            // Also update local mock copy for instant UI sync
-            const matchedProduct = MOCK_PRODUCTS.find((p) => p.name.toLowerCase() === productName.toLowerCase()) || {
-                id: "p_" + Date.now(),
-                name: productName,
-                emoji: "🛒",
-            };
-
-            const newEntry: MockBazarEntry = {
-                id: "e_" + Date.now(),
-                product: matchedProduct,
-                price,
-                quantity,
-                unit,
-                date: new Date(dateStr),
-                notes: notes || undefined,
-                user: MOCK_USERS[0],
-            };
-
-            setEntries((prev) => [newEntry, ...prev]);
         } catch (err: any) {
             toast.error(err?.data?.message || err?.message || "Failed to add bazar expense");
         }
@@ -328,19 +264,6 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             }).unwrap();
 
             toast.success(`Logged ${title} bill successfully!`);
-
-            // Also update local mock copy for instant UI sync
-            const newBill: MockBill = {
-                id: "b_" + Date.now(),
-                category,
-                title,
-                amount,
-                date: new Date(dateStr),
-                notes: notes || undefined,
-                user: MOCK_USERS[0],
-            };
-
-            setBills((prev) => [newBill, ...prev]);
         } catch (err: any) {
             toast.error(err?.data?.message || err?.message || "Failed to add monthly bill");
         }
@@ -350,7 +273,6 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         try {
             await deleteBazarEntry(id).unwrap();
             toast.success("Expense entry deleted successfully!");
-            setEntries((prev) => prev.filter((e) => e.id !== id));
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to delete expense entry");
         }
@@ -360,7 +282,6 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         try {
             await deleteBill(id).unwrap();
             toast.success("Monthly bill deleted successfully!");
-            setBills((prev) => prev.filter((b) => b.id !== id));
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to delete bill");
         }
@@ -413,105 +334,209 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                         {/* ─── TAB: HOME (WEBSITE DESIGN) ─────────────────────────────── */}
                         {tab === "home" && (
                             <>
-                                {/* Banner metrics */}
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 shrink-0">
-                                    <MetricCard title="Total Bazar Spent" value={calculations.totalBazar} subtitle={`${calculations.monthEntriesCount} shopping items logged`} color="text-primary" />
-                                    <MetricCard title="Monthly Rent & Bills" value={calculations.totalBills} subtitle={`${calculations.monthBillsCount} bills this month`} color="text-accent" />
-                                    <MetricCard title="Grand Combined Total" value={calculations.grandTotal} subtitle="All room accounts total" color="text-green-400" />
+                                {/* ─── Group Header ───────────────────────────────────────── */}
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                                            {dashboardStats?.groupName || stats?.groupName || "My Bazar Group"}
+                                        </h1>
+                                        <p className="text-muted-foreground text-xs mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                            {mn} {yr} — Hisab Overview
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10">
+                                            <Star className="w-3 h-3 text-primary" strokeWidth={2} />
+                                            <span className="text-primary text-xs font-semibold font-mono">{dashboardStats?.totalMembers ?? stats?.totalMembers ?? 1} members</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-[#251508]">
+                                            <BookOpen className="w-3 h-3 text-muted-foreground" strokeWidth={2} />
+                                            <span className="text-muted-foreground text-xs font-semibold font-mono">
+                                                {isDashboardLoading ? <WebLoadingDots currency={false} size="sm" /> : (dashboardStats?.totalGroupBazarAndBills ?? dashboardStats?.totalGroupBazarEntries ?? 0)} entries
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Main Split Panels */}
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                                    {/* Left Column: Settlements & Member splits */}
-                                    <div className="lg:col-span-2 flex flex-col gap-6">
-                                        <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
-                                            <h3 className="text-base font-bold mb-4 font-mono uppercase text-muted-foreground tracking-wider flex items-center gap-2">
-                                                <span>📊</span> Room Splits & Balances
-                                            </h3>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {calculations.memberSplits.map((s) => {
-                                                    const isPositive = s.balance >= 0;
-                                                    return (
-                                                        <div key={s.user.id} className="p-4 rounded-2xl border border-[rgba(232,160,32,0.08)] bg-[#1a0e07] flex items-center justify-between">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-inner" style={{ background: avatarColor(s.user.id) }}>
-                                                                    {initials(s.user.name)}
-                                                                </div>
-                                                                <div>
-                                                                    <h4 className="text-sm font-semibold">{s.user.name}</h4>
-                                                                    <p className="text-[10px] text-muted-foreground font-mono">Spent: {fmtFull(s.spent)}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <p className={`text-sm font-bold font-mono ${isPositive ? "text-green-400" : "text-destructive"}`}>
-                                                                    {isPositive ? "+" : ""}
-                                                                    {fmtFull(s.balance)}
-                                                                </p>
-                                                                <p className="text-[9px] text-muted-foreground">{isPositive ? "Owed" : "Owes"}</p>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
+                                {/* ─── 3 Hero Summary Cards ──────────────────────────────── */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                    {/* Total Expense Card */}
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                                        className="rounded-2xl border border-primary/30 p-6 relative overflow-hidden"
+                                        style={{ background: "linear-gradient(145deg, rgba(232,160,32,0.15) 0%, rgba(192,96,16,0.06) 100%)", boxShadow: "0 4px 32px rgba(232,160,32,0.12)" }}
+                                    >
+                                        <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-primary/5 -translate-y-6 translate-x-6 pointer-events-none" />
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
+                                                <TrendingUp className="w-4 h-4 text-primary" />
                                             </div>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Total Expense</span>
+                                        </div>
+                                        <div className="min-h-[2.5rem] flex items-center text-3xl font-bold text-primary font-mono mb-1">
+                                            {isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthTotalExpense ?? 0)}
+                                        </div>
+                                        {!isDashboardLoading && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <WebDelta current={dashboardStats?.thisMonthTotalExpense ?? 0} prev={dashboardStats?.prevMonthTotalExpense ?? 0} />
+                                                <span className="text-[11px] text-muted-foreground">vs last month</span>
+                                            </div>
+                                        )}
+                                    </motion.div>
+
+                                    {/* Bazar Expense Card */}
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+                                        className="rounded-2xl border border-border bg-[#251508] p-6 relative overflow-hidden"
+                                        style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
+                                    >
+                                        <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-primary/3 -translate-y-6 translate-x-6 pointer-events-none" />
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="w-8 h-8 rounded-lg bg-primary/12 border border-primary/20 flex items-center justify-center">
+                                                <ShoppingBag className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Bazar Expense</span>
+                                        </div>
+                                        <div className="min-h-[2.5rem] flex items-center text-3xl font-bold text-foreground font-mono mb-1">
+                                            {isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthBazarExpense ?? 0)}
+                                        </div>
+                                        {!isDashboardLoading && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <WebDelta current={dashboardStats?.thisMonthBazarExpense ?? 0} prev={dashboardStats?.prevMonthBazarExpense ?? 0} />
+                                                <span className="text-[11px] text-muted-foreground">vs last month</span>
+                                            </div>
+                                        )}
+                                    </motion.div>
+
+                                    {/* Bill Expense Card */}
+                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.19 }}
+                                        className="rounded-2xl border border-border bg-[#251508] p-6 relative overflow-hidden"
+                                        style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
+                                    >
+                                        <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-accent/3 -translate-y-6 translate-x-6 pointer-events-none" />
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <div className="w-8 h-8 rounded-lg bg-accent/15 border border-accent/25 flex items-center justify-center">
+                                                <Receipt className="w-4 h-4 text-accent" />
+                                            </div>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Bill Expense</span>
+                                        </div>
+                                        <div className="min-h-[2.5rem] flex items-center text-3xl font-bold text-foreground font-mono mb-1">
+                                            {isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthBillExpense ?? 0)}
+                                        </div>
+                                        {!isDashboardLoading && (
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <WebDelta current={dashboardStats?.thisMonthBillExpense ?? 0} prev={dashboardStats?.prevMonthBillExpense ?? 0} />
+                                                <span className="text-[11px] text-muted-foreground">vs last month</span>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                </div>
+
+                                {/* ─── Expense Breakdown Panels + Recent Logs ─────────────── */}
+                                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                                    {/* Left: Breakdown panels (3 cols) */}
+                                    <div className="lg:col-span-3 flex flex-col gap-5">
+                                        {/* Bazar Breakdown */}
+                                        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                                            className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
+                                        >
+                                            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
+                                                <ShoppingBag className="w-4 h-4 text-primary" />
+                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Bazar Breakdown</span>
+                                            </div>
+                                            <div className="divide-y divide-border/50">
+                                                <ExpenseRow label={`${mn} ${yr}`} value={dashboardStats?.thisMonthBazarExpense ?? 0} prev={dashboardStats?.prevMonthBazarExpense ?? 0} isLoading={isDashboardLoading} color="text-primary" />
+                                                <ExpenseRow label="Previous Month" value={dashboardStats?.prevMonthBazarExpense ?? 0} isLoading={isDashboardLoading} />
+                                                <ExpenseRow label={`Year ${yr}`} value={dashboardStats?.thisYearBazarExpense ?? 0} prev={dashboardStats?.prevYearBazarExpense ?? 0} isLoading={isDashboardLoading} color="text-primary" />
+                                                <ExpenseRow label={`Year ${yr - 1}`} value={dashboardStats?.prevYearBazarExpense ?? 0} isLoading={isDashboardLoading} />
+                                            </div>
+                                        </motion.div>
+
+                                        {/* Bill Breakdown */}
+                                        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                                            className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
+                                        >
+                                            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
+                                                <Receipt className="w-4 h-4 text-accent" />
+                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Bill Breakdown</span>
+                                            </div>
+                                            <div className="divide-y divide-border/50">
+                                                <ExpenseRow label={`${mn} ${yr}`} value={dashboardStats?.thisMonthBillExpense ?? 0} prev={dashboardStats?.prevMonthBillExpense ?? 0} isLoading={isDashboardLoading} color="text-accent" />
+                                                <ExpenseRow label="Previous Month" value={dashboardStats?.prevMonthBillExpense ?? 0} isLoading={isDashboardLoading} />
+                                                <ExpenseRow label={`Year ${yr}`} value={dashboardStats?.thisYearBillExpense ?? 0} prev={dashboardStats?.prevYearBillExpense ?? 0} isLoading={isDashboardLoading} color="text-accent" />
+                                                <ExpenseRow label={`Year ${yr - 1}`} value={dashboardStats?.prevYearBillExpense ?? 0} isLoading={isDashboardLoading} />
+                                            </div>
+                                        </motion.div>
+
+                                        {/* Year Totals */}
+                                        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                                            className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
+                                        >
+                                            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
+                                                <BarChart2 className="w-4 h-4 text-green-400" />
+                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Yearly Summary</span>
+                                            </div>
+                                            <div className="divide-y divide-border/50">
+                                                <ExpenseRow label={`${yr} Grand Total`} value={dashboardStats?.thisYearTotalExpense ?? 0} prev={dashboardStats?.prevYearTotalExpense ?? 0} isLoading={isDashboardLoading} color="text-green-400" />
+                                                <ExpenseRow label={`${yr - 1} Grand Total`} value={dashboardStats?.prevYearTotalExpense ?? 0} isLoading={isDashboardLoading} />
+                                            </div>
+                                        </motion.div>
+                                    </div>
+
+                                    {/* Right: Recent Bazar Logs (2 cols) */}
+                                    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                                        className="lg:col-span-2 bg-[#251508] border border-border rounded-2xl overflow-hidden flex flex-col"
+                                        style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
+                                    >
+                                        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50 shrink-0">
+                                            <ShoppingBag className="w-4 h-4 text-primary" />
+                                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Recent Bazar Logs</span>
                                         </div>
 
-                                        {/* Settlement calculations */}
-                                        <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
-                                            <h3 className="text-base font-bold mb-4 font-mono uppercase text-muted-foreground tracking-wider flex items-center gap-2">
-                                                <span>💸</span> Who owes Whom
-                                            </h3>
-
-                                            {calculations.settlements.length === 0 ? (
-                                                <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-8">
-                                                    <span className="text-3xl mb-2">🎉</span>
-                                                    <p className="text-sm">All room shares are completely settled!</p>
-                                                </div>
-                                            ) : (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {calculations.settlements.map((s, idx) => (
-                                                        <div key={idx} className="p-4 rounded-2xl border border-dashed border-primary/20 bg-primary/5 flex flex-col gap-2">
-                                                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                                                <span className="font-semibold text-destructive">{s.from}</span>
-                                                                <span>owes</span>
-                                                                <span className="font-semibold text-green-400">{s.to}</span>
+                                        <div className="flex-1 overflow-y-auto">
+                                            {bazarEntriesLoading ? (
+                                                <div className="divide-y divide-border/30">
+                                                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                                                        <div key={i} className="flex items-center justify-between px-5 py-3 animate-pulse">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-lg bg-[#2e1a0a]" />
+                                                                <div>
+                                                                    <div className="h-3 w-28 bg-[#2e1a0a] rounded mb-1.5" />
+                                                                    <div className="h-2.5 w-20 bg-[#2e1a0a] rounded" />
+                                                                </div>
                                                             </div>
-                                                            <div className="text-xl font-bold text-primary font-mono text-center">{fmtFull(s.amount)}</div>
+                                                            <div className="h-3.5 w-14 bg-[#2e1a0a] rounded" />
                                                         </div>
                                                     ))}
                                                 </div>
+                                            ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
+                                                <div className="divide-y divide-border/30">
+                                                    {bazarEntriesResponse.data.slice(0, 10).map((e: any) => (
+                                                        <div key={e._id} className="flex items-center justify-between px-5 py-3 hover:bg-white/[0.02] transition-colors">
+                                                            <div className="flex items-center gap-3 min-w-0">
+                                                                <div className="w-8 h-8 rounded-lg bg-primary/8 border border-primary/15 flex items-center justify-center shrink-0">
+                                                                    <ShoppingBag className="w-3.5 h-3.5 text-primary" />
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-sm font-medium truncate text-[#f5ede2]">{e.product?.name || e.name}</p>
+                                                                    <p className="text-[11px] text-muted-foreground font-mono">
+                                                                        {e.user?.name || "Unknown"} · {new Date(e.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right shrink-0 pl-3">
+                                                                <p className="text-sm font-bold text-primary font-mono">৳{((e.price || 0) * (e.quantity || 1)).toLocaleString()}</p>
+                                                                <p className="text-[10px] text-muted-foreground font-mono">{e.quantity} {e.unit}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-12">
+                                                    <ShoppingBag className="w-8 h-8 mb-2 opacity-20" />
+                                                    <p className="text-sm">No bazar entries yet</p>
+                                                </div>
                                             )}
                                         </div>
-                                    </div>
-
-                                    {/* Right Column: Recent Activity Feed */}
-                                    <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl flex flex-col">
-                                        <h3 className="text-base font-bold mb-4 font-mono uppercase text-muted-foreground tracking-wider flex items-center gap-2">
-                                            <span>🛒</span> Recent Bazar Logs
-                                        </h3>
-
-                                        <div className="space-y-3.5 max-h-90 overflow-y-auto pr-1">
-                                            {entries.slice(0, 5).map((e) => (
-                                                <div key={e.id} className="p-3.5 rounded-xl bg-[#1a0e07] border border-[rgba(232,160,32,0.06)] flex items-center justify-between gap-3">
-                                                    <div className="flex items-center gap-2.5 min-w-0">
-                                                        <span className="text-xl">{e.product.emoji}</span>
-                                                        <div className="min-w-0">
-                                                            <p className="text-xs font-semibold truncate text-[#f5ede2]">{e.product.name}</p>
-                                                            <p className="text-[10px] text-muted-foreground font-mono">
-                                                                {e.user.name} • {fmtDate(e.date)}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right shrink-0">
-                                                        <p className="text-xs font-bold text-primary font-mono">৳{(e.price * e.quantity).toLocaleString()}</p>
-                                                        <p className="text-[9px] text-muted-foreground font-mono">
-                                                            {e.quantity} {e.unit}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                                    </motion.div>
                                 </div>
                             </>
                         )}

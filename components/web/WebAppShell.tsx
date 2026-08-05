@@ -1,22 +1,25 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, Camera, ShieldCheck, Globe, MapPin, LayoutDashboard, ChevronDown, Edit3, Bell, MessageSquare, Star, Send } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Plus, Search, X, LogOut, Lock, Mail, Phone, ShieldCheck, Globe, MapPin, ChevronDown, Edit3, Bell, MessageSquare, Star } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit, BillCategory, MockBazarEntry, MockBill, GroupStats } from "@/types";
 import { INITIAL_ENTRIES, INITIAL_BILLS, MOCK_USERS, MOCK_PRODUCTS, BILL_META, fmt, fmtFull, fmtDate } from "@/lib/mockData";
-import { PrimaryButton } from "@/components/app/ui/Shared";
 import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/redux/features/auth/authApi";
 import { useSubmitMessageMutation } from "@/redux/features/contact/contactApi";
 import { useCreateFeedbackMutation } from "@/redux/features/feedback/feedbackApi";
-import { useCreateReviewMutation } from "@/redux/features/review/reviewApi";
+import { useCreateReviewMutation, useGetMyReviewQuery } from "@/redux/features/review/reviewApi";
 import { useGetMyNotificationsQuery, useGetUnreadCountQuery, useMarkAllAsReadMutation, useDeleteAllNotificationsMutation, useDeleteNotificationMutation } from "@/redux/features/notification/notificationApi";
 import { useCreateBazarEntryMutation, useGetAllBazarEntriesQuery, useDeleteBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { useCreateBillMutation, useGetAllBillsQuery, useDeleteBillMutation } from "@/redux/features/bill/billApi";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
-import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
 import { WebPagination } from "@/components/web/shell/WebPagination";
 import { WebConfirmModal } from "@/components/web/shell/WebModal";
+import { WebHeader } from "@/components/web/shell/WebHeader";
+import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
+import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
+import { WebDialogModal as Modal, WebFieldBox as FieldBox, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent } from "@/components/web/shell/WebDialogs";
+import { WebMetricCard as MetricCard, avatarColor, initials } from "@/components/web/shell/WebMetricCard";
 
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
     const router = useRouter();
@@ -54,23 +57,31 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const [billFilter, setBillFilter] = useState<"month" | "all">("month");
 
     // RTK Query Hooks for Live Data Fetching & Pagination
-    const { data: bazarEntriesResponse, isLoading: bazarEntriesLoading, isFetching: bazarEntriesFetching } = useGetAllBazarEntriesQuery(
+    const {
+        data: bazarEntriesResponse,
+        isLoading: bazarEntriesLoading,
+        isFetching: bazarEntriesFetching,
+    } = useGetAllBazarEntriesQuery(
         {
             filter: expenseFilter === "all" ? "ALL" : undefined,
             searchTerm: expenseSearch.trim() || undefined,
             page: expensePage,
             limit: 10,
         },
-        { skip: tab !== "expenses" && tab !== "home" }
+        { skip: tab !== "expenses" && tab !== "home" },
     );
-    const { data: billsResponse, isLoading: billsLoading, isFetching: billsFetching } = useGetAllBillsQuery(
+    const {
+        data: billsResponse,
+        isLoading: billsLoading,
+        isFetching: billsFetching,
+    } = useGetAllBillsQuery(
         {
             filter: billFilter === "all" ? "ALL" : undefined,
             searchTerm: billSearch.trim() || undefined,
             page: billPage,
             limit: 10,
         },
-        { skip: tab !== "bills" && tab !== "home" }
+        { skip: tab !== "bills" && tab !== "home" },
     );
 
     const [deleteBazarEntry] = useDeleteBazarEntryMutation();
@@ -99,6 +110,15 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const [submitContact, { isLoading: contactLoading }] = useSubmitMessageMutation();
     const [createFeedback, { isLoading: feedbackLoading }] = useCreateFeedbackMutation();
     const [createReview, { isLoading: reviewLoading }] = useCreateReviewMutation();
+    const {
+        data: myReviewData,
+        isLoading: myReviewLoading,
+        refetch: refetchMyReview,
+    } = useGetMyReviewQuery(undefined, {
+        skip: !showReview,
+        refetchOnMountOrArgChange: true,
+    });
+    const userReviewState = myReviewData?.data;
 
     // Form states for modals
     const [contactSubject, setContactSubject] = useState("");
@@ -233,16 +253,16 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         while (dIdx < debtors.length && cIdx < creditors.length) {
             const debtor = debtors[dIdx];
             const creditor = creditors[cIdx];
-            const settlementAmount = Math.min(debtor.amount, creditor.amount);
+            const amount = Math.min(debtor.amount, creditor.amount);
 
             settlements.push({
                 from: debtor.name,
                 to: creditor.name,
-                amount: settlementAmount,
+                amount: amount,
             });
 
-            debtor.amount -= settlementAmount;
-            creditor.amount -= settlementAmount;
+            debtor.amount -= amount;
+            creditor.amount -= amount;
 
             if (debtor.amount < 0.01) dIdx++;
             if (creditor.amount < 0.01) cIdx++;
@@ -349,288 +369,28 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
     return (
         <div className="min-h-screen bg-[#1a0e07] text-[#f5ede2] flex flex-col font-sans overflow-x-clip">
-            {/* ─── Top Website Header (Animated Sticky Header) ────────────────────── */}
-            <header
-                className={`sticky top-0 z-50 w-full transition-all duration-300 ease-in-out select-none border-b ${
-                    scrolled
-                        ? "bg-[#251508]/85 backdrop-blur-md border-[rgba(232,160,32,0.3)] shadow-2xl"
-                        : "bg-[#251508] border-[rgba(232,160,32,0.15)] shadow-md"
-                }`}
-            >
-                <div
-                    className={`container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between transition-all duration-300 ease-in-out ${
-                        scrolled ? "h-16" : "h-20"
-                    }`}
-                >
-                    {/* Logo & Group */}
-                    <div className="flex items-center gap-3">
-                        <img src="/assets/logo.png" alt="Bazar Hisab" className="w-9 h-9 object-contain rounded-xl" />
-                        <div>
-                            <span className="text-lg font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                                My Bazar <span className="text-primary">Hisab</span>
-                            </span>
-                            <span className="ml-3 hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-[10px] font-semibold font-mono">{stats?.groupName || "My Bazar Group"}</span>
-                        </div>
-                    </div>
-
-                    {/* Nav Items */}
-                    <nav className="hidden md:flex items-center gap-1">
-                        {[
-                            { id: "home", label: "Home", icon: <Home className="w-4 h-4" /> },
-                            { id: "expenses", label: "Expenses", icon: <ShoppingBag className="w-4 h-4" /> },
-                            { id: "bills", label: "Bills", icon: <Receipt className="w-4 h-4" /> },
-                            { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
-                        ].map((item) => {
-                            const active = tab === item.id;
-                            return (
-                                <button key={item.id} onClick={() => setTab(item.id as never)} className="relative px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer" style={{ color: active ? "#e8a020" : "#a08060" }}>
-                                    {item.icon}
-                                    {item.label}
-                                    {active && <motion.div layoutId="web-nav-underline" className="absolute bottom-0 left-5 right-5 h-0.5 bg-primary rounded-full" />}
-                                </button>
-                            );
-                        })}
-                    </nav>
-
-                    {/* User profile dropdown & actions */}
-                    <div className="flex items-center gap-3">
-                        {/* Quick Action Trigger Buttons */}
-                        <div className="hidden sm:flex items-center gap-2">
-                            <button onClick={() => setShowAddExpense(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground text-xs font-bold rounded-lg transition-all hover:bg-accent cursor-pointer shadow-md shadow-primary/10">
-                                <Plus className="w-3.5 h-3.5" /> Expense
-                            </button>
-                            <button onClick={() => setShowAddBill(true)} className="flex items-center gap-1 px-3 py-1.5 border border-accent text-accent text-xs font-bold rounded-lg transition-all hover:bg-accent/10 cursor-pointer">
-                                <Plus className="w-3.5 h-3.5" /> Bill
-                            </button>
-                        </div>
-
-                        {/* Notification Bell Dropdown Button */}
-                        <div className="relative" ref={notifDropdownRef}>
-                            <button
-                                onClick={() => {
-                                    setShowNotifDropdown((prev) => !prev);
-                                    if (!showNotifDropdown) {
-                                        markAllAsRead();
-                                    }
-                                }}
-                                className="p-2 rounded-full border border-border/80 hover:border-primary/50 bg-[#1a0e07] text-muted-foreground hover:text-primary transition-all relative cursor-pointer"
-                                title="Notifications"
-                            >
-                                <Bell className="w-4 h-4" />
-                                {unreadData?.data?.count ? (
-                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[9px] font-bold font-mono rounded-full flex items-center justify-center animate-pulse">
-                                        {unreadData.data.count}
-                                    </span>
-                                ) : null}
-                            </button>
-
-                            {/* Notification Dropdown Panel */}
-                            <AnimatePresence>
-                                {showNotifDropdown && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-[#251508] border border-border shadow-2xl p-4 z-50 flex flex-col gap-3 font-sans"
-                                    >
-                                        {/* Dropdown Header */}
-                                        <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
-                                            <div className="flex items-center gap-2">
-                                                <Bell className="w-4 h-4 text-primary" />
-                                                <h4 className="text-xs font-bold text-foreground">Notifications</h4>
-                                                {unreadData?.data?.count ? (
-                                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-primary/20 text-primary border border-primary/30">
-                                                        {unreadData.data.count} New
-                                                    </span>
-                                                ) : null}
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => markAllAsRead()}
-                                                    className="text-[10px] font-mono text-primary hover:underline cursor-pointer"
-                                                >
-                                                    Mark Read
-                                                </button>
-                                                <span className="text-muted-foreground/40 text-[10px]">•</span>
-                                                <button
-                                                    onClick={() => deleteAllNotifications()}
-                                                    className="text-[10px] font-mono text-destructive hover:underline cursor-pointer"
-                                                >
-                                                    Clear All
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Notifications List */}
-                                        <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
-                                            {notifLoading ? (
-                                                <div className="p-6 text-center text-xs font-mono text-muted-foreground">
-                                                    Loading notifications…
-                                                </div>
-                                            ) : notifData?.data && notifData.data.length > 0 ? (
-                                                notifData.data.map((n: any) => (
-                                                    <div
-                                                        key={n._id}
-                                                        className={`p-3 rounded-xl border transition-all text-left flex items-start justify-between gap-2 ${
-                                                            !n.isRead
-                                                                ? "bg-primary/10 border-primary/30"
-                                                                : "bg-[#1a0e07] border-border/60 hover:bg-white/5"
-                                                        }`}
-                                                    >
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="flex items-center justify-between gap-2 mb-0.5 font-mono text-[10px]">
-                                                                <span className="font-bold text-primary truncate">{n.title}</span>
-                                                                <span className="text-muted-foreground shrink-0 text-[9px]">
-                                                                    {new Date(n.createdAt).toLocaleDateString()}
-                                                                </span>
-                                                            </div>
-                                                            <p className="text-xs text-foreground font-sans line-clamp-2 leading-relaxed">
-                                                                {n.message}
-                                                            </p>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => deleteNotification(n._id)}
-                                                            className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors shrink-0"
-                                                            title="Delete notification"
-                                                        >
-                                                            <X className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <p className="p-6 text-center text-xs font-mono text-muted-foreground">
-                                                    No notifications recorded yet.
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        {/* Dropdown Footer: See All Notifications Page trigger */}
-                                        <div className="border-t border-border/60 pt-2 flex items-center justify-center">
-                                            <button
-                                                onClick={() => {
-                                                    setShowNotifDropdown(false);
-                                                    setTab("notifications");
-                                                }}
-                                                className="text-xs font-bold text-primary hover:underline font-mono cursor-pointer py-1"
-                                            >
-                                                See All Notifications →
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-
-                        {/* Dynamic User Profile Avatar & Dropdown Menu */}
-                        <div className="h-8 w-px bg-border mx-1 hidden sm:block" />
-
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setShowUserDropdown((prev) => !prev)}
-                                className="flex items-center gap-2 p-1 rounded-full border border-border/80 hover:border-primary/50 bg-[#1a0e07] transition-all cursor-pointer shadow-md"
-                            >
-                                <div className="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0">
-                                    {currentUser?.profileImage ? (
-                                        <img src={currentUser.profileImage} alt={currentUser.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        initials(currentUser?.name || "User")
-                                    )}
-                                </div>
-                                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 mr-1 ${showUserDropdown ? "rotate-180 text-primary" : ""}`} />
-                            </button>
-
-                            {/* Dropdown Menu Box */}
-                            <AnimatePresence>
-                                {showUserDropdown && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="absolute right-0 mt-3 w-64 rounded-2xl bg-[#251508] border border-border shadow-2xl p-3 z-50 flex flex-col gap-2 font-sans"
-                                    >
-                                        {/* User Header */}
-                                        <div className="p-2.5 rounded-xl bg-[#1a0e07] border border-border/60 flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-xs text-primary-foreground shrink-0 shadow-sm">
-                                                {currentUser?.profileImage ? (
-                                                    <img src={currentUser.profileImage} alt={currentUser.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    initials(currentUser?.name || "User")
-                                                )}
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex items-center justify-between gap-1">
-                                                    <h4 className="text-xs font-bold text-foreground truncate">{currentUser?.name || "User"}</h4>
-                                                    {currentUser?.role && (
-                                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-primary/20 text-primary border border-primary/30 shrink-0">
-                                                            {currentUser.role}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="text-[10px] text-muted-foreground font-mono truncate">{currentUser?.email || "user@email.com"}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Admin Dashboard Navigation Button */}
-                                        {currentUser?.role === "ADMIN" && (
-                                            <button
-                                                onClick={() => {
-                                                    setShowUserDropdown(false);
-                                                    router.push("/dashboard");
-                                                }}
-                                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary font-bold text-xs hover:bg-primary/25 transition-all cursor-pointer"
-                                            >
-                                                <ShieldCheck className="w-4 h-4 text-primary" />
-                                                <span>Go to Admin Dashboard</span>
-                                            </button>
-                                        )}
-
-                                        {/* Profile Details Button */}
-                                        <button
-                                            onClick={() => {
-                                                setTab("profile");
-                                                setShowUserDropdown(false);
-                                            }}
-                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
-                                        >
-                                            <User className="w-4 h-4 text-muted-foreground" />
-                                            <span>Profile & Settings</span>
-                                        </button>
-
-                                        {/* Change Password Button */}
-                                        <button
-                                            onClick={() => {
-                                                setTab("profile");
-                                                setShowUserDropdown(false);
-                                            }}
-                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
-                                        >
-                                            <Lock className="w-4 h-4 text-muted-foreground" />
-                                            <span>Change Password</span>
-                                        </button>
-
-                                        <div className="h-px bg-border/60 my-0.5" />
-
-                                        {/* Log Out Button */}
-                                        <button
-                                            onClick={() => {
-                                                setShowUserDropdown(false);
-                                                onLogout();
-                                            }}
-                                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-destructive/15 text-muted-foreground hover:text-destructive text-xs font-semibold transition-all cursor-pointer"
-                                        >
-                                            <LogOut className="w-4 h-4 text-destructive" />
-                                            <span>Log Out</span>
-                                        </button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <WebHeader
+                scrolled={scrolled}
+                stats={stats}
+                tab={tab}
+                setTab={setTab}
+                setShowAddExpense={setShowAddExpense}
+                setShowAddBill={setShowAddBill}
+                showNotifDropdown={showNotifDropdown}
+                setShowNotifDropdown={setShowNotifDropdown}
+                notifDropdownRef={notifDropdownRef}
+                unreadCount={unreadData?.data?.count}
+                markAllAsRead={markAllAsRead}
+                deleteAllNotifications={deleteAllNotifications}
+                deleteNotification={deleteNotification}
+                notifLoading={notifLoading}
+                notifData={notifData}
+                showUserDropdown={showUserDropdown}
+                setShowUserDropdown={setShowUserDropdown}
+                dropdownRef={dropdownRef}
+                currentUser={currentUser}
+                onLogout={onLogout}
+            />
 
             {/* ─── Main Website Content Area ───────────────────────────────────────── */}
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col min-h-0 relative">
@@ -805,13 +565,27 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                             {bazarEntriesLoading || (bazarEntriesFetching && (!bazarEntriesResponse?.data || bazarEntriesResponse.data.length === 0)) ? (
                                                 [1, 2, 3, 4, 5].map((i) => (
                                                     <tr key={i} className="animate-pulse">
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-32" /></td>
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-24" /></td>
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-20" /></td>
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" /></td>
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-12 ml-auto" /></td>
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" /></td>
-                                                        <td className="p-4"><div className="h-4 bg-[#2e1a0a] rounded-md w-6 mx-auto" /></td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-32" />
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-24" />
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-20" />
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-12 ml-auto" />
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
+                                                        </td>
+                                                        <td className="p-4">
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-6 mx-auto" />
+                                                        </td>
                                                     </tr>
                                                 ))
                                             ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
@@ -966,9 +740,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 })}
                                         </div>
                                     ) : (
-                                        <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">
-                                            No monthly bills found.
-                                        </div>
+                                        <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">No monthly bills found.</div>
                                     )}
                                 </div>
 
@@ -990,499 +762,56 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                         {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
                         {tab === "notifications" && (
-                            <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl font-sans">
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
-                                            <Bell className="w-5 h-5" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-foreground">Notifications & Activity Feed</h3>
-                                            <p className="text-xs text-muted-foreground font-mono">
-                                                All room updates, bazar entries, and account notifications
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => markAllAsRead()}
-                                            className="px-4 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary text-xs font-bold font-mono hover:bg-primary/25 transition-all cursor-pointer"
-                                        >
-                                            Mark All as Read
-                                        </button>
-                                        <button
-                                            onClick={() => deleteAllNotifications()}
-                                            className="px-4 py-2 rounded-xl bg-destructive/15 border border-destructive/30 text-destructive text-xs font-bold font-mono hover:bg-destructive/25 transition-all cursor-pointer"
-                                        >
-                                            Clear All Logs
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-                                    {notifLoading ? (
-                                        <div className="p-12 text-center text-xs font-mono text-muted-foreground">
-                                            Fetching notifications log history…
-                                        </div>
-                                    ) : notifData?.data && notifData.data.length > 0 ? (
-                                        notifData.data.map((n: any) => (
-                                            <div
-                                                key={n._id}
-                                                className={`p-4 rounded-2xl border transition-all text-left flex items-start justify-between gap-4 ${
-                                                    !n.isRead
-                                                        ? "bg-primary/10 border-primary/40 shadow-md"
-                                                        : "bg-[#1a0e07] border-border/60 hover:bg-white/5"
-                                                }`}
-                                            >
-                                                <div className="min-w-0 flex-1 space-y-1">
-                                                    <div className="flex items-center justify-between font-mono text-xs">
-                                                        <span className="font-bold text-primary">{n.title}</span>
-                                                        <span className="text-[10px] text-muted-foreground">
-                                                            {new Date(n.createdAt).toLocaleString()}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-xs text-foreground font-sans leading-relaxed">{n.message}</p>
-                                                </div>
-                                                <button
-                                                    onClick={() => deleteNotification(n._id)}
-                                                    className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors shrink-0 cursor-pointer"
-                                                    title="Delete notification"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">
-                                            No notifications found in your account logs.
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <WebNotificationsTab
+                                markAllAsRead={markAllAsRead}
+                                deleteAllNotifications={deleteAllNotifications}
+                                notifLoading={notifLoading}
+                                notifData={notifData}
+                                deleteNotification={deleteNotification}
+                            />
                         )}
 
                         {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
                         {tab === "profile" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start font-sans">
-                                {/* Profile Overview / Edit Panel */}
-                                {!isEditingProfile ? (
-                                    <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
-                                        <div className="flex items-center justify-between border-b border-border pb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-                                                    <User className="w-5 h-5 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-bold text-foreground">User Profile Overview</h3>
-                                                    <p className="text-xs text-muted-foreground">Your account & contact details</p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => setIsEditingProfile(true)}
-                                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-accent transition-all cursor-pointer shadow-md"
-                                            >
-                                                <Edit3 className="w-3.5 h-3.5" />
-                                                <span>Edit Profile</span>
-                                            </button>
-                                        </div>
-
-                                        {/* Avatar & Name Header */}
-                                        <div className="flex flex-col items-center justify-center py-2 text-center border-b border-border/60 pb-6">
-                                            <div className="w-24 h-24 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-2xl text-primary-foreground border-2 border-primary/40 shadow-xl mb-3">
-                                                {profileImage ? (
-                                                    <img src={profileImage} alt={name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    initials(name || "User")
-                                                )}
-                                            </div>
-                                            <h3 className="text-lg font-bold text-foreground">{name || "User Name"}</h3>
-                                            <p className="text-xs text-muted-foreground font-mono mt-0.5">{email}</p>
-                                            {currentUser?.role && (
-                                                <span className="mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono bg-primary/15 text-primary border border-primary/30">
-                                                    {currentUser.role} ROLE
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Details Grid */}
-                                        <div className="space-y-3.5 text-xs">
-                                            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1a0e07] border border-border/60">
-                                                <span className="text-muted-foreground font-semibold flex items-center gap-2">
-                                                    <Phone className="w-3.5 h-3.5 text-primary" /> Phone Number:
-                                                </span>
-                                                <span className="font-mono font-bold text-foreground">{phone || "Not specified"}</span>
-                                            </div>
-
-                                            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1a0e07] border border-border/60">
-                                                <span className="text-muted-foreground font-semibold flex items-center gap-2">
-                                                    <Globe className="w-3.5 h-3.5 text-primary" /> Language:
-                                                </span>
-                                                <span className="font-bold text-foreground">{language || "English"}</span>
-                                            </div>
-
-                                            {aboutme && (
-                                                <div className="p-3.5 rounded-2xl bg-[#1a0e07] border border-border/60 space-y-1">
-                                                    <span className="text-muted-foreground font-semibold block">About Me / Bio:</span>
-                                                    <p className="text-foreground italic">{aboutme}</p>
-                                                </div>
-                                            )}
-
-                                            <div className="p-4 rounded-2xl bg-[#1a0e07] border border-border/60 space-y-2">
-                                                <span className="text-muted-foreground font-bold font-mono flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
-                                                    <MapPin className="w-3.5 h-3.5 text-primary" /> Address Details
-                                                </span>
-                                                <p className="text-foreground font-mono text-xs">
-                                                    {[street, city, state, zipCode, country].filter(Boolean).join(", ") || "No address specified"}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Quick Actions & Support Section inside Profile */}
-                                        <div className="pt-4 border-t border-border flex flex-col gap-3">
-                                            <h4 className="text-xs font-bold text-muted-foreground font-mono uppercase tracking-wider">Help & Support Actions</h4>
-                                            <div className="grid grid-cols-3 gap-3">
-                                                <button
-                                                    onClick={() => setShowFeedback(true)}
-                                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1a0e07] border border-border/60 hover:border-primary/50 text-muted-foreground hover:text-primary transition-all cursor-pointer gap-1.5"
-                                                >
-                                                    <MessageSquare className="w-5 h-5 text-primary" />
-                                                    <span className="text-[11px] font-bold">Feedback</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => setShowContact(true)}
-                                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1a0e07] border border-border/60 hover:border-primary/50 text-muted-foreground hover:text-primary transition-all cursor-pointer gap-1.5"
-                                                >
-                                                    <Mail className="w-5 h-5 text-primary" />
-                                                    <span className="text-[11px] font-bold">Contact</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => setShowReview(true)}
-                                                    className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#1a0e07] border border-border/60 hover:border-amber-400/50 text-muted-foreground hover:text-amber-400 transition-all cursor-pointer gap-1.5"
-                                                >
-                                                    <Star className="w-5 h-5 text-amber-400" />
-                                                    <span className="text-[11px] font-bold">Review</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    /* Editable Profile Form Panel */
-                                    <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
-                                        <div className="flex items-center justify-between border-b border-border pb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-                                                    <User className="w-5 h-5 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-bold text-foreground">Edit Profile Details</h3>
-                                                    <p className="text-xs text-muted-foreground">Update your contact information</p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => setIsEditingProfile(false)}
-                                                className="px-3 py-1.5 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-white/5 cursor-pointer"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-
-                                        {/* Profile Avatar Photo (Full Round & Centered) */}
-                                        <div className="flex flex-col items-center justify-center text-center py-2">
-                                            <ImageUpload
-                                                label="Profile Avatar Photo"
-                                                variant="circle"
-                                                value={profileImage}
-                                                onChange={(url) => setProfileImage(url)}
-                                                onRemove={() => setProfileImage("")}
-                                            />
-                                        </div>
-
-                                        <form
-                                            onSubmit={async (e) => {
-                                                e.preventDefault();
-                                                if (!name.trim()) {
-                                                    toast.error("Name cannot be empty");
-                                                    return;
-                                                }
-                                                try {
-                                                    await updateProfile({
-                                                        profileImage: profileImage || undefined,
-                                                        name: name.trim(),
-                                                        phone: phone.trim() || undefined,
-                                                        language: language.trim() || undefined,
-                                                        aboutme: aboutme.trim() || undefined,
-                                                        address: {
-                                                            street: street.trim() || undefined,
-                                                            city: city.trim() || undefined,
-                                                            state: state.trim() || undefined,
-                                                            zipCode: zipCode.trim() || undefined,
-                                                            country: country.trim() || undefined,
-                                                        },
-                                                    }).unwrap();
-                                                    toast.success("Complete profile details updated successfully!");
-                                                    setIsEditingProfile(false);
-                                                } catch (err: any) {
-                                                    toast.error(err?.data?.message || err?.message || "Failed to update profile");
-                                                }
-                                            }}
-                                            className="flex flex-col gap-4"
-                                        >
-                                            <FieldBox label="Full Name" focused={false}>
-                                                <div className="flex items-center">
-                                                    <span className="pl-4 text-muted-foreground">
-                                                        <User className="w-4 h-4" />
-                                                    </span>
-                                                    <input
-                                                        type="text"
-                                                        value={name}
-                                                        onChange={(e) => setName(e.target.value)}
-                                                        required
-                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                    />
-                                                </div>
-                                            </FieldBox>
-
-                                            <div>
-                                                <div className="flex items-center justify-between mb-1.5 px-1">
-                                                    <span className="text-xs font-semibold text-muted-foreground">Email Address</span>
-                                                    <span className="text-[10px] text-muted-foreground/80 font-mono flex items-center gap-1">
-                                                        <Lock className="w-3 h-3 text-muted-foreground" /> Cannot be updated
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center bg-[#170c06] border border-border/40 rounded-2xl opacity-60 cursor-not-allowed">
-                                                    <span className="pl-4 text-muted-foreground/50">
-                                                        <Mail className="w-4 h-4" />
-                                                    </span>
-                                                    <input
-                                                        type="email"
-                                                        value={email}
-                                                        disabled
-                                                        readOnly
-                                                        title="Email address cannot be changed."
-                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm text-muted-foreground font-mono cursor-not-allowed select-none outline-none"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <FieldBox label="Phone Number" focused={false}>
-                                                <div className="flex items-center">
-                                                    <span className="pl-4 text-muted-foreground">
-                                                        <Phone className="w-4 h-4" />
-                                                    </span>
-                                                    <input
-                                                        type="text"
-                                                        value={phone}
-                                                        onChange={(e) => setPhone(e.target.value)}
-                                                        placeholder="+880 1700-000000"
-                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none font-mono text-foreground"
-                                                    />
-                                                </div>
-                                            </FieldBox>
-
-                                            <FieldBox label="Preferred Language" focused={false}>
-                                                <div className="flex items-center">
-                                                    <span className="pl-4 text-muted-foreground">
-                                                        <Globe className="w-4 h-4" />
-                                                    </span>
-                                                    <input
-                                                        type="text"
-                                                        value={language}
-                                                        onChange={(e) => setLanguage(e.target.value)}
-                                                        placeholder="e.g. English, Bengali"
-                                                        className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                    />
-                                                </div>
-                                            </FieldBox>
-
-                                            <div>
-                                                <label className="block text-xs font-semibold text-muted-foreground mb-1.5 px-1">About Me / Bio</label>
-                                                <textarea
-                                                    value={aboutme}
-                                                    onChange={(e) => setAboutme(e.target.value)}
-                                                    rows={2}
-                                                    placeholder="Write a brief intro about yourself…"
-                                                    className="w-full px-4 py-3 bg-[#170c06] border border-border/60 rounded-2xl text-sm outline-none text-foreground focus:border-primary/60 transition-colors"
-                                                />
-                                            </div>
-
-                                            {/* Address Section */}
-                                            <div className="border-t border-border/60 pt-4 flex flex-col gap-4">
-                                                <div className="flex items-center gap-2">
-                                                    <MapPin className="w-4 h-4 text-primary" />
-                                                    <span className="text-xs font-bold text-foreground uppercase tracking-wider font-mono">Address Details</span>
-                                                </div>
-
-                                                <FieldBox label="Street Address" focused={false}>
-                                                    <div className="flex items-center">
-                                                        <span className="pl-4 text-muted-foreground">
-                                                            <MapPin className="w-4 h-4" />
-                                                        </span>
-                                                        <input
-                                                            type="text"
-                                                            value={street}
-                                                            onChange={(e) => setStreet(e.target.value)}
-                                                            placeholder="House / Flat #, Road name"
-                                                            className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                        />
-                                                    </div>
-                                                </FieldBox>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <FieldBox label="City" focused={false}>
-                                                        <input
-                                                            type="text"
-                                                            value={city}
-                                                            onChange={(e) => setCity(e.target.value)}
-                                                            placeholder="Dhaka"
-                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                        />
-                                                    </FieldBox>
-                                                    <FieldBox label="State / Division" focused={false}>
-                                                        <input
-                                                            type="text"
-                                                            value={state}
-                                                            onChange={(e) => setState(e.target.value)}
-                                                            placeholder="Dhaka"
-                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                        />
-                                                    </FieldBox>
-                                                    <FieldBox label="Zip Code" focused={false}>
-                                                        <input
-                                                            type="text"
-                                                            value={zipCode}
-                                                            onChange={(e) => setZipCode(e.target.value)}
-                                                            placeholder="1212"
-                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none font-mono text-foreground"
-                                                        />
-                                                    </FieldBox>
-                                                    <FieldBox label="Country" focused={false}>
-                                                        <input
-                                                            type="text"
-                                                            value={country}
-                                                            onChange={(e) => setCountry(e.target.value)}
-                                                            placeholder="Bangladesh"
-                                                            className="w-full px-4 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                        />
-                                                    </FieldBox>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex gap-3 pt-4 border-t border-border/60">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setIsEditingProfile(false)}
-                                                    className="flex-1 py-3 border border-border text-foreground font-bold text-xs rounded-xl hover:bg-secondary transition-all cursor-pointer text-center"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    type="submit"
-                                                    disabled={profileLoading}
-                                                    className="flex-1 py-3 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-accent transition-all cursor-pointer shadow-md shadow-primary/10 disabled:opacity-50 text-center"
-                                                >
-                                                    {profileLoading ? "Saving…" : "Save Changes"}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                )}
-
-                                {/* Change Password Panel */}
-                                <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6">
-                                    <div className="flex items-center gap-3 border-b border-border pb-4">
-                                        <div className="w-10 h-10 rounded-xl bg-accent/20 border border-accent/30 flex items-center justify-center">
-                                            <Lock className="w-5 h-5 text-accent" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-foreground">Update Account Password</h3>
-                                            <p className="text-xs text-muted-foreground">Change your password regularly for security</p>
-                                        </div>
-                                    </div>
-
-                                    <form
-                                        onSubmit={async (e) => {
-                                            e.preventDefault();
-                                            if (!currentPassword || !newPassword) {
-                                                toast.error("Please fill in all password fields");
-                                                return;
-                                            }
-                                            if (newPassword !== repeatPassword) {
-                                                toast.error("Passwords do not match");
-                                                return;
-                                            }
-                                            try {
-                                                await changePassword({ currentPassword, newPassword }).unwrap();
-                                                toast.success("Password changed successfully!");
-                                                setCurrentPassword("");
-                                                setNewPassword("");
-                                                setRepeatPassword("");
-                                            } catch (err: any) {
-                                                toast.error(err?.data?.message || err?.message || "Failed to change password");
-                                            }
-                                        }}
-                                        className="flex flex-col gap-4"
-                                    >
-                                        <FieldBox label="Current Password" focused={false}>
-                                            <div className="flex items-center">
-                                                <span className="pl-4 text-muted-foreground">
-                                                    <Lock className="w-4 h-4" />
-                                                </span>
-                                                <input
-                                                    type="password"
-                                                    value={currentPassword}
-                                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                                    required
-                                                    placeholder="••••••••"
-                                                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                />
-                                            </div>
-                                        </FieldBox>
-
-                                        <FieldBox label="New Password" focused={false}>
-                                            <div className="flex items-center">
-                                                <span className="pl-4 text-muted-foreground">
-                                                    <Lock className="w-4 h-4" />
-                                                </span>
-                                                <input
-                                                    type="password"
-                                                    value={newPassword}
-                                                    onChange={(e) => setNewPassword(e.target.value)}
-                                                    required
-                                                    placeholder="Min. 8 characters"
-                                                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                />
-                                            </div>
-                                        </FieldBox>
-
-                                        <FieldBox label="Re-enter New Password" focused={false}>
-                                            <div className="flex items-center">
-                                                <span className="pl-4 text-muted-foreground">
-                                                    <Lock className="w-4 h-4" />
-                                                </span>
-                                                <input
-                                                    type="password"
-                                                    value={repeatPassword}
-                                                    onChange={(e) => setRepeatPassword(e.target.value)}
-                                                    required
-                                                    placeholder="Re-enter new password"
-                                                    className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none text-foreground"
-                                                />
-                                            </div>
-                                        </FieldBox>
-
-                                        <div className="pt-4 border-t border-border/60 flex justify-end">
-                                            <button
-                                                type="submit"
-                                                disabled={passLoading}
-                                                className="w-full py-3 bg-primary text-primary-foreground font-bold text-xs rounded-xl hover:bg-accent transition-all cursor-pointer shadow-md shadow-primary/10 disabled:opacity-50 text-center"
-                                            >
-                                                {passLoading ? "Resetting Password…" : "Reset Password"}
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+                            <WebProfileTab
+                                currentUser={currentUser}
+                                isEditingProfile={isEditingProfile}
+                                setIsEditingProfile={setIsEditingProfile}
+                                profileImage={profileImage}
+                                setProfileImage={setProfileImage}
+                                name={name}
+                                setName={setName}
+                                email={email}
+                                phone={phone}
+                                setPhone={setPhone}
+                                language={language}
+                                setLanguage={setLanguage}
+                                aboutme={aboutme}
+                                setAboutme={setAboutme}
+                                street={street}
+                                setStreet={setStreet}
+                                city={city}
+                                setCity={setCity}
+                                state={state}
+                                setState={setState}
+                                zipCode={zipCode}
+                                setZipCode={setZipCode}
+                                country={country}
+                                setCountry={setCountry}
+                                updateProfile={updateProfile}
+                                profileLoading={profileLoading}
+                                currentPassword={currentPassword}
+                                setCurrentPassword={setCurrentPassword}
+                                newPassword={newPassword}
+                                setNewPassword={setNewPassword}
+                                repeatPassword={repeatPassword}
+                                setRepeatPassword={setRepeatPassword}
+                                changePassword={changePassword}
+                                passLoading={passLoading}
+                                setShowFeedback={setShowFeedback}
+                                setShowContact={setShowContact}
+                                setShowReview={setShowReview}
+                            />
                         )}
                     </motion.div>
                 </AnimatePresence>
@@ -1537,25 +866,11 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                 >
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Subject</label>
-                        <input
-                            type="text"
-                            value={contactSubject}
-                            onChange={(e) => setContactSubject(e.target.value)}
-                            required
-                            placeholder="What can we help you with?"
-                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none"
-                        />
+                        <input type="text" value={contactSubject} onChange={(e) => setContactSubject(e.target.value)} required placeholder="What can we help you with?" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Message</label>
-                        <textarea
-                            value={contactMsg}
-                            onChange={(e) => setContactMsg(e.target.value)}
-                            required
-                            rows={4}
-                            placeholder="Type your message details here…"
-                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none"
-                        />
+                        <textarea value={contactMsg} onChange={(e) => setContactMsg(e.target.value)} required rows={4} placeholder="Type your message details here…" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none" />
                     </div>
                     <div className="flex gap-3 mt-2">
                         <button type="button" onClick={() => setShowContact(false)} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
@@ -1592,12 +907,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                 >
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Category</label>
-                        <select
-                            value={feedbackCategory}
-                            onChange={(e) => setFeedbackCategory(e.target.value as any)}
-                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans"
-                            style={{ colorScheme: "dark" }}
-                        >
+                        <select value={feedbackCategory} onChange={(e) => setFeedbackCategory(e.target.value as any)} className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans" style={{ colorScheme: "dark" }}>
                             <option value="GENERAL">General Feedback</option>
                             <option value="BUG">Report a Bug</option>
                             <option value="FEATURE_REQUEST">Feature Request</option>
@@ -1606,25 +916,11 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Subject</label>
-                        <input
-                            type="text"
-                            value={feedbackSubject}
-                            onChange={(e) => setFeedbackSubject(e.target.value)}
-                            required
-                            placeholder="Feedback title..."
-                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none"
-                        />
+                        <input type="text" value={feedbackSubject} onChange={(e) => setFeedbackSubject(e.target.value)} required placeholder="Feedback title..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Feedback Details</label>
-                        <textarea
-                            value={feedbackMsg}
-                            onChange={(e) => setFeedbackMsg(e.target.value)}
-                            required
-                            rows={4}
-                            placeholder="Tell us what you think..."
-                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none"
-                        />
+                        <textarea value={feedbackMsg} onChange={(e) => setFeedbackMsg(e.target.value)} required rows={4} placeholder="Tell us what you think..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none" />
                     </div>
                     <div className="flex gap-3 mt-2">
                         <button type="button" onClick={() => setShowFeedback(false)} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
@@ -1639,8 +935,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
             {/* Website Dialog: Leave a Review */}
             <Modal show={showReview} onClose={() => setShowReview(false)} title="Leave a User Review">
-                <form
-                    onSubmit={async (e) => {
+                <WebReviewModalContent
+                    myReviewLoading={myReviewLoading}
+                    userReviewState={userReviewState}
+                    reviewRating={reviewRating}
+                    setReviewRating={setReviewRating}
+                    reviewComment={reviewComment}
+                    setReviewComment={setReviewComment}
+                    onSubmitReview={async (e) => {
                         e.preventDefault();
                         if (!reviewComment) return;
                         try {
@@ -1650,48 +952,15 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             }).unwrap();
                             toast.success("Review posted successfully!");
                             setReviewComment("");
+                            refetchMyReview();
                             setShowReview(false);
                         } catch (err: any) {
                             toast.error(err?.data?.message || "Failed to post review");
                         }
                     }}
-                    className="flex flex-col gap-4 text-left"
-                >
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Rating (1 to 5 Stars)</label>
-                        <div className="flex items-center gap-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    type="button"
-                                    onClick={() => setReviewRating(star)}
-                                    className="p-2 text-2xl transition-transform hover:scale-110 cursor-pointer"
-                                >
-                                    <Star className={`w-7 h-7 ${star <= reviewRating ? "text-amber-400 fill-amber-400" : "text-muted-foreground"}`} />
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Your Review</label>
-                        <textarea
-                            value={reviewComment}
-                            onChange={(e) => setReviewComment(e.target.value)}
-                            required
-                            rows={4}
-                            placeholder="Share your experience using My Bazar Hisab..."
-                            className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none"
-                        />
-                    </div>
-                    <div className="flex gap-3 mt-2">
-                        <button type="button" onClick={() => setShowReview(false)} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
-                            Cancel
-                        </button>
-                        <button type="submit" disabled={reviewLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent cursor-pointer disabled:opacity-50">
-                            {reviewLoading ? "Posting…" : "Post Review"}
-                        </button>
-                    </div>
-                </form>
+                    onClose={() => setShowReview(false)}
+                    reviewLoading={reviewLoading}
+                />
             </Modal>
 
             {/* Website Dialog: Notifications Full Modal */}
@@ -1702,10 +971,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             Total: <span className="font-bold text-primary">{notifData?.data?.length || 0}</span> notifications
                         </span>
                         {notifData?.data && notifData.data.length > 0 && (
-                            <button
-                                onClick={() => deleteAllNotifications()}
-                                className="px-3 py-1 rounded-xl bg-destructive/15 text-destructive border border-destructive/30 text-xs font-mono font-bold hover:bg-destructive/25 transition-all cursor-pointer"
-                            >
+                            <button onClick={() => deleteAllNotifications()} className="px-3 py-1 rounded-xl bg-destructive/15 text-destructive border border-destructive/30 text-xs font-mono font-bold hover:bg-destructive/25 transition-all cursor-pointer">
                                 Clear All Notifications
                             </button>
                         )}
@@ -1714,36 +980,21 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                     <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
                         {notifData?.data && notifData.data.length > 0 ? (
                             notifData.data.map((n: any) => (
-                                <div
-                                    key={n._id}
-                                    className={`p-4 rounded-2xl border transition-all text-left flex items-start justify-between gap-3 ${
-                                        !n.isRead
-                                            ? "bg-primary/10 border-primary/40 shadow-sm"
-                                            : "bg-[#1a0e07] border-border/60 hover:bg-white/5"
-                                    }`}
-                                >
+                                <div key={n._id} className={`p-4 rounded-2xl border transition-all text-left flex items-start justify-between gap-3 ${!n.isRead ? "bg-primary/10 border-primary/40 shadow-sm" : "bg-[#1a0e07] border-border/60 hover:bg-white/5"}`}>
                                     <div className="min-w-0 flex-1 space-y-1">
                                         <div className="flex items-center justify-between font-mono text-xs">
                                             <span className="font-bold text-primary">{n.title}</span>
-                                            <span className="text-[10px] text-muted-foreground">
-                                                {new Date(n.createdAt).toLocaleString()}
-                                            </span>
+                                            <span className="text-[10px] text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</span>
                                         </div>
                                         <p className="text-xs text-foreground font-sans leading-relaxed">{n.message}</p>
                                     </div>
-                                    <button
-                                        onClick={() => deleteNotification(n._id)}
-                                        className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors shrink-0 cursor-pointer"
-                                        title="Delete notification"
-                                    >
+                                    <button onClick={() => deleteNotification(n._id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors shrink-0 cursor-pointer" title="Delete notification">
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
                             ))
                         ) : (
-                            <p className="p-12 text-center text-xs font-mono text-muted-foreground">
-                                No notification messages recorded.
-                            </p>
+                            <p className="p-12 text-center text-xs font-mono text-muted-foreground">No notification messages recorded.</p>
                         )}
                     </div>
                 </div>
@@ -1778,194 +1029,4 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             />
         </div>
     );
-}
-
-// Stats Card Layout
-function MetricCard({ title, value, subtitle, color }: { title: string; value: number; subtitle: string; color: string }) {
-    return (
-        <div className="bg-[#251508] border border-border rounded-2xl p-6 flex flex-col gap-1.5 relative overflow-hidden shadow-md">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest font-mono">{title}</p>
-            <p className={`text-3xl font-black ${color} font-mono`}>{fmt(value)}</p>
-            <p className="text-xs text-muted-foreground font-sans">{subtitle}</p>
-        </div>
-    );
-}
-
-// Modal component
-function Modal({ show, onClose, title, children }: { show: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
-    return (
-        <AnimatePresence>
-            {show && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
-                    <motion.div initial={{ opacity: 0, scale: 0.95, y: 15 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 15 }} className="w-full max-w-lg bg-[#251508] border border-border rounded-3xl p-8 relative z-10 shadow-2xl">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                                {title}
-                            </h3>
-                            <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#2e1a0a] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
-                        {children}
-                    </motion.div>
-                </div>
-            )}
-        </AnimatePresence>
-    );
-}
-
-// FieldBox wrapper (mimics original field box style)
-function FieldBox({ label, focused, error, children }: { label: string; focused: boolean; error?: string; children: React.ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1.5 text-left">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">{label}</label>
-            <div className="rounded-xl border transition-all duration-200" style={{ borderColor: error ? "rgba(212,24,61,0.6)" : focused ? "rgba(232,160,32,0.7)" : "rgba(232,160,32,0.18)", background: "#2e1a0a" }}>
-                {children}
-            </div>
-            {error && <p className="text-xs text-destructive mt-0.5">{error}</p>}
-        </div>
-    );
-}
-
-// Add forms components (using direct design matching web view)
-function AddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: (prod: string, price: number, qty: number, unit: BazarUnit, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
-    const [product, setProduct] = useState("");
-    const [price, setPrice] = useState("");
-    const [quantity, setQuantity] = useState("");
-    const [unit, setUnit] = useState<BazarUnit>("KG");
-    const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-    const [notes, setNotes] = useState("");
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!product || !price || !quantity) return;
-        onSubmit(product, Number(price), Number(quantity), unit, date, notes);
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Product Name</label>
-                <ProductSelectInput
-                    valueName={product}
-                    onSelect={(p) => setProduct(p.name)}
-                />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Price (৳)</label>
-                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Quantity</label>
-                    <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="e.g. 2, 1.5" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
-                </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Unit</label>
-                <div className="flex gap-2">
-                    {(["KG", "PIECE", "GM"] as BazarUnit[]).map((u) => (
-                        <button
-                            key={u}
-                            type="button"
-                            onClick={() => setUnit(u)}
-                            className="flex-1 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer font-mono"
-                            style={{ borderColor: unit === u ? "rgba(232,160,32,0.8)" : "rgba(232,160,32,0.18)", background: unit === u ? "rgba(232,160,32,0.15)" : "#2e1a0a", color: unit === u ? "#e8a020" : "#a08060" }}
-                        >
-                            {u}
-                        </button>
-                    ))}
-                </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Purchase Date</label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground font-mono" style={{ colorScheme: "dark" }} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Notes (optional)</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Add purchase details..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none text-foreground" />
-            </div>
-            <div className="flex gap-3 mt-4">
-                <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl transition-all hover:bg-secondary cursor-pointer">
-                    Cancel
-                </button>
-                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer disabled:opacity-50">
-                    {isLoading ? "Saving Entry…" : "Save Entry"}
-                </button>
-            </div>
-        </form>
-    );
-}
-
-function AddBillForm({ onSubmit, onClose, isLoading }: { onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
-    const [category, setCategory] = useState<BillCategory>("RENT");
-    const [title, setTitle] = useState("");
-    const [amount, setAmount] = useState("");
-    const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-    const [notes, setNotes] = useState("");
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!title || !amount) return;
-        onSubmit(category, title, Number(amount), date, notes);
-    };
-
-    const BILL_CATEGORIES_LIST = Object.entries(BILL_META).map(([k, v]) => ({ key: k as BillCategory, label: v.label }));
-
-    return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value as BillCategory)} className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans text-foreground" style={{ colorScheme: "dark" }}>
-                        {BILL_CATEGORIES_LIST.map((c) => (
-                            <option key={c.key} value={c.key}>
-                                {c.label}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Amount (৳)</label>
-                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
-                </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Bill Title</label>
-                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. July House Rent, Wi-Fi Bill" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground" />
-            </div>
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Billing Date</label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground font-mono" style={{ colorScheme: "dark" }} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Notes (optional)</label>
-                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Add billing details..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none text-foreground" />
-            </div>
-            <div className="flex gap-3 mt-4">
-                <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl transition-all hover:bg-secondary cursor-pointer">
-                    Cancel
-                </button>
-                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer disabled:opacity-50">
-                    {isLoading ? "Saving Bill…" : "Save Bill"}
-                </button>
-            </div>
-        </form>
-    );
-}
-
-const AVATAR_COLORS = ["#c06010", "#8b6914", "#3d7a5c", "#5a4a8a", "#7a3d3d"];
-
-function avatarColor(id: string) {
-    return AVATAR_COLORS[id.charCodeAt(1) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-    return name
-        .split(" ")
-        .map((w) => w[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase();
 }

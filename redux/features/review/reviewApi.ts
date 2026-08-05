@@ -45,6 +45,12 @@ export type ReviewQueryParams = {
     limit?: number;
 };
 
+export type TMyReviewResponse = {
+    hasReviewed: boolean;
+    canReview: boolean;
+    review: TReview | null;
+};
+
 // ── API ────────────────────────────────────────────────────────────────────────
 
 const reviewApi = baseApi.injectEndpoints({
@@ -58,6 +64,15 @@ const reviewApi = baseApi.injectEndpoints({
                 body,
             }),
             invalidatesTags: ["Review"],
+        }),
+
+        // GET /reviews/me (Authenticated user review)
+        getMyReview: builder.query<CommonResponse<TMyReviewResponse>, void>({
+            query: () => ({
+                url: "/reviews/me",
+                method: "GET",
+            }),
+            providesTags: ["Review"],
         }),
 
         // GET /reviews/summary (Public)
@@ -99,4 +114,11 @@ const reviewApi = baseApi.injectEndpoints({
     }),
 });
 
-export const { useCreateReviewMutation, useGetReviewSummaryStatsQuery, useGetAllReviewsQuery, useToggleReviewVisibilityMutation, useDeleteReviewMutation } = reviewApi;
+export const {
+    useCreateReviewMutation,
+    useGetMyReviewQuery,
+    useGetReviewSummaryStatsQuery,
+    useGetAllReviewsQuery,
+    useToggleReviewVisibilityMutation,
+    useDeleteReviewMutation,
+} = reviewApi;

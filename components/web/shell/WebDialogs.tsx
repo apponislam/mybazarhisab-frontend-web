@@ -8,7 +8,7 @@ import { BILL_META } from "@/lib/mockData";
 import { toast } from "sonner";
 import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
 import { TMyReviewResponse } from "@/redux/features/review/reviewApi";
-import { useLazyGetStatementQuery } from "@/redux/features/dashboard/dashboardApi";
+import { fetchAndDownloadStatement } from "@/lib/downloadStatement";
 
 // ── Generic Animated Modal ───────────────────────────────────────────────────
 export function WebDialogModal({ show, onClose, title, children }: { show: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
@@ -329,41 +329,22 @@ export function WebStatementModal({ show, onClose }: { show: boolean; onClose: (
     });
     const [endDate, setEndDate] = useState(() => new Date().toISOString().slice(0, 10));
     const [format, setFormat] = useState<"html" | "pdf">("html");
-
-    const [triggerGetStatement, { isLoading }] = useLazyGetStatementQuery();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
         try {
-            const rawData = await triggerGetStatement({
+            await fetchAndDownloadStatement({
                 startDate,
                 endDate,
                 format,
-            }).unwrap();
-
-            if (format === "pdf") {
-                const blob = new Blob([rawData], { type: "application/pdf" });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", `bazar_hisab_statement_${startDate}_to_${endDate}.pdf`);
-                document.body.appendChild(link);
-                link.click();
-                link.parentNode?.removeChild(link);
-                window.URL.revokeObjectURL(url);
-                toast.success("Statement PDF downloaded successfully!");
-            } else {
-                const newWindow = window.open("", "_blank");
-                if (newWindow) {
-                    newWindow.document.write(rawData);
-                    newWindow.document.close();
-                } else {
-                    toast.error("Pop-up blocked! Please allow pop-ups for this site.");
-                }
-            }
+            });
             onClose();
         } catch (err: any) {
-            toast.error(err?.data?.message || err?.message || "Failed to generate statement");
+            toast.error(err?.message || "Failed to generate statement");
+        } finally {
+            setIsLoading(false);
         }
     };
 

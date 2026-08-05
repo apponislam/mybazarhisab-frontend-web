@@ -91,16 +91,6 @@ const dashboardApi = baseApi.injectEndpoints({
             }),
             providesTags: ["Dashboard"],
         }),
-
-        // GET /dashboard/statement (returns text/string)
-        getStatement: builder.query<string, StatementParams | void>({
-            query: (params) => ({
-                url: "/dashboard/statement",
-                method: "GET",
-                params: params || undefined,
-                responseHandler: (response: Response) => response.text(),
-            }),
-        }),
     }),
 });
 
@@ -109,6 +99,4 @@ export const {
     useGetUserDashboardStatsQuery,
     useGetMonthlyExpenseTrendQuery,
     useGetProductPriceGrowthTrendQuery,
-    useGetStatementQuery,
-    useLazyGetStatementQuery,
 } = dashboardApi;

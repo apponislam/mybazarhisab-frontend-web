@@ -1,11 +1,190 @@
-"use client";
-
-import React from "react";
-import { User, Phone, Globe, MapPin, MessageSquare, Mail, Star, Lock } from "lucide-react";
+import React, { useState } from "react";
+import { User, Phone, Globe, MapPin, MessageSquare, Mail, Star, Lock, Users, Copy, Check, RefreshCw, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
 import { WebFieldBox as FieldBox } from "@/components/web/shell/WebDialogs";
 import { initials } from "@/components/web/shell/WebMetricCard";
+import {
+    useGetMyGroupQuery,
+    useUpdateGroupMutation,
+    useGenerateInviteCodeMutation,
+    useLeaveGroupMutation,
+} from "@/redux/features/group/groupApi";
+
+function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
+    const { data: groupResponse, isLoading } = useGetMyGroupQuery();
+    const [updateGroup, { isLoading: isUpdating }] = useUpdateGroupMutation();
+    const [generateCode, { isLoading: isGenerating }] = useGenerateInviteCodeMutation();
+    const [leaveGroup, { isLoading: isLeaving }] = useLeaveGroupMutation();
+
+    const group = groupResponse?.data;
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [groupName, setGroupName] = useState("");
+    const [copied, setCopied] = useState(false);
+
+    const isCreator = group?.creator && (typeof group.creator === "string" ? group.creator === currentUser?._id : group.creator._id === currentUser?._id);
+
+    const handleCopyCode = () => {
+        if (!group?.inviteCode) return;
+        navigator.clipboard.writeText(group.inviteCode);
+        setCopied(true);
+        toast.success("Invite code copied to clipboard!");
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleUpdateName = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!groupName.trim()) return;
+        try {
+            await updateGroup({ name: groupName.trim() }).unwrap();
+            toast.success("Group name updated!");
+            setIsEditingName(false);
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to update group name");
+        }
+    };
+
+    const handleRegenerateCode = async () => {
+        try {
+            await generateCode().unwrap();
+            toast.success("Invite code regenerated!");
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to regenerate invite code");
+        }
+    };
+
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+
+    const handleLeaveGroup = async () => {
+        try {
+            await leaveGroup().unwrap();
+            toast.success("Left group successfully!");
+            setShowLeaveConfirm(false);
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to leave group");
+        }
+    };
+
+    return (
+        <div className="pt-4 border-t border-border flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-primary" />
+                    <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">My Group & Invitation Code</h4>
+                </div>
+                {isCreator && !isEditingName && (
+                    <button
+                        onClick={() => {
+                            setGroupName(group?.name || "");
+                            setIsEditingName(true);
+                        }}
+                        className="text-[11px] font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                        Rename Group
+                    </button>
+                )}
+            </div>
+
+            <div className="p-5 rounded-2xl bg-[#1a0e07] border border-border/60 flex flex-col gap-4">
+                {isEditingName ? (
+                    <form onSubmit={handleUpdateName} className="flex gap-2">
+                        <input
+                            value={groupName}
+                            onChange={(e) => setGroupName(e.target.value)}
+                            placeholder="Group Name"
+                            className="flex-1 px-3 py-2 bg-[#2a170a] border border-primary/50 rounded-xl text-sm text-foreground outline-none font-bold"
+                            autoFocus
+                        />
+                        <button type="button" onClick={() => setIsEditingName(false)} className="px-3 py-2 rounded-xl border border-border text-xs text-muted-foreground">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={isUpdating} className="px-4 py-2 rounded-xl bg-primary text-xs font-bold text-primary-foreground">
+                            {isUpdating ? "Saving..." : "Save"}
+                        </button>
+                    </form>
+                ) : (
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-base font-bold text-foreground">{group?.name || (isLoading ? "Loading group..." : "My Group")}</h3>
+                            <p className="text-xs text-muted-foreground font-mono mt-0.5">
+                                Created by {typeof group?.creator === "object" ? group.creator?.name : currentUser?.name || "Admin"}
+                            </p>
+                        </div>
+                        {showLeaveConfirm ? (
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setShowLeaveConfirm(false)} className="px-2.5 py-1 rounded-lg border border-border text-[11px] font-semibold text-foreground">
+                                    Cancel
+                                </button>
+                                <button onClick={handleLeaveGroup} disabled={isLeaving} className="px-2.5 py-1 rounded-lg bg-destructive text-white text-[11px] font-bold">
+                                    {isLeaving ? "Leaving..." : "Confirm Leave"}
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowLeaveConfirm(true)}
+                                className="px-3 py-1.5 rounded-xl border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                            >
+                                <LogOut className="w-3.5 h-3.5" />
+                                <span>Leave</span>
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {/* Invitation Code Box */}
+                <div className="p-3.5 rounded-xl bg-[#241307] border border-primary/30 flex items-center justify-between gap-3">
+                    <div>
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">Invitation Code</span>
+                        <span className="text-lg font-bold font-mono text-primary tracking-wider">{group?.inviteCode || "BAZAR-XXXXXX"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleCopyCode}
+                            className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                            {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copied ? "Copied!" : "Copy Code"}</span>
+                        </button>
+                        {isCreator && (
+                            <button
+                                onClick={handleRegenerateCode}
+                                disabled={isGenerating}
+                                className="p-1.5 rounded-lg border border-border bg-secondary/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                title="Regenerate Code"
+                            >
+                                <RefreshCw className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`} />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Group Members List */}
+                <div className="space-y-2 pt-1">
+                    <span className="text-[11px] font-bold font-mono text-muted-foreground uppercase tracking-wider block">
+                        Members ({group?.members?.length || 0})
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {group?.members?.map((m: any) => {
+                            const memberIsCreator = typeof group.creator === "string" ? group.creator === m._id : group.creator?._id === m._id;
+                            return (
+                                <div key={m._id} className="p-2.5 rounded-xl bg-[#201006] border border-border/40 flex items-center gap-2.5">
+                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0">
+                                        {m.profileImage ? <img src={m.profileImage} alt={m.name} className="w-full h-full object-cover" /> : initials(m.name || "User")}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-bold text-foreground truncate">{m.name}</p>
+                                        <p className="text-[10px] text-muted-foreground font-mono truncate">{m.phone || m.email}</p>
+                                    </div>
+                                    {memberIsCreator && <span className="text-[9px] font-bold font-mono px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30">ADMIN</span>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export function WebProfileTab({
     currentUser,
@@ -145,6 +324,9 @@ export function WebProfileTab({
                             <p className="text-foreground font-mono text-xs">{[street, city, state, zipCode, country].filter(Boolean).join(", ") || "No address specified"}</p>
                         </div>
                     </div>
+
+                    {/* My Group Details & Invitation Code */}
+                    <WebMyGroupSection currentUser={currentUser} />
 
                     {/* Quick Actions & Support Section inside Profile */}
                     <div className="pt-4 border-t border-border flex flex-col gap-3">

@@ -1,14 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bell, CheckCheck, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { ScreenShell, BackButton, Avatar } from "@/components/app/ui/Shared";
 import { fmtDate } from "@/lib/mockData";
-import {
-    useGetMyNotificationsQuery,
-    useMarkAllAsReadMutation,
-    useDeleteAllNotificationsMutation,
-    useDeleteNotificationMutation,
-} from "@/redux/features/notification/notificationApi";
+import { useGetMyNotificationsQuery, useMarkAllAsReadMutation, useDeleteAllNotificationsMutation, useDeleteNotificationMutation } from "@/redux/features/notification/notificationApi";
 
 export function NotificationsScreen({ onBack }: { onBack: () => void }) {
     const { data: notifData, isLoading } = useGetMyNotificationsQuery();
@@ -27,11 +22,13 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
         }
     };
 
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
+
     const handleDeleteAll = async () => {
-        if (!window.confirm("Are you sure you want to clear all notifications?")) return;
         try {
             await deleteAll().unwrap();
             toast.success("Cleared all notifications!");
+            setShowClearConfirm(false);
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to clear notifications");
         }
@@ -53,25 +50,30 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
                     <BackButton onBack={onBack} label="Profile" />
                     {notifications.length > 0 && (
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={handleMarkAllRead}
-                                disabled={isMarking}
-                                className="px-3 py-1.5 rounded-xl border border-primary/40 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors flex items-center gap-1.5"
-                            >
+                            <button onClick={handleMarkAllRead} disabled={isMarking} className="px-3 py-1.5 rounded-xl border border-primary/40 bg-primary/10 text-xs font-semibold text-primary hover:bg-primary/20 transition-colors flex items-center gap-1.5">
                                 <CheckCheck className="w-3.5 h-3.5" />
                                 {isMarking ? "Reading..." : "Mark all read"}
                             </button>
-                            <button
-                                onClick={handleDeleteAll}
-                                disabled={isDeletingAll}
-                                className="w-8 h-8 rounded-xl border border-destructive/40 bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors"
-                                title="Clear all"
-                            >
+                            <button onClick={() => setShowClearConfirm(true)} className="w-8 h-8 rounded-xl border border-destructive/40 bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors" title="Clear all">
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
                     )}
                 </div>
+
+                {showClearConfirm && (
+                    <div className="p-4 rounded-2xl border border-destructive/40 bg-card flex flex-col gap-3 shadow-xl">
+                        <p className="text-xs font-bold text-destructive">Clear all notifications?</p>
+                        <div className="flex gap-2">
+                            <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-1.5 rounded-lg border border-border text-xs text-foreground font-semibold">
+                                Cancel
+                            </button>
+                            <button onClick={handleDeleteAll} disabled={isDeletingAll} className="flex-1 py-1.5 rounded-lg bg-destructive text-white text-xs font-bold">
+                                {isDeletingAll ? "Clearing..." : "Clear All"}
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div>
                     <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
@@ -97,9 +99,7 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
                         </div>
                     ) : notifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-2xl mb-3">
-                                🔔
-                            </div>
+                            <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-2xl mb-3">🔔</div>
                             <p className="text-sm font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                 No Notifications
                             </p>
@@ -109,13 +109,7 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
                         </div>
                     ) : (
                         notifications.map((n: any) => (
-                            <div
-                                key={n._id}
-                                className={`rounded-2xl border p-4 flex flex-col gap-2 transition-all relative ${
-                                    n.isRead ? "border-border/60 bg-card/60" : "border-primary/50 bg-card"
-                                }`}
-                                style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}
-                            >
+                            <div key={n._id} className={`rounded-2xl border p-4 flex flex-col gap-2 transition-all relative ${n.isRead ? "border-border/60 bg-card/60" : "border-primary/50 bg-card"}`} style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
@@ -128,10 +122,7 @@ export function NotificationsScreen({ onBack }: { onBack: () => void }) {
                                             <p className="text-[11px] text-muted-foreground font-mono">{fmtDate(new Date(n.createdAt))}</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => handleDeleteSingle(n._id)}
-                                        className="w-7 h-7 rounded-lg border border-destructive/30 bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors shrink-0"
-                                    >
+                                    <button onClick={() => handleDeleteSingle(n._id)} className="w-7 h-7 rounded-lg border border-destructive/30 bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors shrink-0">
                                         <Trash2 className="w-3.5 h-3.5" />
                                     </button>
                                 </div>

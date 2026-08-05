@@ -55,11 +55,13 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
         }
     };
 
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+
     const handleLeaveGroup = async () => {
-        if (!window.confirm("Are you sure you want to leave this group?")) return;
         try {
             await leaveGroup().unwrap();
             toast.success("Left group successfully!");
+            setShowLeaveConfirm(false);
             onBack();
         } catch (err: any) {
             toast.error(err?.data?.message || "Failed to leave group");
@@ -188,14 +190,28 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
 
                 {/* Leave Group Button */}
                 <div className="pt-2">
-                    <button
-                        onClick={handleLeaveGroup}
-                        disabled={isLeaving}
-                        className="w-full py-3.5 rounded-2xl border border-destructive/40 bg-destructive/10 text-sm font-bold text-destructive hover:bg-destructive/20 transition-all cursor-pointer flex items-center justify-center gap-2"
-                    >
-                        <LogOut className="w-4 h-4" />
-                        {isLeaving ? "Leaving Group..." : "Leave Group"}
-                    </button>
+                    {showLeaveConfirm ? (
+                        <div className="p-5 rounded-2xl border border-destructive/40 bg-card flex flex-col gap-3 shadow-2xl">
+                            <p className="text-sm font-bold text-destructive">Are you sure you want to leave this group?</p>
+                            <p className="text-xs text-muted-foreground">You will lose access to group Bazar entries and shared bills.</p>
+                            <div className="flex gap-2 pt-1">
+                                <button onClick={() => setShowLeaveConfirm(false)} className="flex-1 py-2.5 rounded-xl border border-border text-xs font-bold text-foreground hover:bg-secondary transition-all">
+                                    Cancel
+                                </button>
+                                <button onClick={handleLeaveGroup} disabled={isLeaving} className="flex-1 py-2.5 rounded-xl bg-destructive text-white text-xs font-bold hover:opacity-90 transition-all">
+                                    {isLeaving ? "Leaving..." : "Yes, Leave Group"}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setShowLeaveConfirm(true)}
+                            className="w-full py-3.5 rounded-2xl border border-destructive/40 bg-destructive/10 text-sm font-bold text-destructive hover:bg-destructive/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            <span>Leave Group</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </ScreenShell>

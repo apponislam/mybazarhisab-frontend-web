@@ -46,6 +46,7 @@ export type StatementParams = {
     startDate?: string;
     endDate?: string;
     year?: string;
+    format?: "html" | "pdf";
 };
 
 // ── API ────────────────────────────────────────────────────────────────────────
@@ -91,16 +92,23 @@ const dashboardApi = baseApi.injectEndpoints({
             providesTags: ["Dashboard"],
         }),
 
-        // GET /dashboard/statement (returns PDF blob)
-        getStatementPdf: builder.query<Blob, StatementParams | void>({
+        // GET /dashboard/statement (returns text/string)
+        getStatement: builder.query<string, StatementParams | void>({
             query: (params) => ({
                 url: "/dashboard/statement",
                 method: "GET",
                 params: params || undefined,
-                responseHandler: (response: Response) => response.blob(),
+                responseHandler: (response: Response) => response.text(),
             }),
         }),
     }),
 });
 
-export const { useGetAdminDashboardStatsQuery, useGetUserDashboardStatsQuery, useGetMonthlyExpenseTrendQuery, useGetProductPriceGrowthTrendQuery, useGetStatementPdfQuery } = dashboardApi;
+export const {
+    useGetAdminDashboardStatsQuery,
+    useGetUserDashboardStatsQuery,
+    useGetMonthlyExpenseTrendQuery,
+    useGetProductPriceGrowthTrendQuery,
+    useGetStatementQuery,
+    useLazyGetStatementQuery,
+} = dashboardApi;

@@ -21,7 +21,6 @@ const baseQuery = fetchBaseQuery({
 
 export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions);
-    console.log(result);
 
     const url = typeof args === "string" ? args : args?.url;
     const isPublicRoute = url ? url.includes("/auth/admin-login") || url.includes("/auth/login") || url.includes("/auth/register") || url.includes("/auth/forgot-password") || url.includes("/auth/reset-password") || url.includes("/auth/verify-email") : false;

@@ -5,8 +5,10 @@ import { X, Star } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BazarUnit, BillCategory } from "@/types";
 import { BILL_META } from "@/lib/mockData";
+import { toast } from "sonner";
 import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
 import { TMyReviewResponse } from "@/redux/features/review/reviewApi";
+import { useLazyGetStatementQuery } from "@/redux/features/dashboard/dashboardApi";
 
 // ── Generic Animated Modal ───────────────────────────────────────────────────
 export function WebDialogModal({ show, onClose, title, children }: { show: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
@@ -315,5 +317,107 @@ export function WebReviewModalContent({
                 </button>
             </div>
         </form>
+    );
+}
+
+// ── Statement Generator Modal ────────────────────────────────────────────────
+export function WebStatementModal({ show, onClose }: { show: boolean; onClose: () => void }) {
+    const [startDate, setStartDate] = useState(() => {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 2);
+        return d.toISOString().slice(0, 10);
+    });
+    const [endDate, setEndDate] = useState(() => new Date().toISOString().slice(0, 10));
+    const [format, setFormat] = useState<"html" | "pdf">("html");
+
+    const [triggerGetStatement, { isLoading }] = useLazyGetStatementQuery();
+
+    const handleGenerate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const rawData = await triggerGetStatement({
+                startDate,
+                endDate,
+                format,
+            }).unwrap();
+
+            if (format === "pdf") {
+                const blob = new Blob([rawData], { type: "application/pdf" });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", `bazar_hisab_statement_${startDate}_to_${endDate}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode?.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                toast.success("Statement PDF downloaded successfully!");
+            } else {
+                const newWindow = window.open("", "_blank");
+                if (newWindow) {
+                    newWindow.document.write(rawData);
+                    newWindow.document.close();
+                } else {
+                    toast.error("Pop-up blocked! Please allow pop-ups for this site.");
+                }
+            }
+            onClose();
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to generate statement");
+        }
+    };
+
+    return (
+        <WebDialogModal show={show} onClose={onClose} title="Generate Expense Statement">
+            <form onSubmit={handleGenerate} className="flex flex-col gap-4 text-left font-sans">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                    Select a date range to generate a combined statement of all Bazar purchases and Monthly Bills.
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Start Date</label>
+                        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground font-mono" style={{ colorScheme: "dark" }} />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">End Date</label>
+                        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground font-mono" style={{ colorScheme: "dark" }} />
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Format</label>
+                    <div className="flex gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setFormat("html")}
+                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                                format === "html" ? "bg-primary/20 text-primary border-primary" : "bg-[#2e1a0a] text-muted-foreground border-border/60"
+                            }`}
+                        >
+                            🌐 Interactive HTML
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFormat("pdf")}
+                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                                format === "pdf" ? "bg-accent/20 text-accent border-accent" : "bg-[#2e1a0a] text-muted-foreground border-border/60"
+                            }`}
+                        >
+                            📄 Download PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex gap-3 mt-4">
+                    <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl transition-all hover:bg-secondary cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-primary text-primary-foreground font-bold rounded-xl transition-all hover:bg-accent cursor-pointer shadow-lg shadow-primary/20 disabled:opacity-50">
+                        {isLoading ? "Generating…" : "Generate Statement"}
+                    </button>
+                </div>
+            </form>
+        </WebDialogModal>
     );
 }

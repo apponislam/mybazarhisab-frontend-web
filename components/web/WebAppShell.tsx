@@ -18,7 +18,7 @@ import { WebConfirmModal } from "@/components/web/shell/WebModal";
 import { WebHeader } from "@/components/web/shell/WebHeader";
 import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
 import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
-import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent } from "@/components/web/shell/WebDialogs";
+import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent, WebStatementModal } from "@/components/web/shell/WebDialogs";
 import { avatarColor, initials } from "@/components/web/shell/WebMetricCard";
 import { EditExpenseModal } from "@/components/dashboard/expenses/EditExpenseModal";
 import { EditBillModal } from "@/components/dashboard/bills/EditBillModal";
@@ -144,6 +144,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     // Onboarding & Interaction Modal States
     const [showAddExpense, setShowAddExpense] = useState(false);
     const [showAddBill, setShowAddBill] = useState(false);
+    const [showStatement, setShowStatement] = useState(false);
     const [showContact, setShowContact] = useState(false);
     const [showFeedback, setShowFeedback] = useState(false);
     const [showReview, setShowReview] = useState(false);
@@ -300,6 +301,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                 setTab={setTab}
                 setShowAddExpense={setShowAddExpense}
                 setShowAddBill={setShowAddBill}
+                onOpenStatement={() => setShowStatement(true)}
                 showNotifDropdown={showNotifDropdown}
                 setShowNotifDropdown={setShowNotifDropdown}
                 notifDropdownRef={notifDropdownRef}
@@ -1063,6 +1065,9 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
             {/* Edit Bill Modal */}
             <EditBillModal bill={editingBill} onClose={() => setEditingBill(null)} />
+
+            {/* Expense & Bill Statement Generator Modal */}
+            <WebStatementModal show={showStatement} onClose={() => setShowStatement(false)} />
         </div>
     );
 }

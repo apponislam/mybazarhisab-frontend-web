@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Plus, Bell, ChevronDown, ShieldCheck, Lock, LogOut, X } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Plus, Bell, ChevronDown, ShieldCheck, Lock, LogOut, X, FileText } from "lucide-react";
 import { GroupStats } from "@/types";
 import { initials } from "@/components/web/shell/WebMetricCard";
 
@@ -14,6 +14,7 @@ export function WebHeader({
     setTab,
     setShowAddExpense,
     setShowAddBill,
+    onOpenStatement,
     showNotifDropdown,
     setShowNotifDropdown,
     notifDropdownRef,
@@ -35,6 +36,7 @@ export function WebHeader({
     setTab: (tab: "home" | "expenses" | "bills" | "notifications" | "profile") => void;
     setShowAddExpense: (show: boolean) => void;
     setShowAddBill: (show: boolean) => void;
+    onOpenStatement?: () => void;
     showNotifDropdown: boolean;
     setShowNotifDropdown: React.Dispatch<React.SetStateAction<boolean>>;
     notifDropdownRef: React.RefObject<HTMLDivElement | null>;
@@ -231,6 +233,18 @@ export function WebHeader({
                                             <span>Go to Admin Dashboard</span>
                                         </button>
                                     )}
+
+                                    {/* Download Statement Button */}
+                                    <button
+                                        onClick={() => {
+                                            setShowUserDropdown(false);
+                                            onOpenStatement?.();
+                                        }}
+                                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-accent/15 border border-accent/30 text-accent font-bold text-xs hover:bg-accent/25 transition-all cursor-pointer"
+                                    >
+                                        <FileText className="w-4 h-4 text-accent" />
+                                        <span>Expense Statement</span>
+                                    </button>
 
                                     {/* Profile Details Button */}
                                     <button

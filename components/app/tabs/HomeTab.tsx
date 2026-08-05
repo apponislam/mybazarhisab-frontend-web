@@ -19,9 +19,10 @@ function Delta({ current, prev }: { current: number; prev: number }) {
     );
 }
 
-function LoadingDots() {
+function LoadingDots({ currency = true }: { currency?: boolean }) {
     return (
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-1 font-mono font-bold">
+            {currency && <span>৳</span>}
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
@@ -49,8 +50,8 @@ function StatCard({ label, value, prev, icon, delay = 0, accent = false, isLoadi
                 </motion.div>
                 {!isLoading && prev !== undefined && <Delta current={value} prev={prev} />}
             </div>
-            <div className="min-h-[2rem] flex items-center">
-                {isLoading ? <LoadingDots /> : <p className="text-2xl font-bold text-foreground font-mono">{fmt(value)}</p>}
+            <div className="min-h-[2rem] flex items-center text-2xl font-bold text-foreground font-mono">
+                {isLoading ? <LoadingDots currency /> : <p>{fmt(value)}</p>}
             </div>
             <p className="text-xs text-muted-foreground leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 {label}
@@ -73,8 +74,8 @@ function CountCard({ label, value, icon, delay = 0, isLoading = false }: { label
                 {icon}
             </motion.div>
             <div>
-                <div className="min-h-[1.75rem] flex items-center">
-                    {isLoading ? <LoadingDots /> : <p className="text-xl font-bold text-foreground font-mono">{value.toLocaleString()}</p>}
+                <div className="min-h-[1.75rem] flex items-center text-xl font-bold text-foreground font-mono">
+                    {isLoading ? <LoadingDots currency={false} /> : <p>{value.toLocaleString()}</p>}
                 </div>
                 <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     {label}
@@ -118,8 +119,8 @@ export function HomeTab({ stats, isLoading = false }: { stats: GroupStats; isLoa
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-widest font-mono">
                         {mn} {yr} — Total
                     </p>
-                    <div className="min-h-[2.5rem] flex items-center mb-2">
-                        {isLoading ? <LoadingDots /> : <p className="text-4xl font-bold text-primary font-mono">{fmt(stats.thisMonthTotalExpense)}</p>}
+                    <div className="min-h-[2.5rem] flex items-center mb-2 text-4xl font-bold text-primary font-mono">
+                        {isLoading ? <LoadingDots currency /> : <p>{fmt(stats.thisMonthTotalExpense)}</p>}
                     </div>
                     {!isLoading && (
                         <div className="flex items-center gap-2">

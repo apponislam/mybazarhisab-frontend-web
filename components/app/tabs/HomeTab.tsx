@@ -74,7 +74,7 @@ export function HomeTab({ stats }: { stats: GroupStats }) {
                     <CountCard label="Group Bazar Entries" value={stats.totalGroupBazarEntries} icon={<ShoppingBag className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.05} />
                     <CountCard label="My Bazar Entries" value={stats.totalMyBazarEntries} icon={<BookOpen className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.1} />
                 </div>
-                <CountCard label="Products Created by Me" value={stats.totalProductsCreatedByMe} icon={<Package className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.15} />
+                {/* <CountCard label="Products Created by Me" value={stats.totalProductsCreatedByMe} icon={<Package className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.15} /> */}
                 <SectionLabel>Bazar Expense</SectionLabel>
                 <div className="grid grid-cols-2 gap-3">
                     <StatCard label={`${mn} Bazar`} value={stats.thisMonthBazarExpense} prev={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.2} />

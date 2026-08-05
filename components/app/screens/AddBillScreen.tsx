@@ -1,30 +1,42 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Receipt, ChevronRight, AlignLeft, Calendar, X } from "lucide-react";
+import { toast } from "sonner";
 import { BillCategory } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 import { toInputDate, BILL_META, BILL_CATEGORIES } from "@/lib/mockData";
+import { useCreateBillMutation } from "@/redux/features/bill/billApi";
 
 export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+    const [createBill, { isLoading }] = useCreateBillMutation();
+
     const [category, setCategory] = useState<BillCategory>("RENT");
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
     const [date, setDate] = useState(toInputDate(new Date()));
     const [notes, setNotes] = useState("");
-    const [loading, setLoading] = useState(false);
     const [showCatPicker, setShowCatPicker] = useState(false);
     const [fTitle, setFTitle] = useState(false);
     const [fAmount, setFAmount] = useState(false);
     const [fNotes, setFNotes] = useState(false);
     const meta = BILL_META[category];
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await createBill({
+                category,
+                title: title.trim(),
+                amount: Number(amount),
+                date,
+                notes: notes.trim() || undefined,
+            }).unwrap();
+
+            toast.success("Bill entry created successfully!");
             onDone();
-        }, 1400);
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to create bill");
+        }
     };
 
     return (
@@ -94,7 +106,7 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
                         />
                     </FieldBox>
                     <div className="mt-2">
-                        <PrimaryButton loading={loading} label="Save Bill" loadingLabel="Saving…" />
+                        <PrimaryButton loading={isLoading} label="Save Bill" loadingLabel="Saving…" />
                     </div>
                 </form>
                 {showCatPicker && (

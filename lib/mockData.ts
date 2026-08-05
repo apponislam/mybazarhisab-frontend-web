@@ -50,9 +50,7 @@ export const INITIAL_BILLS: MockBill[] = [
 ];
 
 export function fmt(n: number) {
-  if (n >= 100000) return `৳${(n / 100000).toFixed(1)}L`;
-  if (n >= 1000) return `৳${(n / 1000).toFixed(1)}K`;
-  return `৳${n.toLocaleString()}`;
+  return `৳${Math.round(n).toLocaleString()}`;
 }
 
 export function fmtFull(n: number) {
@@ -67,14 +65,17 @@ export function toInputDate(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
-export function initials(name: string) {
-  return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+export function initials(name?: string) {
+  if (!name) return "U";
+  return name.split(" ").map(w => w[0]).filter(Boolean).join("").slice(0, 2).toUpperCase() || "U";
 }
 
 const AVATAR_COLORS = ["#c06010", "#8b6914", "#3d7a5c", "#5a4a8a", "#7a3d3d"];
 
-export function avatarColor(id: string) {
-  return AVATAR_COLORS[id.charCodeAt(1) % AVATAR_COLORS.length];
+export function avatarColor(id?: string) {
+  if (!id) return AVATAR_COLORS[0];
+  const charCode = id.length > 1 ? id.charCodeAt(1) : id.charCodeAt(0) || 0;
+  return AVATAR_COLORS[charCode % AVATAR_COLORS.length];
 }
 
 export function isThisMonth(d: Date) {

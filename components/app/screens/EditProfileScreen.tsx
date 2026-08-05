@@ -1,25 +1,30 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { Camera, User, Mail, Phone, Globe, MapPin, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox, SectionLabel } from "@/components/app/ui/Shared";
-import { MOCK_USERS, avatarColor, initials } from "@/lib/mockData";
+import { avatarColor, initials } from "@/lib/mockData";
+import { useGetMeQuery, useUpdateProfileMutation } from "@/redux/features/auth/authApi";
 
 export function EditProfileScreen({ onBack }: { onBack: () => void }) {
-    const me = MOCK_USERS[0];
+    const { data: userData } = useGetMeQuery();
+    const me = userData?.data;
+    const [updateProfile, { isLoading }] = useUpdateProfileMutation();
+
     const [photo, setPhoto] = useState<string | null>(null);
-    const [name, setName] = useState(me.name);
-    const [email, setEmail] = useState(me.email);
-    const [phone, setPhone] = useState(me.phone);
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [lang, setLang] = useState("English");
-    const [about, setAbout] = useState("Managing our family bazar hisab since 2024.");
-    const [street, setStreet] = useState("42 Mirpur Road");
-    const [city, setCity] = useState("Dhaka");
-    const [state, setState] = useState("Dhaka Division");
-    const [zip, setZip] = useState("1216");
+    const [about, setAbout] = useState("");
+    const [street, setStreet] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [zip, setZip] = useState("");
     const [country, setCountry] = useState("Bangladesh");
-    const [loading, setLoading] = useState(false);
     const [saved, setSaved] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
+
     const [fName, setFName] = useState(false);
     const [fEmail, setFEmail] = useState(false);
     const [fPhone, setFPhone] = useState(false);
@@ -31,17 +36,51 @@ export function EditProfileScreen({ onBack }: { onBack: () => void }) {
     const [fZip, setFZip] = useState(false);
     const [fCountry, setFCountry] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    useEffect(() => {
+        if (me) {
+            setPhoto(me.profileImage || null);
+            setName(me.name || "");
+            setEmail(me.email || "");
+            setPhone(me.phone || "");
+            setLang(me.language || "English");
+            setAbout(me.aboutme || "");
+            if (me.address) {
+                setStreet(me.address.street || "");
+                setCity(me.address.city || "");
+                setState(me.address.state || "");
+                setZip(me.address.zipCode || "");
+                setCountry(me.address.country || "Bangladesh");
+            }
+        }
+    }, [me]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await updateProfile({
+                profileImage: photo || undefined,
+                name: name.trim(),
+                phone: phone.trim() || undefined,
+                language: lang.trim() || undefined,
+                aboutme: about.trim() || undefined,
+                address: {
+                    street: street.trim() || undefined,
+                    city: city.trim() || undefined,
+                    state: state.trim() || undefined,
+                    zipCode: zip.trim() || undefined,
+                    country: country.trim() || undefined,
+                },
+            }).unwrap();
+
             setSaved(true);
+            toast.success("Profile updated successfully!");
             setTimeout(() => {
                 setSaved(false);
                 onBack();
-            }, 1500);
-        }, 1200);
+            }, 1200);
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to update profile");
+        }
     };
 
     return (
@@ -58,8 +97,8 @@ export function EditProfileScreen({ onBack }: { onBack: () => void }) {
                             {photo ? (
                                 <img src={photo} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white font-mono" style={{ background: avatarColor(me.id) }}>
-                                    {initials(me.name)}
+                                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white font-mono" style={{ background: avatarColor(me?._id || "u1") }}>
+                                    {initials(me?.name || "User")}
                                 </div>
                             )}
                         </div>
@@ -133,7 +172,7 @@ export function EditProfileScreen({ onBack }: { onBack: () => void }) {
                                 </span>
                             </motion.div>
                         ) : (
-                            <PrimaryButton loading={loading} label="Save Profile" loadingLabel="Saving…" />
+                            <PrimaryButton loading={isLoading} label="Save Profile" loadingLabel="Saving…" />
                         )}
                     </div>
                 </form>

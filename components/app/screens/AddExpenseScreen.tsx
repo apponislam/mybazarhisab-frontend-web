@@ -1,29 +1,42 @@
 import React, { useState } from "react";
 import { ShoppingBag, Package, Weight, Calendar } from "lucide-react";
+import { toast } from "sonner";
 import { BazarUnit } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 import { toInputDate } from "@/lib/mockData";
+import { useCreateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 
 export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+    const [createBazarEntry, { isLoading }] = useCreateBazarEntryMutation();
+
     const [product, setProduct] = useState("");
     const [price, setPrice] = useState("");
     const [quantity, setQuantity] = useState("");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(toInputDate(new Date()));
     const [notes, setNotes] = useState("");
-    const [loading, setLoading] = useState(false);
     const [fProduct, setFProduct] = useState(false);
     const [fPrice, setFPrice] = useState(false);
     const [fQty, setFQty] = useState(false);
     const [fNotes, setFNotes] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await createBazarEntry({
+                name: product.trim(),
+                price: Number(price),
+                quantity: Number(quantity) || 1,
+                unit,
+                date,
+                notes: notes.trim() || undefined,
+            }).unwrap();
+
+            toast.success("Bazar expense created successfully!");
             onDone();
-        }, 1400);
+        } catch (err: any) {
+            toast.error(err?.data?.message || err?.message || "Failed to create expense");
+        }
     };
 
     return (
@@ -98,7 +111,7 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                         <textarea value={notes} onChange={(e) => setNotes(e.target.value)} onFocus={() => setFNotes(true)} onBlur={() => setFNotes(false)} placeholder="Any additional info…" rows={3} className="w-full px-4 py-3.5 bg-transparent text-sm outline-none resize-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
                     </FieldBox>
                     <div className="mt-2">
-                        <PrimaryButton loading={loading} label="Save Expense" loadingLabel="Saving…" />
+                        <PrimaryButton loading={isLoading} label="Save Expense" loadingLabel="Saving…" />
                     </div>
                 </form>
             </div>

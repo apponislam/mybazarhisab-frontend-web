@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Shield, Lock, EyeOff, Eye, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
+import { useChangePasswordMutation } from "@/redux/features/auth/authApi";
 
 export function ChangePasswordScreen({ onBack }: { onBack: () => void }) {
+    const [changePassword, { isLoading }] = useChangePasswordMutation();
+
     const [current, setCurrent] = useState("");
     const [newPass, setNewPass] = useState("");
     const [repeat, setRepeat] = useState("");
     const [showCurrent, setShowCurrent] = useState(false);
     const [showNew, setShowNew] = useState(false);
     const [showRepeat, setShowRepeat] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(false);
     const [fCurrent, setFCurrent] = useState(false);
     const [fNew, setFNew] = useState(false);
     const [fRepeat, setFRepeat] = useState(false);
+
     const mismatch = repeat.length > 0 && newPass !== repeat;
     const sl = newPass.length === 0 ? 0 : newPass.length < 6 ? 1 : newPass.length < 10 ? 2 : 3;
     const sc = ["", "#ef4444", "#e8a020", "#22c55e"];
@@ -36,14 +40,19 @@ export function ChangePasswordScreen({ onBack }: { onBack: () => void }) {
                     </p>
                 </div>
                 <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                         e.preventDefault();
                         if (mismatch || newPass.length < 8) return;
-                        setLoading(true);
-                        setTimeout(() => {
-                            setLoading(false);
+                        try {
+                            await changePassword({ currentPassword: current, newPassword: newPass }).unwrap();
+                            toast.success("Password changed successfully!");
                             setDone(true);
-                        }, 1200);
+                            setTimeout(() => {
+                                onBack();
+                            }, 1200);
+                        } catch (err: any) {
+                            toast.error(err?.data?.message || err?.message || "Failed to change password");
+                        }
                     }}
                     className="flex flex-col gap-4 flex-1 justify-between"
                 >
@@ -96,7 +105,7 @@ export function ChangePasswordScreen({ onBack }: { onBack: () => void }) {
                                 </span>
                             </motion.div>
                         ) : (
-                            <PrimaryButton loading={loading} label="Update Password" loadingLabel="Updating…" disabled={mismatch || newPass.length < 8 || !current} />
+                            <PrimaryButton loading={isLoading} label="Update Password" loadingLabel="Updating…" disabled={mismatch || newPass.length < 8 || !current} />
                         )}
                     </div>
                 </form>

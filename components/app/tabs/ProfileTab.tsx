@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { User, Shield, Info, Bell, BellOff, Mail, Globe, MapPin, FileText, LogOut, Trash2, AlertTriangle } from "lucide-react";
 import { Toggle, SettingsRow } from "@/components/app/ui/Shared";
-import { initials, avatarColor, MOCK_USERS } from "@/lib/mockData";
-import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { initials, avatarColor } from "@/lib/mockData";
+import { useLogoutMutation, useGetMeQuery } from "@/redux/features/auth/authApi";
 import { logOut } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 
 export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile: () => void; onChangePassword: () => void }) {
     const dispatch = useAppDispatch();
     const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
+    const { data: userData } = useGetMeQuery();
+    const me = userData?.data;
+
     const handleLogout = async () => {
         try {
             await logoutMutation().unwrap();
@@ -19,7 +22,6 @@ export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile:
         dispatch(logOut());
     };
 
-    const me = MOCK_USERS[0];
     const [pushNotif, setPushNotif] = useState(true);
     const [emailNotif, setEmailNotif] = useState(true);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -38,16 +40,20 @@ export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile:
 
             <div className="flex flex-col px-6 pb-8 gap-5">
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl border border-border bg-card p-5 flex items-center gap-4" style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.35)" }}>
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 font-bold text-xl text-white" style={{ background: avatarColor(me.id) }}>
-                        {initials(me.name)}
+                    <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center shrink-0 font-bold text-xl text-white bg-primary" style={{ background: avatarColor(me?._id || "u1") }}>
+                        {me?.profileImage ? (
+                            <img src={me.profileImage} alt={me.name} className="w-full h-full object-cover" />
+                        ) : (
+                            initials(me?.name || "User")
+                        )}
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-base font-bold text-foreground truncate" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            {me.name}
+                            {me?.name || "User"}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5 font-mono">{me.email}</p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5 font-mono">{me?.email || "email@example.com"}</p>
                         <p className="text-xs text-muted-foreground mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            {me.phone}
+                            {me?.phone || "No phone number"}
                         </p>
                         <div className="flex items-center gap-1.5 mt-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
@@ -80,11 +86,15 @@ export function ProfileTab({ onEditProfile, onChangePassword }: { onEditProfile:
                     <div className="px-4 py-3 border-b border-border">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">Preferences</p>
                     </div>
-                    <SettingsRow icon={<Globe className="w-4 h-4" />} label="Language" sub="English" right={<span className="text-xs text-muted-foreground font-semibold font-mono">EN</span>} />
+                    <SettingsRow icon={<Globe className="w-4 h-4" />} label="Language" sub={me?.language || "English"} right={<span className="text-xs text-muted-foreground font-semibold font-mono">{(me?.language || "EN").slice(0, 2).toUpperCase()}</span>} />
                     <div className="h-px bg-border mx-4" />
-                    <SettingsRow icon={<MapPin className="w-4 h-4" />} label="Address" sub="42 Mirpur Road, Dhaka, Bangladesh" />
+                    <SettingsRow
+                        icon={<MapPin className="w-4 h-4" />}
+                        label="Address"
+                        sub={me?.address ? [me.address.street, me.address.city, me.address.state, me.address.zipCode, me.address.country].filter(Boolean).join(", ") : "No address set"}
+                    />
                     <div className="h-px bg-border mx-4" />
-                    <SettingsRow icon={<FileText className="w-4 h-4" />} label="About Me" sub="Managing our family bazar hisab since 2024." />
+                    <SettingsRow icon={<FileText className="w-4 h-4" />} label="About Me" sub={me?.aboutme || "No bio added yet"} />
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="rounded-2xl border border-destructive/25 bg-card overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.3)" }}>

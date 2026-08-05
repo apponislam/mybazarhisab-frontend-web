@@ -44,9 +44,24 @@ function ExpenseRow({ entry, onClick }: { entry: MockBazarEntry; onClick: () => 
     );
 }
 
-export function ExpensesTab({ entries, onDetail }: { entries: MockBazarEntry[]; onDetail: (e: MockBazarEntry) => void }) {
-    const [filter, setFilter] = useState<"month" | "all">("month");
-    const filtered = filter === "month" ? entries.filter((e) => isThisMonth(e.date)) : entries;
+export function ExpensesTab({
+    entries,
+    onDetail,
+    isLoading,
+    filter = "month",
+    setFilter,
+}: {
+    entries: MockBazarEntry[];
+    onDetail: (e: MockBazarEntry) => void;
+    isLoading?: boolean;
+    filter?: "month" | "all";
+    setFilter?: (f: "month" | "all") => void;
+}) {
+    const [localFilter, setLocalFilter] = useState<"month" | "all">("month");
+    const activeFilter = setFilter ? filter : localFilter;
+    const handleFilterChange = setFilter || setLocalFilter;
+
+    const filtered = activeFilter === "month" ? entries.filter((e) => isThisMonth(e.date)) : entries;
     const total = filtered.reduce((s, e) => s + e.price * e.quantity, 0);
     const mn = now.toLocaleString("default", { month: "long" });
 
@@ -57,15 +72,27 @@ export function ExpensesTab({ entries, onDetail }: { entries: MockBazarEntry[]; 
                     Bazar <span className="text-primary">Expenses</span>
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                    {filtered.length} entries · <span className="text-primary font-semibold font-mono">{fmtFull(total)}</span>
-                    {filter === "month" && <span className="text-muted-foreground"> in {mn}</span>}
+                    {isLoading ? "Loading expenses..." : `${filtered.length} entries · ${fmtFull(total)}`}
+                    {activeFilter === "month" && !isLoading && <span className="text-muted-foreground"> in {mn}</span>}
                 </p>
             </div>
             <div className="shrink-0">
-                <FilterTabs active={filter} onChange={setFilter} />
+                <FilterTabs active={activeFilter} onChange={handleFilterChange} />
             </div>
             <div className="flex-1 overflow-y-auto px-6 pb-4 flex flex-col gap-3">
-                {filtered.length === 0 ? (
+                {isLoading ? (
+                    <div className="space-y-3 py-2">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="w-full h-20 rounded-2xl bg-card/60 border border-border/40 animate-pulse flex items-center p-4 gap-3">
+                                <div className="w-12 h-12 rounded-xl bg-secondary/80 shrink-0" />
+                                <div className="flex-1 space-y-2">
+                                    <div className="h-4 bg-secondary/80 rounded-md w-1/3" />
+                                    <div className="h-3 bg-secondary/60 rounded-md w-1/4" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : filtered.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center py-16 text-center">
                         <div className="text-4xl mb-3">🛒</div>
                         <p className="text-muted-foreground text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>

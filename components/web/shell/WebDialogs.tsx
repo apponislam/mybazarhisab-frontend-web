@@ -122,6 +122,69 @@ export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: 
     );
 }
 
+// ── Custom Category Dropdown Component ──────────────────────────────────────
+function CategorySelect({ value, onChange }: { value: BillCategory; onChange: (cat: BillCategory) => void }) {
+    const [open, setOpen] = useState(false);
+    const selectedMeta = BILL_META[value];
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={() => setOpen((prev) => !prev)}
+                className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm flex items-center justify-between text-foreground hover:border-primary/50 transition-colors cursor-pointer"
+            >
+                <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-5 h-5 flex items-center justify-center shrink-0" style={{ color: selectedMeta?.color || "#e8a020" }}>
+                        {selectedMeta?.icon}
+                    </div>
+                    <span className="truncate font-medium">{selectedMeta?.label || value}</span>
+                </div>
+                <span className="text-xs text-muted-foreground ml-2">▼</span>
+            </button>
+
+            <AnimatePresence>
+                {open && (
+                    <>
+                        <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+                        <motion.div
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 5 }}
+                            className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-56 overflow-y-auto bg-[#251508] border border-border rounded-xl shadow-2xl p-1.5 divide-y divide-border/20"
+                        >
+                            {Object.entries(BILL_META).map(([key, meta]) => {
+                                const isSelected = key === value;
+                                return (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => {
+                                            onChange(key as BillCategory);
+                                            setOpen(false);
+                                        }}
+                                        className={`w-full px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
+                                            isSelected ? "bg-primary/20 text-primary font-bold" : "hover:bg-[#2e1a0a] text-foreground"
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="w-4 h-4 flex items-center justify-center shrink-0" style={{ color: meta.color }}>
+                                                {meta.icon}
+                                            </div>
+                                            <span className="truncate">{meta.label}</span>
+                                        </div>
+                                        {isSelected && <span className="text-primary text-xs">✓</span>}
+                                    </button>
+                                );
+                            })}
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
 // ── Add Monthly Bill Form ────────────────────────────────────────────────────
 export function WebAddBillForm({ onSubmit, onClose, isLoading }: { onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
     const [category, setCategory] = useState<BillCategory>("RENT");
@@ -136,20 +199,12 @@ export function WebAddBillForm({ onSubmit, onClose, isLoading }: { onSubmit: (ca
         onSubmit(category, title, Number(amount), date, notes);
     };
 
-    const BILL_CATEGORIES_LIST = Object.entries(BILL_META).map(([k, v]) => ({ key: k as BillCategory, label: v.label }));
-
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value as BillCategory)} className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-sans text-foreground" style={{ colorScheme: "dark" }}>
-                        {BILL_CATEGORIES_LIST.map((c) => (
-                            <option key={c.key} value={c.key}>
-                                {c.label}
-                            </option>
-                        ))}
-                    </select>
+                    <CategorySelect value={category} onChange={setCategory} />
                 </div>
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Amount (৳)</label>

@@ -56,7 +56,7 @@ export function BillEditScreen({ bill, onBack, onSave }: { bill: MockBill; onBac
                         <label className="text-sm font-medium text-foreground/80" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                             Category
                         </label>
-                        <button type="button" onClick={() => setShowCatPicker(true)} className="flex items-center gap-3 p-4 rounded-xl border transition-all text-left cursor-pointer" style={{ borderColor: "rgba(232,160,32,0.3)", background: "#2e1a0a" }}>
+                        <button type="button" onClick={() => setShowCatPicker(true)} className="flex items-center gap-3 p-2 rounded-xl border transition-all text-left cursor-pointer" style={{ borderColor: "rgba(232,160,32,0.3)", background: "#2e1a0a" }}>
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border" style={{ background: `${meta.color}20`, borderColor: `${meta.color}40`, color: meta.color }}>
                                 {meta.icon}
                             </div>

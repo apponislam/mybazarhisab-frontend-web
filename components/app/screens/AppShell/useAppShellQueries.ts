@@ -4,6 +4,7 @@ import { useGetAllBazarEntriesQuery } from "@/redux/features/bazar-entry/bazarEn
 import { useGetAllBillsQuery } from "@/redux/features/bill/billApi";
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
 import { useGetUserDashboardStatsQuery } from "@/redux/features/dashboard/dashboardApi";
+import { useGetMyGroupQuery } from "@/redux/features/group/groupApi";
 import { useAppShellData } from "./useAppShellData";
 
 export function useAppShellQueries(tab: AppTab) {
@@ -11,6 +12,10 @@ export function useAppShellQueries(tab: AppTab) {
     const [billPage, setBillPage] = useState(1);
     const [expenseFilter, setExpenseFilter] = useState<"month" | "all">("month");
     const [billFilter, setBillFilter] = useState<"month" | "all">("month");
+
+    // Fetch user group data for accurate group name & stats fallback
+    const { data: myGroupResponse } = useGetMyGroupQuery();
+    const groupData = myGroupResponse?.data;
 
     // Dashboard stats query for Home tab
     const { data: dashboardData, isLoading: isDashboardLoading } = useGetUserDashboardStatsQuery(undefined, {
@@ -65,6 +70,7 @@ export function useAppShellQueries(tab: AppTab) {
         isBillLoading,
         isBillFetching,
         currentUser,
+        groupData,
         entries,
         bills,
     };

@@ -18,7 +18,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
     const [subScreen, setSubScreen] = useState<AppSubScreen>(null);
 
     // Custom Hook encapsulating RTK Query endpoints & data transformers
-    const { dashboardStats, isDashboardLoading, isBazarLoading, isBillLoading, currentUser, entries, bills, expenseFilter, setExpenseFilter, billFilter, setBillFilter } = useAppShellQueries(tab);
+    const { dashboardStats, isDashboardLoading, isBazarLoading, isBillLoading, currentUser, groupData, entries, bills, expenseFilter, setExpenseFilter, billFilter, setBillFilter } = useAppShellQueries(tab);
 
     const [selectedEntry, setSelectedEntry] = useState<MockBazarEntry | null>(null);
     const [selectedBill, setSelectedBill] = useState<MockBill | null>(null);
@@ -26,10 +26,13 @@ export function AppShell({ stats }: { stats: GroupStats }) {
     const showNav = subScreen === null || subScreen === "add-picker";
 
     const computedStats = React.useMemo(() => {
+        const activeGroupName = dashboardStats?.groupName || groupData?.name || stats?.groupName || "My Bazar Group";
+        const activeMembers = dashboardStats?.totalMembers ?? groupData?.members?.length ?? stats?.totalMembers ?? 1;
+
         if (dashboardStats) {
             return {
-                groupName: dashboardStats.groupName || stats?.groupName || "My Bazar Group",
-                totalMembers: dashboardStats.totalMembers ?? stats?.totalMembers ?? 1,
+                groupName: activeGroupName,
+                totalMembers: activeMembers,
                 totalGroupBazarEntries: dashboardStats.totalGroupBazarAndBills ?? dashboardStats.totalGroupBazarEntries ?? entries.length,
                 totalMyBazarEntries: dashboardStats.totalMyBazarAndBills ?? dashboardStats.totalMyBazarEntries ?? entries.length,
                 totalProductsCreatedByMe: dashboardStats.totalNewProductsCreatedByMe ?? dashboardStats.totalProductsCreatedByMe ?? 0,
@@ -55,8 +58,8 @@ export function AppShell({ stats }: { stats: GroupStats }) {
         const totalBill = bills.reduce((sum, b) => sum + b.amount, 0);
 
         return {
-            groupName: stats?.groupName || "My Bazar Group",
-            totalMembers: stats?.totalMembers || 1,
+            groupName: activeGroupName,
+            totalMembers: activeMembers,
             totalGroupBazarEntries: entries.length,
             totalMyBazarEntries: myEntries.length,
             totalProductsCreatedByMe: new Set(myEntries.map((e) => e.product.name)).size,
@@ -73,7 +76,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
             thisYearTotalExpense: totalBazar + totalBill,
             prevYearTotalExpense: 0,
         };
-    }, [dashboardStats, entries, bills, stats, currentUser]);
+    }, [dashboardStats, groupData, entries, bills, stats, currentUser]);
 
     // Subscreen overlay rendering
     if (subScreen && subScreen !== "add-picker") {

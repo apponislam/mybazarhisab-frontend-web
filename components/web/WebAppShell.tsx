@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, Star, Calendar, TrendingUp, Minus, BookOpen, Package, BarChart2 } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, Star, Calendar, TrendingUp, Minus, BookOpen, Package, BarChart2, Edit2 } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit, BillCategory, GroupStats } from "@/types";
 import { BILL_META, fmt } from "@/lib/mockData";
@@ -11,8 +11,8 @@ import { useSubmitMessageMutation } from "@/redux/features/contact/contactApi";
 import { useCreateFeedbackMutation } from "@/redux/features/feedback/feedbackApi";
 import { useCreateReviewMutation, useGetMyReviewQuery } from "@/redux/features/review/reviewApi";
 import { useGetMyNotificationsQuery, useGetUnreadCountQuery, useMarkAllAsReadMutation, useDeleteAllNotificationsMutation, useDeleteNotificationMutation } from "@/redux/features/notification/notificationApi";
-import { useCreateBazarEntryMutation, useGetAllBazarEntriesQuery, useDeleteBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
-import { useCreateBillMutation, useGetAllBillsQuery, useDeleteBillMutation } from "@/redux/features/bill/billApi";
+import { useCreateBazarEntryMutation, useGetAllBazarEntriesQuery, useDeleteBazarEntryMutation, TBazarEntry } from "@/redux/features/bazar-entry/bazarEntryApi";
+import { useCreateBillMutation, useGetAllBillsQuery, useDeleteBillMutation, TBill } from "@/redux/features/bill/billApi";
 import { WebPagination } from "@/components/web/shell/WebPagination";
 import { WebConfirmModal } from "@/components/web/shell/WebModal";
 import { WebHeader } from "@/components/web/shell/WebHeader";
@@ -20,6 +20,8 @@ import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
 import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
 import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent } from "@/components/web/shell/WebDialogs";
 import { avatarColor, initials } from "@/components/web/shell/WebMetricCard";
+import { EditExpenseModal } from "@/components/dashboard/expenses/EditExpenseModal";
+import { EditBillModal } from "@/components/dashboard/bills/EditBillModal";
 
 // ─── Helper Components for Dashboard Stats ─────────────────────────────────
 
@@ -133,9 +135,11 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     });
     const dashboardStats = dashboardData?.data;
 
-    // Delete Confirmation Modal States
+    // Delete & Edit Modal States
     const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
     const [deletingBillId, setDeletingBillId] = useState<string | null>(null);
+    const [editingExpense, setEditingExpense] = useState<TBazarEntry | null>(null);
+    const [editingBill, setEditingBill] = useState<TBill | null>(null);
 
     // Onboarding & Interaction Modal States
     const [showAddExpense, setShowAddExpense] = useState(false);
@@ -581,8 +585,8 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 <th className="p-4">Date</th>
                                                 <th className="p-4 text-right">Price</th>
                                                 <th className="p-4 text-right">Qty</th>
-                                                <th className="p-4 text-right">Total</th>
-                                                <th className="p-4 text-center">Delete</th>
+                                                 <th className="p-4 text-right">Total</th>
+                                                <th className="p-4 text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-[rgba(232,160,32,0.06)] bg-[#251508]">
@@ -608,7 +612,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                             <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
                                                         </td>
                                                         <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-6 mx-auto" />
+                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-12 mx-auto" />
                                                         </td>
                                                     </tr>
                                                 ))
@@ -645,9 +649,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                             </td>
                                                             <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.price * e.quantity).toLocaleString()}</td>
                                                             <td className="p-4 text-center">
-                                                                <button onClick={() => setDeletingExpenseId(e._id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Delete Expense">
-                                                                    <X className="w-4 h-4" />
-                                                                </button>
+                                                                <div className="flex items-center justify-center gap-1">
+                                                                    <button onClick={() => setEditingExpense(e)} className="p-1.5 text-muted-foreground hover:text-primary rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" title="Edit Expense">
+                                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                    <button onClick={() => setDeletingExpenseId(e._id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Delete Expense">
+                                                                        <X className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     ))
@@ -744,9 +753,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
                                                                         {meta.icon} {meta.label}
                                                                     </span>
-                                                                    <button onClick={() => setDeletingBillId(b._id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer" title="Delete Bill">
-                                                                        <X className="w-3.5 h-3.5" />
-                                                                    </button>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <button onClick={() => setEditingBill(b)} className="text-muted-foreground hover:text-primary p-1 rounded-md transition-colors cursor-pointer" title="Edit Bill">
+                                                                            <Edit2 className="w-3.5 h-3.5" />
+                                                                        </button>
+                                                                        <button onClick={() => setDeletingBillId(b._id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer" title="Delete Bill">
+                                                                            <X className="w-3.5 h-3.5" />
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                                 <h4 className="text-base font-semibold text-foreground">{b.title}</h4>
                                                                 {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
@@ -1043,6 +1057,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                     }
                 }}
             />
+
+            {/* Edit Expense Modal */}
+            <EditExpenseModal entry={editingExpense} onClose={() => setEditingExpense(null)} />
+
+            {/* Edit Bill Modal */}
+            <EditBillModal bill={editingBill} onClose={() => setEditingBill(null)} />
         </div>
     );
 }

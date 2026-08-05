@@ -18,7 +18,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
     const [subScreen, setSubScreen] = useState<AppSubScreen>(null);
 
     // Custom Hook encapsulating RTK Query endpoints & data transformers
-    const { dashboardStats, isBazarLoading, isBillLoading, currentUser, entries, bills, expenseFilter, setExpenseFilter, billFilter, setBillFilter } = useAppShellQueries(tab);
+    const { dashboardStats, isDashboardLoading, isBazarLoading, isBillLoading, currentUser, entries, bills, expenseFilter, setExpenseFilter, billFilter, setBillFilter } = useAppShellQueries(tab);
 
     const [selectedEntry, setSelectedEntry] = useState<MockBazarEntry | null>(null);
     const [selectedBill, setSelectedBill] = useState<MockBill | null>(null);
@@ -84,7 +84,7 @@ export function AppShell({ stats }: { stats: GroupStats }) {
         <ScreenShell>
             <div className="flex flex-col flex-1 min-h-0 relative">
                 <div className="flex-1 min-h-0 relative flex flex-col">
-                    {tab === "home" && <HomeTab stats={computedStats} />}
+                    {tab === "home" && <HomeTab stats={computedStats} isLoading={isDashboardLoading} />}
                     {tab === "expenses" && (
                         <ExpensesTab
                             entries={entries}

@@ -19,7 +19,17 @@ function Delta({ current, prev }: { current: number; prev: number }) {
     );
 }
 
-function StatCard({ label, value, prev, icon, delay = 0, accent = false }: { label: string; value: number; prev?: number; icon: React.ReactNode; delay?: number; accent?: boolean }) {
+function LoadingDots() {
+    return (
+        <span className="inline-flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+        </span>
+    );
+}
+
+function StatCard({ label, value, prev, icon, delay = 0, accent = false, isLoading = false }: { label: string; value: number; prev?: number; icon: React.ReactNode; delay?: number; accent?: boolean; isLoading?: boolean }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -37,9 +47,11 @@ function StatCard({ label, value, prev, icon, delay = 0, accent = false }: { lab
                 >
                     {icon}
                 </motion.div>
-                {prev !== undefined && <Delta current={value} prev={prev} />}
+                {!isLoading && prev !== undefined && <Delta current={value} prev={prev} />}
             </div>
-            <p className="text-2xl font-bold text-foreground font-mono">{fmt(value)}</p>
+            <div className="min-h-[2rem] flex items-center">
+                {isLoading ? <LoadingDots /> : <p className="text-2xl font-bold text-foreground font-mono">{fmt(value)}</p>}
+            </div>
             <p className="text-xs text-muted-foreground leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 {label}
             </p>
@@ -47,7 +59,7 @@ function StatCard({ label, value, prev, icon, delay = 0, accent = false }: { lab
     );
 }
 
-function CountCard({ label, value, icon, delay = 0 }: { label: string; value: number; icon: React.ReactNode; delay?: number }) {
+function CountCard({ label, value, icon, delay = 0, isLoading = false }: { label: string; value: number; icon: React.ReactNode; delay?: number; isLoading?: boolean }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -61,7 +73,9 @@ function CountCard({ label, value, icon, delay = 0 }: { label: string; value: nu
                 {icon}
             </motion.div>
             <div>
-                <p className="text-xl font-bold text-foreground font-mono">{value.toLocaleString()}</p>
+                <div className="min-h-[1.75rem] flex items-center">
+                    {isLoading ? <LoadingDots /> : <p className="text-xl font-bold text-foreground font-mono">{value.toLocaleString()}</p>}
+                </div>
                 <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     {label}
                 </p>
@@ -70,7 +84,7 @@ function CountCard({ label, value, icon, delay = 0 }: { label: string; value: nu
     );
 }
 
-export function HomeTab({ stats }: { stats: GroupStats }) {
+export function HomeTab({ stats, isLoading = false }: { stats: GroupStats; isLoading?: boolean }) {
     const mn = now.toLocaleString("default", { month: "long" }),
         yr = now.getFullYear();
     return (
@@ -104,42 +118,46 @@ export function HomeTab({ stats }: { stats: GroupStats }) {
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-widest font-mono">
                         {mn} {yr} — Total
                     </p>
-                    <p className="text-4xl font-bold text-primary mb-2 font-mono">{fmt(stats.thisMonthTotalExpense)}</p>
-                    <div className="flex items-center gap-2">
-                        <Delta current={stats.thisMonthTotalExpense} prev={stats.prevMonthTotalExpense} />
-                        <span className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            vs {fmt(stats.prevMonthTotalExpense)} last month
-                        </span>
+                    <div className="min-h-[2.5rem] flex items-center mb-2">
+                        {isLoading ? <LoadingDots /> : <p className="text-4xl font-bold text-primary font-mono">{fmt(stats.thisMonthTotalExpense)}</p>}
                     </div>
+                    {!isLoading && (
+                        <div className="flex items-center gap-2">
+                            <Delta current={stats.thisMonthTotalExpense} prev={stats.prevMonthTotalExpense} />
+                            <span className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                vs {fmt(stats.prevMonthTotalExpense)} last month
+                            </span>
+                        </div>
+                    )}
                 </motion.div>
                 <div className="grid grid-cols-2 gap-3">
-                    <StatCard label={`${yr} Grand Total`} value={stats.thisYearTotalExpense} prev={stats.prevYearTotalExpense} icon={<TrendingUp className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.1} />
-                    <StatCard label={`${yr - 1} Grand Total`} value={stats.prevYearTotalExpense} icon={<Minus className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.15} />
+                    <StatCard label={`${yr} Grand Total`} value={stats.thisYearTotalExpense} prev={stats.prevYearTotalExpense} icon={<TrendingUp className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.1} isLoading={isLoading} />
+                    <StatCard label={`${yr - 1} Grand Total`} value={stats.prevYearTotalExpense} icon={<Minus className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.15} isLoading={isLoading} />
                 </div>
 
                 {/* 2. Bazar Expense */}
                 <SectionLabel>Bazar Expense</SectionLabel>
                 <div className="grid grid-cols-2 gap-3">
-                    <StatCard label={`${mn} Bazar`} value={stats.thisMonthBazarExpense} prev={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.2} />
-                    <StatCard label="Prev Month" value={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.25} />
-                    <StatCard label={`${yr} Bazar`} value={stats.thisYearBazarExpense} prev={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.3} />
-                    <StatCard label={`${yr - 1} Bazar`} value={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.35} />
+                    <StatCard label={`${mn} Bazar`} value={stats.thisMonthBazarExpense} prev={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.2} isLoading={isLoading} />
+                    <StatCard label="Prev Month" value={stats.prevMonthBazarExpense} icon={<ShoppingBag className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.25} isLoading={isLoading} />
+                    <StatCard label={`${yr} Bazar`} value={stats.thisYearBazarExpense} prev={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-primary" strokeWidth={1.8} />} delay={0.3} isLoading={isLoading} />
+                    <StatCard label={`${yr - 1} Bazar`} value={stats.prevYearBazarExpense} icon={<Calendar className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.35} isLoading={isLoading} />
                 </div>
 
                 {/* 3. Bill Expense */}
                 <SectionLabel>Bill Expense</SectionLabel>
                 <div className="grid grid-cols-2 gap-3">
-                    <StatCard label={`${mn} Bills`} value={stats.thisMonthBillExpense} prev={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.38} accent />
-                    <StatCard label="Prev Month" value={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.41} accent />
-                    <StatCard label={`${yr} Bills`} value={stats.thisYearBillExpense} prev={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.44} accent />
-                    <StatCard label={`${yr - 1} Bills`} value={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.47} accent />
+                    <StatCard label={`${mn} Bills`} value={stats.thisMonthBillExpense} prev={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.38} accent isLoading={isLoading} />
+                    <StatCard label="Prev Month" value={stats.prevMonthBillExpense} icon={<Receipt className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.41} accent isLoading={isLoading} />
+                    <StatCard label={`${yr} Bills`} value={stats.thisYearBillExpense} prev={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-accent" strokeWidth={1.8} />} delay={0.44} accent isLoading={isLoading} />
+                    <StatCard label={`${yr - 1} Bills`} value={stats.prevYearBillExpense} icon={<BarChart2 className="w-4 h-4 text-muted-foreground" strokeWidth={1.8} />} delay={0.47} accent isLoading={isLoading} />
                 </div>
 
                 {/* 4. Group Entries */}
                 <SectionLabel>Group Entries</SectionLabel>
                 <div className="grid grid-cols-2 gap-3">
-                    <CountCard label="Group Bazar Entries" value={stats.totalGroupBazarEntries} icon={<ShoppingBag className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.5} />
-                    <CountCard label="My Bazar Entries" value={stats.totalMyBazarEntries} icon={<BookOpen className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.55} />
+                    <CountCard label="Group Bazar Entries" value={stats.totalGroupBazarEntries} icon={<ShoppingBag className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.5} isLoading={isLoading} />
+                    <CountCard label="My Bazar Entries" value={stats.totalMyBazarEntries} icon={<BookOpen className="w-5 h-5 text-primary" strokeWidth={1.8} />} delay={0.55} isLoading={isLoading} />
                 </div>
             </div>
         </div>

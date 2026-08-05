@@ -48,12 +48,11 @@ export function ImageUpload({ value, onChange, onRemove, label = "Photo", varian
 
             if (data.secure_url) {
                 onChange(data.secure_url);
-                toast.success("Photo uploaded to Cloudinary!");
             } else {
-                throw new Error(data.error?.message || "Failed to upload image to Cloudinary");
+                throw new Error(data.error?.message || "Failed to upload image");
             }
         } catch (err: any) {
-            toast.error(err?.message || "Error uploading photo to Cloudinary");
+            toast.error(err?.message || "Error uploading image");
         } finally {
             setUploading(false);
             if (fileInputRef.current) {

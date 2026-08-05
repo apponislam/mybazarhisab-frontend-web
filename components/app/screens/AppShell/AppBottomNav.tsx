@@ -24,17 +24,20 @@ export function AppBottomNav({
     return (
         <div className="relative z-50 flex items-end bg-card border-t border-border px-2 pb-2 pt-1 shrink-0" style={{ boxShadow: "0 -4px 24px rgba(0,0,0,0.4)" }}>
             {tabs.slice(0, 2).map((t) => (
-                <button key={t.id} onClick={() => onTab(t.id)} className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all cursor-pointer" style={{ color: tab === t.id ? "#e8a020" : "#a08060" }}>
-                    {t.icon}
+                <button key={t.id} onClick={() => onTab(t.id)} className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all cursor-pointer group" style={{ color: tab === t.id ? "#e8a020" : "#a08060" }}>
+                    <motion.div whileHover={{ scale: 1.15, rotate: -5 }} whileTap={{ scale: 0.85 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
+                        {t.icon}
+                    </motion.div>
                     <span className="text-[10px] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         {t.label}
                     </span>
-                    {tab === t.id && <div className="w-1 h-1 rounded-full bg-primary" />}
+                    {tab === t.id && <motion.div layoutId="activeDot" className="w-1 h-1 rounded-full bg-primary" />}
                 </button>
             ))}
             <div className="flex-1 flex flex-col items-center pb-1">
                 <motion.button
                     onClick={onAdd}
+                    whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.9 }}
                     className="w-14 h-14 rounded-full bg-primary flex items-center justify-center -mt-6 shadow-xl cursor-pointer"
                     style={{ boxShadow: "0 4px 20px rgba(232,160,32,0.5)" }}
@@ -48,12 +51,14 @@ export function AppBottomNav({
                 </span>
             </div>
             {tabs.slice(2).map((t) => (
-                <button key={t.id} onClick={() => onTab(t.id)} className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all cursor-pointer" style={{ color: tab === t.id ? "#e8a020" : "#a08060" }}>
-                    {t.icon}
+                <button key={t.id} onClick={() => onTab(t.id)} className="flex-1 flex flex-col items-center gap-0.5 py-2 rounded-xl transition-all cursor-pointer group" style={{ color: tab === t.id ? "#e8a020" : "#a08060" }}>
+                    <motion.div whileHover={{ scale: 1.15, rotate: 5 }} whileTap={{ scale: 0.85 }} transition={{ type: "spring", stiffness: 400, damping: 17 }}>
+                        {t.icon}
+                    </motion.div>
                     <span className="text-[10px] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                         {t.label}
                     </span>
-                    {tab === t.id && <div className="w-1 h-1 rounded-full bg-primary" />}
+                    {tab === t.id && <motion.div layoutId="activeDot" className="w-1 h-1 rounded-full bg-primary" />}
                 </button>
             ))}
         </div>

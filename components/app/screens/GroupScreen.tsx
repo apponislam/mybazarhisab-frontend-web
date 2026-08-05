@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import { Users, Copy, Check, RefreshCw, LogOut } from "lucide-react";
+import { motion } from "motion/react";
 import { toast } from "sonner";
-import { ScreenShell, BackButton, PrimaryButton, Avatar } from "@/components/app/ui/Shared";
-import {
-    useGetMyGroupQuery,
-    useUpdateGroupMutation,
-    useGenerateInviteCodeMutation,
-    useLeaveGroupMutation,
-} from "@/redux/features/group/groupApi";
+import { ScreenShell, BackButton, Avatar } from "@/components/app/ui/Shared";
+import { useGetMyGroupQuery, useUpdateGroupMutation, useGenerateInviteCodeMutation, useLeaveGroupMutation } from "@/redux/features/group/groupApi";
 import { useGetMeQuery } from "@/redux/features/auth/authApi";
 
 export function GroupScreen({ onBack }: { onBack: () => void }) {
@@ -75,32 +71,18 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
 
                 {/* Group Card */}
                 <div className="rounded-3xl border border-border bg-card p-6 flex flex-col items-center text-center gap-3 relative shadow-2xl">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shadow-inner">
+                    <motion.div whileHover={{ scale: 1.1, rotate: -5 }} transition={{ type: "spring", stiffness: 350, damping: 15 }} className="w-16 h-16 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shadow-inner">
                         <Users className="w-8 h-8" />
-                    </div>
+                    </motion.div>
 
                     {isEditingName ? (
                         <form onSubmit={handleUpdateName} className="w-full flex flex-col gap-3 mt-1">
-                            <input
-                                value={groupName}
-                                onChange={(e) => setGroupName(e.target.value)}
-                                placeholder="Group Name"
-                                className="w-full px-4 py-2.5 bg-[#2e1a0a] border border-primary/50 rounded-xl text-center font-bold text-foreground outline-none text-base font-serif"
-                                autoFocus
-                            />
+                            <input value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group Name" className="w-full px-4 py-2.5 bg-[#2e1a0a] border border-primary/50 rounded-xl text-center font-bold text-foreground outline-none text-base font-serif" autoFocus />
                             <div className="flex gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsEditingName(false)}
-                                    className="flex-1 py-2 rounded-xl border border-border text-xs font-semibold text-muted-foreground"
-                                >
+                                <button type="button" onClick={() => setIsEditingName(false)} className="flex-1 py-2 rounded-xl border border-border text-xs font-semibold text-muted-foreground">
                                     Cancel
                                 </button>
-                                <button
-                                    type="submit"
-                                    disabled={isUpdating}
-                                    className="flex-1 py-2 rounded-xl bg-primary text-xs font-bold text-primary-foreground"
-                                >
+                                <button type="submit" disabled={isUpdating} className="flex-1 py-2 rounded-xl bg-primary text-xs font-bold text-primary-foreground">
                                     {isUpdating ? "Saving..." : "Save"}
                                 </button>
                             </div>
@@ -133,14 +115,8 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">Invitation Code</p>
                     <div className="rounded-3xl border border-border bg-card p-6 flex flex-col items-center text-center gap-3 shadow-xl">
                         <div className="flex items-center justify-center gap-3 w-full">
-                            <span className="text-2xl font-bold font-mono text-foreground tracking-wider selection:bg-primary selection:text-primary-foreground">
-                                {group?.inviteCode || "BAZAR-XXXXXX"}
-                            </span>
-                            <button
-                                onClick={handleCopyCode}
-                                className="w-9 h-9 rounded-xl border border-primary/30 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors"
-                                title="Copy code"
-                            >
+                            <span className="text-2xl font-bold font-mono text-foreground tracking-wider selection:bg-primary selection:text-primary-foreground">{group?.inviteCode || "BAZAR-XXXXXX"}</span>
+                            <button onClick={handleCopyCode} className="w-9 h-9 rounded-xl border border-primary/30 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 transition-colors" title="Copy code">
                                 {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                             </button>
                         </div>
@@ -148,11 +124,7 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
                             Share this code with others so they can join your group.
                         </p>
                         {isCreator && (
-                            <button
-                                onClick={handleRegenerateCode}
-                                disabled={isGenerating}
-                                className="mt-1 px-4 py-2 rounded-xl border border-border bg-secondary/50 text-xs font-medium text-foreground hover:border-primary/40 flex items-center gap-2 transition-colors"
-                            >
+                            <button onClick={handleRegenerateCode} disabled={isGenerating} className="mt-1 px-4 py-2 rounded-xl border border-border bg-secondary/50 text-xs font-medium text-foreground hover:border-primary/40 flex items-center gap-2 transition-colors">
                                 <RefreshCw className={`w-3.5 h-3.5 ${isGenerating ? "animate-spin" : ""}`} />
                                 {isGenerating ? "Regenerating..." : "Regenerate Code"}
                             </button>
@@ -162,9 +134,7 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
 
                 {/* Members Section */}
                 <div className="flex flex-col gap-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">
-                        Members ({group?.members?.length || 0})
-                    </p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">Members ({group?.members?.length || 0})</p>
                     <div className="rounded-3xl border border-border bg-card divide-y divide-border overflow-hidden shadow-xl">
                         {group?.members?.map((member: any) => {
                             const memberIsCreator = typeof group.creator === "string" ? group.creator === member._id : group.creator?._id === member._id;
@@ -177,11 +147,7 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
                                         </p>
                                         <p className="text-xs text-muted-foreground font-mono truncate">{member.phone || member.email}</p>
                                     </div>
-                                    {memberIsCreator && (
-                                        <span className="px-2.5 py-1 rounded-lg border border-primary/40 bg-primary/10 text-[11px] font-bold text-primary font-mono">
-                                            Admin
-                                        </span>
-                                    )}
+                                    {memberIsCreator && <span className="px-2.5 py-1 rounded-lg border border-primary/40 bg-primary/10 text-[11px] font-bold text-primary font-mono">Admin</span>}
                                 </div>
                             );
                         })}
@@ -204,10 +170,7 @@ export function GroupScreen({ onBack }: { onBack: () => void }) {
                             </div>
                         </div>
                     ) : (
-                        <button
-                            onClick={() => setShowLeaveConfirm(true)}
-                            className="w-full py-3.5 rounded-2xl border border-destructive/40 bg-destructive/10 text-sm font-bold text-destructive hover:bg-destructive/20 transition-all cursor-pointer flex items-center justify-center gap-2"
-                        >
+                        <button onClick={() => setShowLeaveConfirm(true)} className="w-full py-3.5 rounded-2xl border border-destructive/40 bg-destructive/10 text-sm font-bold text-destructive hover:bg-destructive/20 transition-all cursor-pointer flex items-center justify-center gap-2">
                             <LogOut className="w-4 h-4" />
                             <span>Leave Group</span>
                         </button>

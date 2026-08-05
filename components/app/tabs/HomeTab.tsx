@@ -21,9 +21,9 @@ function Delta({ current, prev }: { current: number; prev: number }) {
 
 function StatCard({ label, value, prev, icon, delay = 0, accent = false }: { label: string; value: number; prev?: number; icon: React.ReactNode; delay?: number; accent?: boolean }) {
     return (
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] }} className="rounded-2xl border border-border bg-card p-4 flex flex-col gap-2" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.35)" }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -3 }} className="rounded-2xl border border-border bg-card p-4 flex flex-col gap-2 transition-shadow hover:shadow-2xl" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.35)" }}>
             <div className="flex items-center justify-between">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${accent ? "bg-accent/20 border border-accent/30" : "bg-primary/12 border border-primary/25"}`}>{icon}</div>
+                <motion.div whileHover={{ scale: 1.2, rotate: 10 }} transition={{ type: "spring", stiffness: 350, damping: 15 }} className={`w-8 h-8 rounded-xl flex items-center justify-center ${accent ? "bg-accent/20 border border-accent/30 text-accent" : "bg-primary/12 border border-primary/25 text-primary"}`}>{icon}</motion.div>
                 {prev !== undefined && <Delta current={value} prev={prev} />}
             </div>
             <p className="text-2xl font-bold text-foreground font-mono">{fmt(value)}</p>
@@ -36,8 +36,8 @@ function StatCard({ label, value, prev, icon, delay = 0, accent = false }: { lab
 
 function CountCard({ label, value, icon, delay = 0 }: { label: string; value: number; icon: React.ReactNode; delay?: number }) {
     return (
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] }} className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.35)" }}>
-            <div className="w-10 h-10 rounded-xl bg-primary/12 border border-primary/25 flex items-center justify-center shrink-0">{icon}</div>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] }} whileHover={{ y: -3 }} className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3 transition-shadow hover:shadow-2xl" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.35)" }}>
+            <motion.div whileHover={{ scale: 1.2, rotate: -10 }} transition={{ type: "spring", stiffness: 350, damping: 15 }} className="w-10 h-10 rounded-xl bg-primary/12 border border-primary/25 flex items-center justify-center shrink-0 text-primary">{icon}</motion.div>
             <div>
                 <p className="text-xl font-bold text-foreground font-mono">{value.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>

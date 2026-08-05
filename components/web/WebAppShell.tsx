@@ -5,7 +5,7 @@ import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, St
 import { toast } from "sonner";
 import { BazarUnit, BillCategory, GroupStats } from "@/types";
 import { BILL_META, fmt } from "@/lib/mockData";
-import { useGetUserDashboardStatsQuery } from "@/redux/features/dashboard/dashboardApi";
+import { useGetUserDashboardStatsQuery, useGetMonthlyExpenseTrendQuery } from "@/redux/features/dashboard/dashboardApi";
 import { useGetMeQuery, useUpdateProfileMutation, useChangePasswordMutation } from "@/redux/features/auth/authApi";
 import { useSubmitMessageMutation } from "@/redux/features/contact/contactApi";
 import { useCreateFeedbackMutation } from "@/redux/features/feedback/feedbackApi";
@@ -22,6 +22,7 @@ import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBil
 import { avatarColor, initials } from "@/components/web/shell/WebMetricCard";
 import { EditExpenseModal } from "@/components/dashboard/expenses/EditExpenseModal";
 import { EditBillModal } from "@/components/dashboard/bills/EditBillModal";
+import { WebMonthlyTrendChart } from "@/components/web/shell/WebMonthlyTrendChart";
 
 // ─── Helper Components for Dashboard Stats ─────────────────────────────────
 
@@ -134,6 +135,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
         skip: tab !== "home",
     });
     const dashboardStats = dashboardData?.data;
+
+    // Monthly Expense Trend (12 Months breakdown)
+    const { data: monthlyTrendResponse, isLoading: isMonthlyTrendLoading } = useGetMonthlyExpenseTrendQuery(undefined, {
+        skip: tab !== "home",
+    });
+    const monthlyTrendData = monthlyTrendResponse?.data || [];
 
     // Delete & Edit Modal States
     const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
@@ -544,6 +551,11 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                         </div>
                                     </motion.div>
                                 </div>
+
+                                {/* ─── Monthly Expense Trend Component ─── */}
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                                    <WebMonthlyTrendChart data={monthlyTrendData} isLoading={isMonthlyTrendLoading} />
+                                </motion.div>
                             </>
                         )}
 

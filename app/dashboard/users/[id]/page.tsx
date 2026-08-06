@@ -349,20 +349,25 @@ export default function UserDetailPage() {
                                                             <th className="p-3">Product Item</th>
                                                             <th className="p-3">Quantity</th>
                                                             <th className="p-3">Date</th>
-                                                            <th className="p-3 text-right">Price Spent</th>
+                                                            <th className="p-3 text-right">Unit Price</th>
+                                                            <th className="p-3 text-right">Total Price</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-border/40">
-                                                        {bazarData.data.map((b: any) => (
-                                                            <tr key={b._id} className="hover:bg-primary/5">
-                                                                <td className="p-3 font-bold text-foreground">{b.product?.name || "Bazar Entry"}</td>
-                                                                <td className="p-3 text-muted-foreground">
-                                                                    {b.quantity} {b.unit}
-                                                                </td>
-                                                                <td className="p-3 text-muted-foreground">{new Date(b.date).toLocaleDateString()}</td>
-                                                                <td className="p-3 text-right font-bold text-primary">৳{(b.price || 0).toLocaleString()}</td>
-                                                            </tr>
-                                                        ))}
+                                                        {bazarData.data.map((b: any) => {
+                                                            const calculatedTotal = b.totalPrice ?? (b.price ? b.price * (b.quantity || 1) : 0);
+                                                            return (
+                                                                <tr key={b._id} className="hover:bg-primary/5">
+                                                                    <td className="p-3 font-bold text-foreground">{b.product?.name || "Bazar Entry"}</td>
+                                                                    <td className="p-3 text-muted-foreground">
+                                                                        {b.quantity} {b.unit}
+                                                                    </td>
+                                                                    <td className="p-3 text-muted-foreground">{new Date(b.date).toLocaleDateString()}</td>
+                                                                    <td className="p-3 text-right text-muted-foreground">৳{(b.price || 0).toLocaleString()}</td>
+                                                                    <td className="p-3 text-right font-bold text-primary">৳{calculatedTotal.toLocaleString()}</td>
+                                                                </tr>
+                                                            );
+                                                        })}
                                                     </tbody>
                                                 </table>
                                             ) : (

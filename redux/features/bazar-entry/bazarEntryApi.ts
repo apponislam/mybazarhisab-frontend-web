@@ -7,6 +7,7 @@ export type BazarUnit = "KG" | "PIECE" | "GM";
 export type TProduct = {
     _id: string;
     name: string;
+    photo?: string;
     isDeleted: boolean;
     createdAt: string;
     updatedAt: string;

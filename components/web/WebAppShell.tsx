@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, Star, Calendar, TrendingUp, Minus, BookOpen, Package, BarChart2, Edit2 } from "lucide-react";
@@ -527,8 +528,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                     {bazarEntriesResponse.data.slice(0, 10).map((e: any) => (
                                                         <div key={e._id} className="flex items-center justify-between px-5 py-3 hover:bg-white/[0.02] transition-colors">
                                                             <div className="flex items-center gap-3 min-w-0">
-                                                                <div className="w-8 h-8 rounded-lg bg-primary/8 border border-primary/15 flex items-center justify-center shrink-0">
-                                                                    <ShoppingBag className="w-3.5 h-3.5 text-primary" />
+                                                                <div className="w-8 h-8 rounded-lg overflow-hidden bg-primary/8 border border-primary/15 flex items-center justify-center shrink-0">
+                                                                    {e.product?.photo ? (
+                                                                        <Image src={e.product.photo} alt={e.product?.name || e.name} width={32} height={32} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <ShoppingBag className="w-3.5 h-3.5 text-primary" />
+                                                                    )}
                                                                 </div>
                                                                 <div className="min-w-0">
                                                                     <p className="text-sm font-medium truncate text-[#f5ede2]">{e.product?.name || e.name}</p>
@@ -643,8 +648,14 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                     })
                                                     .map((e: any) => (
                                                         <tr key={e._id} className="hover:bg-primary/5 transition-colors">
-                                                            <td className="p-4 font-semibold flex items-center gap-2">
-                                                                <span className="text-xl">🛒</span>
+                                                            <td className="p-4 font-semibold flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-xl overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                                                                    {e.product?.photo ? (
+                                                                        <Image src={e.product.photo} alt={e.product?.name || "Bazar Item"} width={32} height={32} className="w-full h-full object-cover" />
+                                                                    ) : (
+                                                                        <span className="text-base">🛒</span>
+                                                                    )}
+                                                                </div>
                                                                 <div>
                                                                     <p>{e.product?.name || "Bazar Item"}</p>
                                                                     {e.notes && <p className="text-[10px] text-muted-foreground font-normal italic">{e.notes}</p>}
@@ -652,8 +663,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                             </td>
                                                             <td className="p-4">
                                                                 <div className="flex items-center gap-2">
-                                                                    <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "u") }}>
-                                                                        {initials(e.user?.name || "U")}
+                                                                    <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "u") }}>
+                                                                        {e.user?.profileImage ? (
+                                                                            <Image src={e.user.profileImage} alt={e.user?.name || "User"} width={24} height={24} className="w-full h-full object-cover" />
+                                                                        ) : (
+                                                                            initials(e.user?.name || "U")
+                                                                        )}
                                                                     </div>
                                                                     <span>{e.user?.name || "User"}</span>
                                                                 </div>
@@ -763,10 +778,17 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                 .map((b: any) => {
                                                     const meta = BILL_META[b.category as keyof typeof BILL_META] || { icon: "📄", label: b.category, color: "#e8a020" };
                                                     return (
-                                                        <div key={b._id} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden">
+                                                        <motion.div
+                                                            key={b._id}
+                                                            initial={{ opacity: 0, y: 15 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            whileHover={{ y: -4, scale: 1.015, boxShadow: `0 8px 30px ${meta.color}25` }}
+                                                            transition={{ duration: 0.2 }}
+                                                            className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden transition-colors hover:border-primary/40 group"
+                                                        >
                                                             <div>
                                                                 <div className="flex items-center justify-between gap-2 mb-3">
-                                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold font-mono border" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
+                                                                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono border shadow-sm transition-transform group-hover:scale-105" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
                                                                         {meta.icon} {meta.label}
                                                                     </span>
                                                                     <div className="flex items-center gap-1">
@@ -778,18 +800,18 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                                         </button>
                                                                     </div>
                                                                 </div>
-                                                                <h4 className="text-base font-semibold text-foreground">{b.title}</h4>
+                                                                <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">{b.title}</h4>
                                                                 {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
                                                             </div>
 
                                                             <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
                                                                 <div>
-                                                                    <p className="text-[10px] text-muted-foreground font-mono">Paid by: {b.user?.name || "User"}</p>
-                                                                    <p className="text-[9px] text-muted-foreground font-mono mt-0.5">{new Date(b.date).toLocaleDateString()}</p>
+                                                                    <p className="text-xs font-medium text-muted-foreground font-mono">Added by: <span className="text-foreground font-semibold">{b.user?.name || "User"}</span></p>
+                                                                    <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{new Date(b.date).toLocaleDateString()}</p>
                                                                 </div>
-                                                                <p className="text-lg font-bold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
+                                                                <p className="text-xl font-extrabold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
                                                             </div>
-                                                        </div>
+                                                        </motion.div>
                                                     );
                                                 })}
                                         </div>

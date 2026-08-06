@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Search, ShoppingBag, Edit2, Trash2, ShieldCheck, User } from "lucide-react";
 import { TBazarEntry } from "@/redux/features/bazar-entry/bazarEntryApi";
 
@@ -96,26 +97,30 @@ export function ExpensesTable({ entries, isLoading, searchTerm, onSearchChange, 
                                     <tr key={e._id} className="hover:bg-primary/5 transition-colors group">
                                         <td className="p-4 font-semibold">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                                                    <ShoppingBag className="w-4 h-4" />
+                                                <div className="w-9 h-9 rounded-xl overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                                                    {e.product?.photo ? (
+                                                        <Image src={e.product.photo} alt={productName} width={36} height={36} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <ShoppingBag className="w-4 h-4" />
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <p className="text-foreground">{productName}</p>
-                                                    {e.notes && <p className="text-[10px] text-muted-foreground font-normal italic">{e.notes}</p>}
-                                                    <p className="text-[10px] text-muted-foreground font-mono select-all mt-0.5" title={e._id}>
+                                                    {e.notes && <p className="text-[11px] text-muted-foreground font-normal italic">{e.notes}</p>}
+                                                    <p className="text-[11px] text-muted-foreground font-mono select-all mt-0.5" title={e._id}>
                                                         ID: {e._id}
                                                     </p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "") }}>
-                                                    {e.user?.profileImage ? <img src={e.user.profileImage} alt={userName} className="w-full h-full object-cover" /> : initials(userName)}
+                                            <div className="flex items-center gap-2.5">
+                                                <div className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center font-bold text-[10px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "") }}>
+                                                    {e.user?.profileImage ? <Image src={e.user.profileImage} alt={userName} width={28} height={28} className="w-full h-full object-cover" /> : initials(userName)}
                                                 </div>
                                                 <div>
                                                     <p className="text-xs font-semibold">{userName}</p>
-                                                    {userEmail && <p className="text-[10px] text-muted-foreground font-mono">{userEmail}</p>}
+                                                    {userEmail && <p className="text-[11px] text-muted-foreground font-mono">{userEmail}</p>}
                                                 </div>
                                             </div>
                                         </td>

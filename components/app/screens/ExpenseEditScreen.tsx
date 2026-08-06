@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Edit3, Weight, Calendar } from "lucide-react";
+import { Edit3, Weight, Calendar, RefreshCw } from "lucide-react";
 import { MockBazarEntry, BazarUnit } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 import { toInputDate } from "@/lib/mockData";
 
 export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarEntry; onBack: () => void; onSave: (updated: MockBazarEntry) => void }) {
     const [price, setPrice] = useState(String(entry.price));
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
     const [quantity, setQuantity] = useState(String(entry.quantity));
     const [unit, setUnit] = useState<BazarUnit>(entry.unit);
     const [date, setDate] = useState(toInputDate(entry.date));
@@ -15,15 +16,36 @@ export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarE
     const [fQty, setFQty] = useState(false);
     const [fNotes, setFNotes] = useState(false);
 
+    const togglePriceMode = () => {
+        const p = Number(price);
+        const q = Number(quantity);
+
+        if (priceMode === "unit") {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p * q).toFixed(2))));
+            }
+            setPriceMode("total");
+        } else {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p / q).toFixed(2))));
+            }
+            setPriceMode("unit");
+        }
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        const p = Number(price);
+        const q = Number(quantity);
+        const unitPrice = priceMode === "total" && q > 0 ? p / q : p;
+
         setTimeout(() => {
             setLoading(false);
             onSave({
                 ...entry,
-                price: Number(price),
-                quantity: Number(quantity),
+                price: unitPrice,
+                quantity: q,
                 unit,
                 date: new Date(date),
                 notes: notes || undefined,
@@ -50,10 +72,18 @@ export function ExpenseEditScreen({ entry, onBack, onSave }: { entry: MockBazarE
                 </div>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="grid grid-cols-2 gap-3">
-                        <FieldBox label="Price (৳)" focused={fPrice}>
-                            <div className="flex items-center" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
+                        <FieldBox label={priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"} focused={fPrice}>
+                            <div className="flex items-center relative" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
                                 <span className="pl-4 text-muted-foreground text-sm font-bold">৳</span>
-                                <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" step="any" value={price} onChange={(e) => setPrice(e.target.value)} required className="flex-1 pl-3 pr-9 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <button
+                                    type="button"
+                                    onClick={togglePriceMode}
+                                    title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                                    className="absolute right-2.5 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                >
+                                    <RefreshCw className="w-3.5 h-3.5" />
+                                </button>
                             </div>
                         </FieldBox>
                         <FieldBox label="Quantity" focused={fQty}>

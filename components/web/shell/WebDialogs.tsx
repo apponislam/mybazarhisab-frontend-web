@@ -64,7 +64,20 @@ export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: 
     const [notes, setNotes] = useState("");
 
     const togglePriceMode = () => {
-        setPriceMode((prev) => (prev === "unit" ? "total" : "unit"));
+        const p = Number(price);
+        const q = Number(quantity);
+
+        if (priceMode === "unit") {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p * q).toFixed(2))));
+            }
+            setPriceMode("total");
+        } else {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p / q).toFixed(2))));
+            }
+            setPriceMode("unit");
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {

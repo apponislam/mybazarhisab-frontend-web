@@ -73,6 +73,9 @@ export default function DashboardContactsPage() {
                                 <option value={20}>20</option>
                                 <option value={50}>50</option>
                             </select>
+                            <button onClick={() => refetch()} className="p-1.5 rounded-lg border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer ml-1" title="Refresh list data">
+                                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-primary" : ""}`} />
+                            </button>
                         </div>
                     </div>
 

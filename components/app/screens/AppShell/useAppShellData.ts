@@ -14,6 +14,7 @@ export function useAppShellData(bazarData: any, billData: any) {
                 emoji: item.product?.emoji || "🛒",
             },
             price: item.price,
+            totalPrice: item.totalPrice ?? (item.price ? item.price * item.quantity : undefined),
             quantity: item.quantity,
             unit: item.unit || "KG",
             date: new Date(item.date || Date.now()),

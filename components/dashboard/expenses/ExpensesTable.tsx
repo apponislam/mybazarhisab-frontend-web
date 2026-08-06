@@ -87,7 +87,7 @@ export function ExpensesTable({ entries, isLoading, searchTerm, onSearchChange, 
                             </tr>
                         ) : (
                             entries.map((e) => {
-                                const totalPrice = e.price * e.quantity;
+                                const totalPrice = e.totalPrice ?? (e.price * e.quantity);
                                 const userName = e.user?.name || "Group Member";
                                 const userEmail = e.user?.email || "";
                                 const productName = e.product?.name || "Bazar Item";

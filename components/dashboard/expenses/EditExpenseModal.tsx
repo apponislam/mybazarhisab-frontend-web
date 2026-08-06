@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Edit2, X } from "lucide-react";
+import { Edit2, X, Repeat } from "lucide-react";
 import { toast } from "sonner";
 import { TBazarEntry, BazarUnit, useUpdateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { ProductSelectInput } from "./ProductSelectInput";
@@ -17,6 +17,7 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
     const [productId, setProductId] = useState<string | undefined>(undefined);
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
     const [quantity, setQuantity] = useState("1");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState("");
@@ -27,12 +28,32 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
             setProductId(entry.product?._id);
             setName(entry.product?.name || "");
             setPrice(entry.price ? String(entry.price) : "");
+            setPriceMode("unit");
             setQuantity(entry.quantity ? String(entry.quantity) : "1");
             setUnit(entry.unit || "KG");
             setDate(entry.date ? new Date(entry.date).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10));
             setNotes(entry.notes || "");
         }
     }, [entry]);
+
+    const togglePriceMode = () => {
+        const p = Number(price);
+        const q = Number(quantity);
+
+        if (priceMode === "unit") {
+            // Switching to Total Price: Total = Unit Price * Quantity
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p * q).toFixed(2))));
+            }
+            setPriceMode("total");
+        } else {
+            // Switching to Unit Price: Unit = Total Price / Quantity
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p / q).toFixed(2))));
+            }
+            setPriceMode("unit");
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,17 +64,24 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
         }
 
         try {
+            const data: any = {
+                productId: productId || undefined,
+                name: name.trim(),
+                quantity: Number(quantity),
+                unit,
+                date: date ? new Date(date).toISOString() : undefined,
+                notes: notes.trim() || undefined,
+            };
+
+            if (priceMode === "unit") {
+                data.price = Number(price);
+            } else {
+                data.totalPrice = Number(price);
+            }
+
             await updateBazarEntry({
                 id: entry._id,
-                data: {
-                    productId: productId || undefined,
-                    name: name.trim(),
-                    price: Number(price),
-                    quantity: Number(quantity),
-                    unit,
-                    date: date ? new Date(date).toISOString() : undefined,
-                    notes: notes.trim() || undefined,
-                },
+                data,
             }).unwrap();
 
             toast.success("Bazar expense updated successfully!");
@@ -96,22 +124,53 @@ export function EditExpenseModal({ entry, onClose }: EditExpenseModalProps) {
                                     }}
                                 />
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Price (৳)</label>
-                                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0" className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                                        {priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}
+                                    </label>
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="number"
+                                            value={price}
+                                            onChange={(e) => setPrice(e.target.value)}
+                                            required
+                                            placeholder="0"
+                                            className="w-full pl-3 pr-8 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={togglePriceMode}
+                                            title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                                            className="absolute right-2 p-1 text-muted-foreground hover:text-accent transition-colors cursor-pointer"
+                                        >
+                                            <Repeat className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Quantity</label>
                                     <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="1" className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Unit</label>
-                                    <select value={unit} onChange={(e) => setUnit(e.target.value as BazarUnit)} className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" style={{ colorScheme: "dark" }}>
-                                        <option value="KG">KG</option>
-                                        <option value="GM">GM</option>
-                                        <option value="PIECE">Piece</option>
-                                    </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Unit</label>
+                                <div className="flex gap-2">
+                                    {(["KG", "PIECE", "GM"] as BazarUnit[]).map((u) => (
+                                        <button
+                                            key={u}
+                                            type="button"
+                                            onClick={() => setUnit(u)}
+                                            className="flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer font-mono"
+                                            style={{
+                                                borderColor: unit === u ? "rgba(232,160,32,0.8)" : "rgba(232,160,32,0.18)",
+                                                background: unit === u ? "rgba(232,160,32,0.15)" : "#1a0e07",
+                                                color: unit === u ? "#e8a020" : "#a08060",
+                                            }}
+                                        >
+                                            {u === "PIECE" ? "Piece" : u}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                             <div>

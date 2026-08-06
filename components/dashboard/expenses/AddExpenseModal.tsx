@@ -24,7 +24,20 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
     const [notes, setNotes] = useState("");
 
     const togglePriceMode = () => {
-        setPriceMode((prev) => (prev === "unit" ? "total" : "unit"));
+        const p = Number(price);
+        const q = Number(quantity);
+
+        if (priceMode === "unit") {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p * q).toFixed(2))));
+            }
+            setPriceMode("total");
+        } else {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p / q).toFixed(2))));
+            }
+            setPriceMode("unit");
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -94,7 +107,7 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
                                     }}
                                 />
                             </div>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">
                                         {priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}
@@ -122,13 +135,25 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Quantity</label>
                                     <input type="number" step="any" value={quantity} onChange={(e) => setQuantity(e.target.value)} required placeholder="1" className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Unit</label>
-                                    <select value={unit} onChange={(e) => setUnit(e.target.value as BazarUnit)} className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" style={{ colorScheme: "dark" }}>
-                                        <option value="KG">KG</option>
-                                        <option value="GM">GM</option>
-                                        <option value="PIECE">Piece</option>
-                                    </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Unit</label>
+                                <div className="flex gap-2">
+                                    {(["KG", "PIECE", "GM"] as BazarUnit[]).map((u) => (
+                                        <button
+                                            key={u}
+                                            type="button"
+                                            onClick={() => setUnit(u)}
+                                            className="flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer font-mono"
+                                            style={{
+                                                borderColor: unit === u ? "rgba(232,160,32,0.8)" : "rgba(232,160,32,0.18)",
+                                                background: unit === u ? "rgba(232,160,32,0.15)" : "#1a0e07",
+                                                color: unit === u ? "#e8a020" : "#a08060",
+                                            }}
+                                        >
+                                            {u === "PIECE" ? "Piece" : u}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                             <div>

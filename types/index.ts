@@ -24,6 +24,7 @@ export interface MockBazarEntry {
   id: string;
   product: MockProduct;
   price: number;
+  totalPrice?: number;
   quantity: number;
   unit: BazarUnit;
   date: Date;

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Edit2, X } from "lucide-react";
+import { Edit2, X, Check } from "lucide-react";
 import { toast } from "sonner";
 import { TProduct, CreateProductPayload, useUpdateProductMutation } from "@/redux/features/product/productApi";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
@@ -88,18 +88,24 @@ export function EditProductModal({ product, onClose }: EditProductModalProps) {
                                 <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground" />
                             </div>
 
-                            <ImageUpload value={formData.photo} onChange={(url) => setFormData({ ...formData, photo: url })} onRemove={() => setFormData({ ...formData, photo: "" })} label="Product Photo (Cloudinary Upload)" />
+                            <ImageUpload value={formData.photo} onChange={(url) => setFormData({ ...formData, photo: url })} onRemove={() => setFormData({ ...formData, photo: "" })} label="Product Photo" variant="square" />
 
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Description</label>
                                 <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none focus:border-primary/60 text-foreground" />
                             </div>
 
-                            <div className="flex items-center gap-3 p-3.5 bg-[#1a0e07] border border-border rounded-xl cursor-pointer" onClick={() => setFormData({ ...formData, is18Plus: !formData.is18Plus })}>
-                                <input type="checkbox" checked={Boolean(formData.is18Plus)} onChange={(e) => setFormData({ ...formData, is18Plus: e.target.checked })} className="w-4 h-4 rounded border-border text-primary focus:ring-0 cursor-pointer" />
+                            <div className="flex items-center justify-between p-3.5 bg-[#1a0e07] border border-border rounded-xl cursor-pointer select-none" onClick={() => setFormData({ ...formData, is18Plus: !formData.is18Plus })}>
                                 <div>
                                     <p className="text-xs font-bold text-foreground">18+ Restricted Product</p>
                                     <p className="text-[10px] text-muted-foreground">Mark if item requires age verification</p>
+                                </div>
+                                <div
+                                    className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
+                                        formData.is18Plus ? "bg-accent border-accent text-accent-foreground shadow-xs shadow-accent/40" : "bg-[#2e1a0a] border-border text-transparent"
+                                    }`}
+                                >
+                                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                                 </div>
                             </div>
 

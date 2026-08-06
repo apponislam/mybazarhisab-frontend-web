@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Check } from "lucide-react";
 import { toast } from "sonner";
 import { CreateProductPayload, useCreateProductMutation } from "@/redux/features/product/productApi";
 import { ImageUpload } from "@/components/dashboard/ImageUpload";
@@ -81,7 +81,7 @@ export function CreateProductModal({ show, onClose }: CreateProductModalProps) {
                                 />
                             </div>
 
-                            <ImageUpload value={formData.photo} onChange={(url) => setFormData({ ...formData, photo: url })} onRemove={() => setFormData({ ...formData, photo: "" })} label="Product Photo (Cloudinary Upload)" />
+                            <ImageUpload value={formData.photo} onChange={(url) => setFormData({ ...formData, photo: url })} onRemove={() => setFormData({ ...formData, photo: "" })} label="Product Photo" variant="square" />
 
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Description</label>
@@ -94,11 +94,17 @@ export function CreateProductModal({ show, onClose }: CreateProductModalProps) {
                                 />
                             </div>
 
-                            <div className="flex items-center gap-3 p-3.5 bg-[#1a0e07] border border-border rounded-xl cursor-pointer" onClick={() => setFormData({ ...formData, is18Plus: !formData.is18Plus })}>
-                                <input type="checkbox" checked={Boolean(formData.is18Plus)} onChange={(e) => setFormData({ ...formData, is18Plus: e.target.checked })} className="w-4 h-4 rounded border-border text-primary focus:ring-0 cursor-pointer" />
+                            <div className="flex items-center justify-between p-3.5 bg-[#1a0e07] border border-border rounded-xl cursor-pointer select-none" onClick={() => setFormData({ ...formData, is18Plus: !formData.is18Plus })}>
                                 <div>
                                     <p className="text-xs font-bold text-foreground">18+ Restricted Product</p>
                                     <p className="text-[10px] text-muted-foreground">Mark if item requires age verification</p>
+                                </div>
+                                <div
+                                    className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
+                                        formData.is18Plus ? "bg-primary border-primary text-primary-foreground shadow-xs shadow-primary/40" : "bg-[#2e1a0a] border-border text-transparent"
+                                    }`}
+                                >
+                                    <Check className="w-3.5 h-3.5 stroke-[3]" />
                                 </div>
                             </div>
 

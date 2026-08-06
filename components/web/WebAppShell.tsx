@@ -537,7 +537,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                                 </div>
                                                             </div>
                                                             <div className="text-right shrink-0 pl-3">
-                                                                <p className="text-sm font-bold text-primary font-mono">৳{((e.price || 0) * (e.quantity || 1)).toLocaleString()}</p>
+                                                                <p className="text-sm font-bold text-primary font-mono">৳{(e.totalPrice ?? ((e.price || 0) * (e.quantity || 1))).toLocaleString()}</p>
                                                                 <p className="text-[10px] text-muted-foreground font-mono">{e.quantity} {e.unit}</p>
                                                             </div>
                                                         </div>
@@ -662,7 +662,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                                             <td className="p-4 text-right font-mono text-xs">
                                                                 {e.quantity} {e.unit}
                                                             </td>
-                                                            <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.price * e.quantity).toLocaleString()}</td>
+                                                            <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.totalPrice ?? (e.price * e.quantity)).toLocaleString()}</td>
                                                             <td className="p-4 text-center">
                                                                 <div className="flex items-center justify-center gap-1">
                                                                     <button onClick={() => setEditingExpense(e)} className="p-1.5 text-muted-foreground hover:text-primary rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" title="Edit Expense">

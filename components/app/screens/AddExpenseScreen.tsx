@@ -24,7 +24,20 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
     const [fNotes, setFNotes] = useState(false);
 
     const togglePriceMode = () => {
-        setPriceMode((prev) => (prev === "unit" ? "total" : "unit"));
+        const p = Number(price);
+        const q = Number(quantity);
+
+        if (priceMode === "unit") {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p * q).toFixed(2))));
+            }
+            setPriceMode("total");
+        } else {
+            if (p > 0 && q > 0) {
+                setPrice(String(Number((p / q).toFixed(2))));
+            }
+            setPriceMode("unit");
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {

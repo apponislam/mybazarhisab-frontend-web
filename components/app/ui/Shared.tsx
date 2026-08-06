@@ -78,12 +78,12 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
     );
 }
 
-export function FieldBox({ label, focused, error, children }: { label: string; focused: boolean; error?: string; children: React.ReactNode }) {
+export function FieldBox({ label, focused, error, children }: { label: React.ReactNode; focused: boolean; error?: string; children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-foreground/80" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <div className="text-sm font-medium text-foreground/80" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 {label}
-            </label>
+            </div>
             <div
                 className="rounded-xl border transition-all duration-200"
                 style={{ borderColor: error ? "rgba(212,24,61,0.6)" : focused ? "rgba(232,160,32,0.7)" : "rgba(232,160,32,0.18)", background: "#2e1a0a", boxShadow: error ? "0 0 0 3px rgba(212,24,61,0.08)" : focused ? "0 0 0 3px rgba(232,160,32,0.12)" : "none" }}

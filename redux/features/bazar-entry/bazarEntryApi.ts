@@ -30,6 +30,7 @@ export type TBazarEntry = {
     _id: string;
     product: TProduct;
     price: number;
+    totalPrice?: number;
     quantity: number;
     unit?: BazarUnit;
     date: string;
@@ -82,7 +83,8 @@ export type BazarEntryStatsParams = {
 export type CreateBazarEntryPayload = {
     productId?: string;
     name: string;
-    price: number;
+    price?: number;
+    totalPrice?: number;
     quantity?: number;
     unit?: BazarUnit;
     notes?: string;

@@ -248,11 +248,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     }, [currentUser]);
 
     // Handlers
-    const handleAddExpense = async (productName: string, price: number, quantity: number, unit: BazarUnit, dateStr: string, notes: string) => {
+    const handleAddExpense = async (productName: string, price?: number, quantity?: number, unit?: BazarUnit, dateStr?: string, notes?: string, totalPrice?: number) => {
         try {
             await createBazarEntry({
                 name: productName.trim(),
-                price: Number(price),
+                price: price !== undefined ? Number(price) : undefined,
+                totalPrice: totalPrice !== undefined ? Number(totalPrice) : undefined,
                 quantity: Number(quantity),
                 unit,
                 date: dateStr,
@@ -865,8 +866,8 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             <Modal show={showAddExpense} onClose={() => setShowAddExpense(false)} title="Add Bazar Expense">
                 <AddExpenseForm
                     isLoading={bazarLoading}
-                    onSubmit={(prod, price, qty, unit, date, notes) => {
-                        handleAddExpense(prod, price, qty, unit, date, notes);
+                    onSubmit={(prod, price, qty, unit, date, notes, totalPrice) => {
+                        handleAddExpense(prod, price, qty, unit, date, notes, totalPrice);
                         setShowAddExpense(false);
                     }}
                     onClose={() => setShowAddExpense(false)}

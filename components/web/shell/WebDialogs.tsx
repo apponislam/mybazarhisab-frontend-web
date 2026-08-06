@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Star } from "lucide-react";
+import { X, Star, Repeat } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BazarUnit, BillCategory } from "@/types";
 import { BILL_META } from "@/lib/mockData";
@@ -54,18 +54,27 @@ export function WebFieldBox({ label, focused, error, children }: { label: string
 }
 
 // ── Add Bazar Expense Form ───────────────────────────────────────────────────
-export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: (prod: string, price: number, qty: number, unit: BazarUnit, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
+export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: (prod: string, price?: number, qty?: number, unit?: BazarUnit, date?: string, notes?: string, totalPrice?: number) => void; onClose: () => void; isLoading?: boolean }) {
     const [product, setProduct] = useState("");
     const [price, setPrice] = useState("");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
     const [quantity, setQuantity] = useState("");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
     const [notes, setNotes] = useState("");
 
+    const togglePriceMode = () => {
+        setPriceMode((prev) => (prev === "unit" ? "total" : "unit"));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!product || !price || !quantity) return;
-        onSubmit(product, Number(price), Number(quantity), unit, date, notes);
+        if (priceMode === "unit") {
+            onSubmit(product, Number(price), Number(quantity), unit, date, notes, undefined);
+        } else {
+            onSubmit(product, undefined, Number(quantity), unit, date, notes, Number(price));
+        }
     };
 
     return (
@@ -76,8 +85,27 @@ export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: 
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Price (৳)</label>
-                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+                        {priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}
+                    </label>
+                    <div className="relative flex items-center">
+                        <input
+                            type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            required
+                            placeholder="0.00"
+                            className="w-full pl-4 pr-9 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
+                        />
+                        <button
+                            type="button"
+                            onClick={togglePriceMode}
+                            title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                            className="absolute right-2.5 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                        >
+                            <Repeat className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Quantity</label>

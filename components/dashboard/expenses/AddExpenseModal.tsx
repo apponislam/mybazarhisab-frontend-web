@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Repeat } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit, useCreateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { ProductSelectInput } from "./ProductSelectInput";
@@ -17,10 +17,15 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
     const [productId, setProductId] = useState<string | undefined>(undefined);
     const [productName, setProductName] = useState("");
     const [price, setPrice] = useState("");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
     const [quantity, setQuantity] = useState("1");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
     const [notes, setNotes] = useState("");
+
+    const togglePriceMode = () => {
+        setPriceMode((prev) => (prev === "unit" ? "total" : "unit"));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,15 +35,22 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
         }
 
         try {
-            await createBazarEntry({
+            const payload: any = {
                 productId: productId || undefined,
                 name: productName.trim(),
-                price: Number(price),
                 quantity: Number(quantity),
                 unit,
                 date: date ? new Date(date).toISOString() : undefined,
                 notes: notes.trim() || undefined,
-            }).unwrap();
+            };
+
+            if (priceMode === "unit") {
+                payload.price = Number(price);
+            } else {
+                payload.totalPrice = Number(price);
+            }
+
+            await createBazarEntry(payload).unwrap();
 
             toast.success("Bazar expense created successfully!");
             setProductId(undefined);
@@ -84,8 +96,27 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
                             </div>
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Price (৳)</label>
-                                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0" className="w-full px-3 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                                        {priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}
+                                    </label>
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="number"
+                                            value={price}
+                                            onChange={(e) => setPrice(e.target.value)}
+                                            required
+                                            placeholder="0"
+                                            className="w-full pl-3 pr-8 py-3 bg-[#1a0e07] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={togglePriceMode}
+                                            title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                                            className="absolute right-2 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                        >
+                                            <Repeat className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-1">Quantity</label>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingBag, Package, Weight, Calendar } from "lucide-react";
+import { ShoppingBag, Package, Weight, Calendar, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
@@ -13,6 +13,7 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
     const [product, setProduct] = useState("");
     const [productId, setProductId] = useState<string | undefined>(undefined);
     const [price, setPrice] = useState("");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
     const [quantity, setQuantity] = useState("");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(toInputDate(new Date()));
@@ -22,6 +23,10 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
     const [fQty, setFQty] = useState(false);
     const [fNotes, setFNotes] = useState(false);
 
+    const togglePriceMode = () => {
+        setPriceMode((prev) => (prev === "unit" ? "total" : "unit"));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!product.trim()) {
@@ -29,15 +34,22 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
             return;
         }
         try {
-            await createBazarEntry({
+            const payload: any = {
                 productId: productId || undefined,
                 name: product.trim(),
-                price: Number(price),
                 quantity: Number(quantity) || 1,
                 unit,
                 date,
                 notes: notes.trim() || undefined,
-            }).unwrap();
+            };
+
+            if (priceMode === "unit") {
+                payload.price = Number(price);
+            } else {
+                payload.totalPrice = Number(price);
+            }
+
+            await createBazarEntry(payload).unwrap();
 
             toast.success("Bazar expense created successfully!");
             onDone();
@@ -83,10 +95,18 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
                         </div>
                     </FieldBox>
                     <div className="grid grid-cols-2 gap-3">
-                        <FieldBox label="Price (৳)" focused={fPrice}>
-                            <div className="flex items-center" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
+                        <FieldBox label={priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"} focused={fPrice}>
+                            <div className="flex items-center relative" onFocus={() => setFPrice(true)} onBlur={() => setFPrice(false)}>
                                 <span className="pl-4 text-sm font-bold text-muted-foreground">৳</span>
-                                <input type="number" step="any" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" required className="flex-1 px-3 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <input type="number" step="any" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" required className="flex-1 pl-3 pr-9 py-3.5 bg-transparent text-sm outline-none" style={{ fontFamily: "'DM Sans', sans-serif" }} />
+                                <button
+                                    type="button"
+                                    onClick={togglePriceMode}
+                                    title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                                    className="absolute right-2.5 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                >
+                                    <RefreshCw className="w-3.5 h-3.5" />
+                                </button>
                             </div>
                         </FieldBox>
                         <FieldBox label="Quantity" focused={fQty}>

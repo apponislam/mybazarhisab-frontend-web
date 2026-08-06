@@ -112,7 +112,16 @@ const productApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["Product"],
         }),
+        // GET /bazar-entries/products (Group Unique Products)
+        getGroupProducts: builder.query<CommonResponse<TProduct[]>, ProductQueryParams | void>({
+            query: (params) => ({
+                url: "/bazar-entries/products",
+                method: "GET",
+                params: params || undefined,
+            }),
+            providesTags: ["Product"],
+        }),
     }),
 });
 
-export const { useCreateProductMutation, useMergeProductsMutation, useGetAllProductsQuery, useGetProductByIdQuery, useUpdateProductMutation, useDeleteProductMutation } = productApi;
+export const { useCreateProductMutation, useMergeProductsMutation, useGetAllProductsQuery, useGetGroupProductsQuery, useGetProductByIdQuery, useUpdateProductMutation, useDeleteProductMutation } = productApi;

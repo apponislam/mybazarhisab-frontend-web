@@ -18,6 +18,7 @@ import { WebConfirmModal } from "@/components/web/shell/WebModal";
 import { WebHeader } from "@/components/web/shell/WebHeader";
 import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
 import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
+import { WebProductsTab } from "@/components/web/shell/WebProductsTab";
 import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent, WebStatementModal } from "@/components/web/shell/WebDialogs";
 import { avatarColor, initials } from "@/components/web/shell/WebMetricCard";
 import { EditExpenseModal } from "@/components/dashboard/expenses/EditExpenseModal";
@@ -71,7 +72,7 @@ function ExpenseRow({ label, value, prev, isLoading, color = "text-foreground" }
 export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout: () => void }) {
     const router = useRouter();
     // Website Tabs
-    const [tab, setTab] = useState<"home" | "expenses" | "bills" | "notifications" | "profile">("home");
+    const [tab, setTab] = useState<"home" | "expenses" | "bills" | "products" | "notifications" | "profile">("home");
     // Notification & User dropdown refs and states
     const [showNotifDropdown, setShowNotifDropdown] = useState(false);
     const notifDropdownRef = useRef<HTMLDivElement>(null);
@@ -812,6 +813,9 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                 )}
                             </div>
                         )}
+
+                        {/* ─── TAB: PRODUCTS (GROUP CATALOG & PRICE GROWTH) ───────── */}
+                        {tab === "products" && <WebProductsTab />}
 
                         {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
                         {tab === "notifications" && <WebNotificationsTab markAllAsRead={markAllAsRead} deleteAllNotifications={deleteAllNotifications} notifLoading={notifLoading} notifData={notifData} deleteNotification={deleteNotification} />}

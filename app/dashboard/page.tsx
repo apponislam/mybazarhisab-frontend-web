@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Users, UsersRound, Package, ShoppingBag, Receipt, Eye, Monitor, Smartphone, TrendingUp, DollarSign } from "lucide-react";
+import { Users, UsersRound, Package, ShoppingBag, Receipt, Eye, Monitor, Smartphone, TrendingUp, DollarSign, Calendar, RefreshCw, ChevronDown } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { AdminMonthlyAnalysisChart } from "@/components/dashboard/AdminMonthlyAnalysisChart";
 import { AddExpenseModal } from "@/components/dashboard/expenses/AddExpenseModal";
 import { AddBillModal } from "@/components/dashboard/bills/AddBillModal";
-import { useGetAdminDashboardStatsQuery } from "@/redux/features/dashboard/dashboardApi";
+import { useGetAdminDashboardStatsQuery, useGetAdminMonthlyAnalysisQuery } from "@/redux/features/dashboard/dashboardApi";
 import { fmt } from "@/lib/mockData";
 
 export default function DashboardPage() {
@@ -164,6 +165,9 @@ export default function DashboardPage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Admin Monthly Analysis Line Chart & Breakdown */}
+                    <AdminMonthlyAnalysisChart />
                 </div>
             </main>
 

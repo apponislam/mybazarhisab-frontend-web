@@ -49,6 +49,24 @@ export type StatementParams = {
     format?: "html" | "pdf";
 };
 
+export type TAdminMonthlyAnalysisItem = {
+    month: string;
+    monthNumber: number;
+    bazarEntriesCount: number;
+    bazarExpense: number;
+    billsCount: number;
+    billExpense: number;
+    totalExpense: number;
+    usersRegistered: number;
+    groupsCreated: number;
+    productsCreated: number;
+};
+
+export type TAdminMonthlyAnalysisData = {
+    year: number;
+    analysis: TAdminMonthlyAnalysisItem[];
+};
+
 // ── API ────────────────────────────────────────────────────────────────────────
 
 const dashboardApi = baseApi.injectEndpoints({
@@ -59,6 +77,16 @@ const dashboardApi = baseApi.injectEndpoints({
             query: () => ({
                 url: "/dashboard/admin-stats",
                 method: "GET",
+            }),
+            providesTags: ["Dashboard"],
+        }),
+
+        // GET /dashboard/admin-monthly-analysis (Admin)
+        getAdminMonthlyAnalysis: builder.query<CommonResponse<TAdminMonthlyAnalysisData>, { year?: number } | void>({
+            query: (params) => ({
+                url: "/dashboard/admin-monthly-analysis",
+                method: "GET",
+                params: params || undefined,
             }),
             providesTags: ["Dashboard"],
         }),
@@ -96,6 +124,7 @@ const dashboardApi = baseApi.injectEndpoints({
 
 export const {
     useGetAdminDashboardStatsQuery,
+    useGetAdminMonthlyAnalysisQuery,
     useGetUserDashboardStatsQuery,
     useGetMonthlyExpenseTrendQuery,
     useGetProductPriceGrowthTrendQuery,

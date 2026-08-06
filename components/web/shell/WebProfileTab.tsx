@@ -61,11 +61,16 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
     };
 
     return (
-        <div className="pt-4 border-t border-border flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-primary" />
-                    <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">My Group & Invitation Code</h4>
+        <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6 font-sans">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
+                        <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-foreground">My Group & Invitation Code</h3>
+                        <p className="text-xs text-muted-foreground">Manage your roommate group & invite codes</p>
+                    </div>
                 </div>
                 {isCreator && !isEditingName && (
                     <button
@@ -73,17 +78,17 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                             setGroupName(group?.name || "");
                             setIsEditingName(true);
                         }}
-                        className="text-[11px] font-semibold text-primary hover:underline cursor-pointer"
+                        className="text-xs font-bold text-primary hover:underline cursor-pointer"
                     >
                         Rename Group
                     </button>
                 )}
             </div>
 
-            <div className="p-5 rounded-2xl bg-[#1a0e07] border border-border/60 flex flex-col gap-4">
+            <div className="flex flex-col gap-4">
                 {isEditingName ? (
                     <form onSubmit={handleUpdateName} className="flex gap-2">
-                        <input value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group Name" className="flex-1 px-3 py-2 bg-[#2a170a] border border-primary/50 rounded-xl text-sm text-foreground outline-none font-bold" autoFocus />
+                        <input value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group Name" className="flex-1 px-3 py-2 bg-[#1a0e07] border border-primary/50 rounded-xl text-sm text-foreground outline-none font-bold" autoFocus />
                         <button type="button" onClick={() => setIsEditingName(false)} className="px-3 py-2 rounded-xl border border-border text-xs text-muted-foreground">
                             Cancel
                         </button>
@@ -92,7 +97,7 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                         </button>
                     </form>
                 ) : (
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-[#1a0e07] border border-border/60">
                         <div>
                             <h3 className="text-base font-bold text-foreground">{group?.name || (isLoading ? "Loading group..." : "My Group")}</h3>
                             <p className="text-xs text-muted-foreground font-mono mt-0.5">Created by {typeof group?.creator === "object" ? group.creator?.name : currentUser?.name || "Admin"}</p>
@@ -116,7 +121,7 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                 )}
 
                 {/* Invitation Code Box */}
-                <div className="p-3.5 rounded-xl bg-[#241307] border border-primary/30 flex items-center justify-between gap-3">
+                <div className="p-4 rounded-2xl bg-[#1a0e07] border border-primary/30 flex items-center justify-between gap-3">
                     <div>
                         <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">Invitation Code</span>
                         <span className="text-lg font-bold font-mono text-primary tracking-wider">{group?.inviteCode || "BAZAR-XXXXXX"}</span>
@@ -137,12 +142,12 @@ function WebMyGroupSection({ currentUser }: { currentUser?: any }) {
                 {/* Group Members List */}
                 <div className="space-y-2 pt-1">
                     <span className="text-[11px] font-bold font-mono text-muted-foreground uppercase tracking-wider block">Members ({group?.members?.length || 0})</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         {group?.members?.map((m: any) => {
                             const memberIsCreator = typeof group.creator === "string" ? group.creator === m._id : group.creator?._id === m._id;
                             return (
-                                <div key={m._id} className="p-2.5 rounded-xl bg-[#201006] border border-border/40 flex items-center gap-2.5">
-                                    <div className="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0">
+                                <div key={m._id} className="p-3 rounded-2xl bg-[#1a0e07] border border-border/60 flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-full overflow-hidden bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0">
                                         {m.profileImage ? <img src={m.profileImage} alt={m.name} className="w-full h-full object-cover" /> : initials(m.name || "User")}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -298,9 +303,6 @@ export function WebProfileTab({
                             <p className="text-foreground font-mono text-xs">{[street, city, state, zipCode, country].filter(Boolean).join(", ") || "No address specified"}</p>
                         </div>
                     </div>
-
-                    {/* My Group Details & Invitation Code */}
-                    <WebMyGroupSection currentUser={currentUser} />
 
                     {/* Quick Actions & Support Section inside Profile */}
                     <div className="pt-4 border-t border-border flex flex-col gap-3">
@@ -540,6 +542,9 @@ export function WebProfileTab({
                     </div>
                 </form>
             </div>
+
+            {/* My Group Details & Invitation Code (Standalone Card Outside User Profile Overview) */}
+            <WebMyGroupSection currentUser={currentUser} />
         </div>
     );
 }

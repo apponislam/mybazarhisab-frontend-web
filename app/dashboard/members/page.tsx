@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, RefreshCw, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useGetAllGroupsAdminQuery } from "@/redux/features/group/groupApi";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -49,23 +49,13 @@ export default function DashboardMembersPage() {
                     <div className="bg-[#251508] border border-border rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 shrink-0">
                         <p className="text-xs text-muted-foreground font-mono">Admin view of all roommate groups and active memberships</p>
 
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                            <SlidersHorizontal className="w-3.5 h-3.5" />
-                            <span>Groups per page:</span>
-                            <select
-                                value={limit}
-                                onChange={(e) => {
-                                    setLimit(Number(e.target.value));
-                                    setPage(1);
-                                }}
-                                className="bg-[#1a0e07] border border-border rounded-lg px-2 py-1 text-xs outline-none text-foreground cursor-pointer"
-                            >
-                                <option value={4}>4</option>
-                                <option value={6}>6</option>
-                                <option value={12}>12</option>
-                                <option value={24}>24</option>
-                            </select>
-                        </div>
+                        <CustomGroupsLimitDropdown
+                            limit={limit}
+                            onChange={(newLimit) => {
+                                setLimit(newLimit);
+                                setPage(1);
+                            }}
+                        />
                     </div>
 
                     {/* Members Grid */}
@@ -113,6 +103,53 @@ export default function DashboardMembersPage() {
                     )}
                 </div>
             </main>
+        </div>
+    );
+}
+
+function CustomGroupsLimitDropdown({ limit, onChange }: { limit: number; onChange: (val: number) => void }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const options = [4, 6, 12, 24];
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={() => setIsOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 bg-[#1a0e07] border border-border hover:border-primary/50 rounded-xl px-3 py-1.5 text-xs font-mono text-foreground transition-colors cursor-pointer select-none"
+            >
+                <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Groups per page:</span>
+                <span className="font-bold text-primary">{limit}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180 text-primary" : ""}`} />
+            </button>
+
+            {isOpen && (
+                <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-44 bg-[#251508] border border-border rounded-xl shadow-2xl py-1.5 z-50 font-mono">
+                        {options.map((opt) => {
+                            const isSelected = limit === opt;
+                            return (
+                                <button
+                                    key={opt}
+                                    type="button"
+                                    onClick={() => {
+                                        onChange(opt);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                                        isSelected ? "bg-primary/15 text-primary" : "text-foreground hover:bg-white/5"
+                                    }`}
+                                >
+                                    <span>{opt} groups</span>
+                                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
         </div>
     );
 }

@@ -126,15 +126,15 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                     {/* Gradient Area Fill */}
                     <path d={areaTotal} fill="url(#primaryAreaGrad)" />
 
-                    {/* 3 Distinct Thin Solid Lines */}
+                    {/* 3 Thin Solid Lines */}
                     {/* Bazar Expense Line (Emerald Green) */}
-                    <path d={pathBazar} fill="none" stroke="#10b981" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={pathBazar} fill="none" stroke="#10b981" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
 
                     {/* Bill Expense Line (Royal Blue) */}
-                    <path d={pathBill} fill="none" stroke="#3b82f6" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={pathBill} fill="none" stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
 
                     {/* Total Expense Line (Warm Gold) */}
-                    <path d={pathTotal} fill="none" stroke="#e8a020" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={pathTotal} fill="none" stroke="#e8a020" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 
                     {/* Interactive Column Hover Lines, Dots & Floating Tooltip */}
                     {points.map((p) => {

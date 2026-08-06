@@ -47,13 +47,17 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
 
     return (
         <aside className="w-80 bg-[#251508] border-r border-[rgba(232,160,32,0.15)] flex flex-col shrink-0">
-            {/* Logo Section */}
-            <div className="flex items-center gap-3 p-6 border-b border-[rgba(232,160,32,0.1)]">
-                <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary flex items-center justify-center">
+            {/* Logo Section - Clickable to go home */}
+            <div
+                onClick={() => router.push("/web")}
+                className="flex items-center gap-3 p-6 border-b border-[rgba(232,160,32,0.1)] cursor-pointer hover:bg-white/5 transition-colors group"
+                title="Go to Home"
+            >
+                <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary flex items-center justify-center group-hover:scale-105 transition-transform">
                     <img src="/assets/logo.png" alt="Bazar Hisab" className="w-full h-full object-contain rounded-xl" />
                 </div>
                 <div>
-                    <h1 className="text-lg font-bold text-foreground leading-none" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                    <h1 className="text-lg font-bold text-foreground leading-none group-hover:text-primary transition-colors" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                         My Bazar <span className="text-primary">Hisab</span>
                     </h1>
                     <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Desktop Manager</span>

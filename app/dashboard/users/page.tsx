@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw, Search, SlidersHorizontal, ChevronLeft, ChevronRight, ShieldCheck, UserCheck } from "lucide-react";
+import { RefreshCw, Search, SlidersHorizontal, ChevronLeft, ChevronRight, ShieldCheck, UserCheck, ChevronDown } from "lucide-react";
 import { useGetAllUsersQuery, UserQueryParams } from "@/redux/features/user/userApi";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -55,48 +55,49 @@ export default function DashboardUsersPage() {
 
                         {/* Select Filters */}
                         <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
-                            {/* Role Filter */}
-                            <div className="flex items-center gap-1.5 bg-[#1a0e07] border border-border rounded-2xl px-3 py-2 text-xs">
-                                <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
-                                <span className="text-muted-foreground font-mono">Role:</span>
-                                <select value={queryParams.role || ""} onChange={(e) => handleFilterChange({ role: e.target.value || undefined, page: 1 })} className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono">
-                                    <option value="">All Roles</option>
-                                    <option value="ADMIN">ADMIN</option>
-                                    <option value="USER">USER</option>
-                                </select>
-                            </div>
+                            {/* Role Filter Custom Dropdown */}
+                            <CustomUserFilterDropdown
+                                icon={<ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />}
+                                label="Role:"
+                                value={queryParams.role || "All Roles"}
+                                options={[
+                                    { label: "All Roles", value: "" },
+                                    { label: "ADMIN", value: "ADMIN" },
+                                    { label: "USER", value: "USER" },
+                                ]}
+                                onSelect={(val) => handleFilterChange({ role: val || undefined, page: 1 })}
+                            />
 
-                            {/* Active Status Filter */}
-                            <div className="flex items-center gap-1.5 bg-[#1a0e07] border border-border rounded-2xl px-3 py-2 text-xs">
-                                <UserCheck className="w-3.5 h-3.5 text-muted-foreground" />
-                                <span className="text-muted-foreground font-mono">Status:</span>
-                                <select
-                                    value={queryParams.isActive === undefined ? "" : String(queryParams.isActive)}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        handleFilterChange({
-                                            isActive: val === "" ? undefined : val === "true",
-                                            page: 1,
-                                        });
-                                    }}
-                                    className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono"
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="true">Active</option>
-                                    <option value="false">Suspended</option>
-                                </select>
-                            </div>
+                            {/* Active Status Filter Custom Dropdown */}
+                            <CustomUserFilterDropdown
+                                icon={<UserCheck className="w-3.5 h-3.5 text-muted-foreground" />}
+                                label="Status:"
+                                value={queryParams.isActive === undefined ? "All Statuses" : queryParams.isActive ? "Active" : "Suspended"}
+                                options={[
+                                    { label: "All Statuses", value: "" },
+                                    { label: "Active", value: "true" },
+                                    { label: "Suspended", value: "false" },
+                                ]}
+                                onSelect={(val) =>
+                                    handleFilterChange({
+                                        isActive: val === "" ? undefined : val === "true",
+                                        page: 1,
+                                    })
+                                }
+                            />
 
-                            {/* Rows Limit Filter */}
-                            <div className="flex items-center gap-1.5 bg-[#1a0e07] border border-border rounded-2xl px-3 py-2 text-xs">
-                                <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
-                                <span className="text-muted-foreground font-mono">Rows:</span>
-                                <select value={queryParams.limit || 10} onChange={(e) => handleFilterChange({ limit: Number(e.target.value), page: 1 })} className="bg-transparent text-foreground font-bold outline-none cursor-pointer font-mono">
-                                    <option value={10}>10</option>
-                                    <option value={20}>20</option>
-                                    <option value={50}>50</option>
-                                </select>
-                            </div>
+                            {/* Rows Limit Filter Custom Dropdown */}
+                            <CustomUserFilterDropdown
+                                icon={<SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />}
+                                label="Rows:"
+                                value={String(queryParams.limit || 10)}
+                                options={[
+                                    { label: "10", value: "10" },
+                                    { label: "20", value: "20" },
+                                    { label: "50", value: "50" },
+                                ]}
+                                onSelect={(val) => handleFilterChange({ limit: Number(val), page: 1 })}
+                            />
                         </div>
                     </div>
 
@@ -137,6 +138,64 @@ export default function DashboardUsersPage() {
                     )}
                 </div>
             </main>
+        </div>
+    );
+}
+
+function CustomUserFilterDropdown({
+    icon,
+    label,
+    value,
+    options,
+    onSelect,
+}: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    options: { label: string; value: string }[];
+    onSelect: (val: string) => void;
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={() => setIsOpen((prev) => !prev)}
+                className="flex items-center gap-1.5 bg-[#1a0e07] border border-border hover:border-primary/50 rounded-2xl px-3.5 py-2 text-xs font-mono text-foreground transition-colors cursor-pointer select-none"
+            >
+                {icon}
+                <span className="text-muted-foreground">{label}</span>
+                <span className="font-bold text-primary">{value}</span>
+                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180 text-primary" : ""}`} />
+            </button>
+
+            {isOpen && (
+                <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-40 bg-[#251508] border border-border rounded-xl shadow-2xl py-1.5 z-50 font-mono">
+                        {options.map((opt) => {
+                            const isSelected = value === opt.label || value === opt.value;
+                            return (
+                                <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() => {
+                                        onSelect(opt.value);
+                                        setIsOpen(false);
+                                    }}
+                                    className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                                        isSelected ? "bg-primary/15 text-primary" : "text-foreground hover:bg-white/5"
+                                    }`}
+                                >
+                                    <span>{opt.label}</span>
+                                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </>
+            )}
         </div>
     );
 }

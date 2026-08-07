@@ -50,6 +50,7 @@ export type AppSubScreen =
   | "add-expense"
   | "add-multiple-expense"
   | "add-bill"
+  | "add-multiple-bill"
   | "expense-detail"
   | "expense-edit"
   | "bill-detail"

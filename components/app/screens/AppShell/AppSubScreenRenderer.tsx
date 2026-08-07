@@ -3,6 +3,7 @@ import { AppSubScreen, MockBazarEntry, MockBill } from "@/types";
 import { AddExpenseScreen } from "@/components/app/screens/AddExpenseScreen";
 import { AddMultipleExpenseScreen } from "@/components/app/screens/AddMultipleExpenseScreen";
 import { AddBillScreen } from "@/components/app/screens/AddBillScreen";
+import { AddMultipleBillScreen } from "@/components/app/screens/AddMultipleBillScreen";
 import { ExpenseDetailScreen } from "@/components/app/screens/ExpenseDetailScreen";
 import { ExpenseEditScreen } from "@/components/app/screens/ExpenseEditScreen";
 import { BillDetailScreen } from "@/components/app/screens/BillDetailScreen";
@@ -104,6 +105,17 @@ export function AppSubScreenRenderer({
         return (
             <AddBillScreen
                 onBack={() => setSubScreen("add-picker")}
+                onAddMultiple={() => setSubScreen("add-multiple-bill")}
+                onDone={() => {
+                    setSubScreen(null);
+                    setTab("bills");
+                }}
+            />
+        );
+    if (subScreen === "add-multiple-bill")
+        return (
+            <AddMultipleBillScreen
+                onBack={() => setSubScreen("add-bill")}
                 onDone={() => {
                     setSubScreen(null);
                     setTab("bills");

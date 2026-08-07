@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { Receipt, ChevronRight, AlignLeft, Calendar, X } from "lucide-react";
+import { Receipt, ChevronRight, AlignLeft, Calendar, X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { BillCategory } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
 import { toInputDate, BILL_META, BILL_CATEGORIES } from "@/lib/mockData";
 import { useCreateBillMutation } from "@/redux/features/bill/billApi";
 
-export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+export function AddBillScreen({ onBack, onDone, onAddMultiple }: { onBack: () => void; onDone: () => void; onAddMultiple?: () => void }) {
     const [createBill, { isLoading }] = useCreateBillMutation();
 
     const [category, setCategory] = useState<BillCategory>("RENT");
@@ -43,18 +43,28 @@ export function AddBillScreen({ onBack, onDone }: { onBack: () => void; onDone: 
         <ScreenShell scrollable>
             <div className="flex flex-col px-6 pt-12 pb-8 relative">
                 <BackButton onBack={onBack} label="Cancel" />
-                <div className="flex items-center gap-3 mb-7 shrink-0">
-                    <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center shadow-md shadow-accent/30">
-                        <Receipt className="w-5 h-5 text-white" strokeWidth={2} />
+                <div className="flex items-center justify-between mb-7 shrink-0">
+                    <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center shadow-md shadow-accent/30">
+                            <Receipt className="w-5 h-5 text-white" strokeWidth={2} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                                Add Bill
+                            </h2>
+                            <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                Utility or recurring expense
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                            Add Bill
-                        </h2>
-                        <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            Utility or recurring expense
-                        </p>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={onAddMultiple}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent/10 hover:bg-accent/20 text-accent text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                        <Plus className="w-3.5 h-3.5" />
+                        Add Multiple
+                    </button>
                 </div>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">

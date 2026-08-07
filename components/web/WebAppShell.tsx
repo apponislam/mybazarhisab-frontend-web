@@ -345,6 +345,10 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             setShowBulkExpense(false);
                             setTab("expenses");
                         }}
+                        onSwitchToBulkBill={() => {
+                            setShowBulkExpense(false);
+                            setShowBulkBill(true);
+                        }}
                     />
                 ) : showBulkBill ? (
                     <WebBulkBillScreen
@@ -352,6 +356,10 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                         onDone={() => {
                             setShowBulkBill(false);
                             setTab("bills");
+                        }}
+                        onSwitchToBulkExpense={() => {
+                            setShowBulkBill(false);
+                            setShowBulkExpense(true);
                         }}
                     />
                 ) : (

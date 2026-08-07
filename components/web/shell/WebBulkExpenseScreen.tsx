@@ -19,7 +19,7 @@ interface RowItem {
     notes: string;
 }
 
-export function WebBulkExpenseScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+export function WebBulkExpenseScreen({ onBack, onDone, onSwitchToBulkBill }: { onBack: () => void; onDone: () => void; onSwitchToBulkBill?: () => void }) {
     const [createBulkBazarEntries, { isLoading }] = useCreateBulkBazarEntriesMutation();
     const todayDate = new Date().toISOString().slice(0, 10);
 
@@ -95,137 +95,155 @@ export function WebBulkExpenseScreen({ onBack, onDone }: { onBack: () => void; o
                         <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                             Bulk Add Bazar Expenses
                         </h1>
-                        <p className="text-xs text-muted-foreground font-mono">Add multiple bazar purchases at once in a desktop spreadsheet layout</p>
+                        <p className="text-xs text-muted-foreground font-mono">Add multiple bazar purchases at once using interactive expense cards</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    {onSwitchToBulkBill && (
+                        <button type="button" onClick={onSwitchToBulkBill} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-accent/40 text-accent bg-accent/10 hover:bg-accent/20 text-xs font-bold transition-all cursor-pointer">
+                            <Plus className="w-3.5 h-3.5" /> Bulk Bill
+                        </button>
+                    )}
                     <button type="button" onClick={handleAddRow} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 text-xs font-bold transition-all cursor-pointer">
-                        <Plus className="w-4 h-4" /> Add Row
+                        <Plus className="w-4 h-4" /> Add Item Card
                     </button>
                     <button type="button" onClick={handleSubmit} disabled={isLoading} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:bg-accent transition-all cursor-pointer shadow-lg shadow-primary/20 disabled:opacity-50">
-                        {isLoading ? "Saving..." : `Save ${rows.filter((r) => r.product.trim()).length || rows.length} Entries`}
+                        {isLoading ? "Saving..." : `Save ${rows.filter((r) => r.product.trim()).length || rows.length} Expenses`}
                     </button>
                 </div>
             </div>
 
-            {/* Desktop Items Table Layout */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[850px]">
-                        <thead>
-                            <tr className="border-b border-border/60 text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
-                                <th className="py-3 px-3 w-12 text-center">#</th>
-                                <th className="py-3 px-3">Product Name</th>
-                                <th className="py-3 px-3 w-44">Price (৳)</th>
-                                <th className="py-3 px-3 w-40">Quantity</th>
-                                <th className="py-3 px-3 w-44">Unit</th>
-                                <th className="py-3 px-3 w-44">Date</th>
-                                <th className="py-3 px-3 w-12 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/30 text-sm">
-                            {rows.map((row, index) => (
-                                <tr key={row.id} className="hover:bg-[#2e1a0a]/50 transition-colors">
-                                    <td className="py-3 px-3 font-mono text-xs text-muted-foreground text-center">{index + 1}</td>
-                                    {/* Product Input */}
-                                    <td className="py-3 px-3">
-                                        <div className="relative">
-                                            <ProductSelectInput
-                                                valueName={row.product}
-                                                onSelect={(p: any) => {
-                                                    updateRow(row.id, {
-                                                        product: p.name,
-                                                        productId: p._id || p.id,
-                                                    });
-                                                }}
-                                                customClass="w-full px-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground"
-                                                hideSearchIcon
-                                            />
-                                        </div>
-                                    </td>
-                                    {/* Price Input & Toggle Mode */}
-                                    <td className="py-3 px-3">
-                                        <div className="relative flex items-center">
-                                            <span className="absolute left-3 text-xs font-bold text-muted-foreground">৳</span>
-                                            <input type="number" step="any" value={row.price} onChange={(e) => updateRow(row.id, { price: e.target.value })} placeholder="0.00" className="w-full pl-7 pr-8 py-2 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const p = Number(row.price);
-                                                    const q = Number(row.quantity);
-                                                    if (row.priceMode === "unit") {
-                                                        if (p > 0 && q > 0) updateRow(row.id, { price: String(Number((p * q).toFixed(2))), priceMode: "total" });
-                                                        else updateRow(row.id, { priceMode: "total" });
-                                                    } else {
-                                                        if (p > 0 && q > 0) updateRow(row.id, { price: String(Number((p / q).toFixed(2))), priceMode: "unit" });
-                                                        else updateRow(row.id, { priceMode: "unit" });
-                                                    }
-                                                }}
-                                                title={row.priceMode === "unit" ? "Unit Price (Click for Total)" : "Total Price (Click for Unit)"}
-                                                className="absolute right-2 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer text-xs"
-                                            >
-                                                <RefreshCw className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                    {/* Quantity Input */}
-                                    <td className="py-3 px-3">
-                                        <input type="number" step="any" value={row.quantity} onChange={(e) => updateRow(row.id, { quantity: e.target.value })} placeholder="1" className="w-full px-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
-                                    </td>
-                                    {/* Unit Selector Buttons */}
-                                    <td className="py-3 px-3">
-                                        <div className="flex gap-1">
-                                            {(["KG", "PIECE", "GM"] as BazarUnit[]).map((u) => (
-                                                <button
-                                                    key={u}
-                                                    type="button"
-                                                    onClick={() => updateRow(row.id, { unit: u })}
-                                                    className="flex-1 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer font-mono"
-                                                    style={{
-                                                        borderColor: row.unit === u ? "rgba(232,160,32,0.8)" : "rgba(232,160,32,0.18)",
-                                                        background: row.unit === u ? "rgba(232,160,32,0.15)" : "#2e1a0a",
-                                                        color: row.unit === u ? "#e8a020" : "#a08060",
-                                                    }}
-                                                >
-                                                    {u}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </td>
-                                    {/* Date Picker */}
-                                    <td className="py-3 px-3">
-                                        <input type="date" value={row.date} onChange={(e) => updateRow(row.id, { date: e.target.value })} className="w-full px-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-xs outline-none font-mono text-foreground" style={{ colorScheme: "dark" }} />
-                                    </td>
-                                    {/* Remove Row */}
-                                    <td className="py-3 px-3 text-center">
-                                        {rows.length > 1 && (
-                                            <button type="button" onClick={() => handleRemoveRow(row.id)} className="p-1.5 text-destructive/80 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer" title="Remove Row">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Desktop Responsive Cards Grid */}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {rows.map((row, index) => (
+                        <div key={row.id} className="p-5 rounded-3xl border border-border/80 bg-[#251508] flex flex-col gap-4 relative shadow-xl hover:border-primary/40 transition-all">
+                            <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                                <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">Item #{index + 1}</span>
+                                {rows.length > 1 && (
+                                    <button type="button" onClick={() => handleRemoveRow(row.id)} className="text-destructive/80 hover:text-destructive p-1.5 hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer" title="Remove Item">
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
 
-                    <div className="mt-4 pt-4 border-t border-border/40 flex items-center justify-between">
-                        <button type="button" onClick={handleAddRow} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 text-xs font-semibold transition-colors cursor-pointer">
-                            <Plus className="w-4 h-4" /> Add Another Entry Row
-                        </button>
-                        <span className="text-xs text-muted-foreground font-mono">
-                            Total Items: <span className="text-foreground font-bold">{rows.length}</span>
-                        </span>
-                    </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Product Name</label>
+                                    <ProductSelectInput
+                                        valueName={row.product}
+                                        onSelect={(p: any) => {
+                                            updateRow(row.id, {
+                                                product: p.name,
+                                                productId: p._id || p.id,
+                                            });
+                                        }}
+                                        customClass="w-full px-3.5 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground"
+                                        hideSearchIcon
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Purchase Date</label>
+                                    <input
+                                        type="date"
+                                        value={row.date}
+                                        onChange={(e) => updateRow(row.id, { date: e.target.value })}
+                                        className="w-full px-3.5 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
+                                        style={{ colorScheme: "dark" }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
+                                        {row.priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}
+                                    </label>
+                                    <div className="relative flex items-center">
+                                        <span className="absolute left-3.5 text-xs font-bold text-muted-foreground">৳</span>
+                                        <input
+                                            type="number"
+                                            step="any"
+                                            value={row.price}
+                                            onChange={(e) => updateRow(row.id, { price: e.target.value })}
+                                            placeholder="0.00"
+                                            className="w-full pl-8 pr-9 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const p = Number(row.price);
+                                                const q = Number(row.quantity);
+                                                if (row.priceMode === "unit") {
+                                                    if (p > 0 && q > 0) updateRow(row.id, { price: String(Number((p * q).toFixed(2))), priceMode: "total" });
+                                                    else updateRow(row.id, { priceMode: "total" });
+                                                } else {
+                                                    if (p > 0 && q > 0) updateRow(row.id, { price: String(Number((p / q).toFixed(2))), priceMode: "unit" });
+                                                    else updateRow(row.id, { priceMode: "unit" });
+                                                }
+                                            }}
+                                            title={row.priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                                            className="absolute right-2.5 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                        >
+                                            <RefreshCw className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Quantity</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={row.quantity}
+                                        onChange={(e) => updateRow(row.id, { quantity: e.target.value })}
+                                        placeholder="1"
+                                        className="w-full px-3.5 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Unit</label>
+                                <div className="flex gap-2">
+                                    {(["KG", "PIECE", "GM"] as BazarUnit[]).map((u) => (
+                                        <button
+                                            key={u}
+                                            type="button"
+                                            onClick={() => updateRow(row.id, { unit: u })}
+                                            className="flex-1 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer font-mono"
+                                            style={{
+                                                borderColor: row.unit === u ? "rgba(232,160,32,0.8)" : "rgba(232,160,32,0.18)",
+                                                background: row.unit === u ? "rgba(232,160,32,0.15)" : "#2e1a0a",
+                                                color: row.unit === u ? "#e8a020" : "#a08060",
+                                            }}
+                                        >
+                                            {u}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
 
-                <div className="flex justify-end gap-3 pt-2">
-                    <button type="button" onClick={onBack} className="px-6 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary transition-all cursor-pointer text-sm">
-                        Cancel
+                <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                    <button
+                        type="button"
+                        onClick={handleAddRow}
+                        className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-dashed border-primary/40 text-primary bg-primary/5 hover:bg-primary/10 text-sm font-semibold transition-colors cursor-pointer"
+                    >
+                        <Plus className="w-4 h-4" /> Add Another Expense Card
                     </button>
-                    <button type="submit" disabled={isLoading} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent transition-all cursor-pointer text-sm shadow-lg shadow-primary/20 disabled:opacity-50">
-                        {isLoading ? "Saving Entries..." : `Save ${rows.filter((r) => r.product.trim()).length || rows.length} Expenses`}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button type="button" onClick={onBack} className="px-6 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary transition-all cursor-pointer text-sm">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={isLoading} className="px-8 py-3 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-accent transition-all cursor-pointer text-sm shadow-lg shadow-primary/20 disabled:opacity-50">
+                            {isLoading ? "Saving Entries..." : `Save ${rows.filter((r) => r.product.trim()).length || rows.length} Expenses`}
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

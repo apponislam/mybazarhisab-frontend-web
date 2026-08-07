@@ -16,7 +16,7 @@ interface BillRowItem {
     notes: string;
 }
 
-export function WebBulkBillScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+export function WebBulkBillScreen({ onBack, onDone, onSwitchToBulkExpense }: { onBack: () => void; onDone: () => void; onSwitchToBulkExpense?: () => void }) {
     const [createBulkBills, { isLoading }] = useCreateBulkBillsMutation();
     const todayDate = new Date().toISOString().slice(0, 10);
 
@@ -85,12 +85,17 @@ export function WebBulkBillScreen({ onBack, onDone }: { onBack: () => void; onDo
                         <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                             Bulk Add Monthly Bills
                         </h1>
-                        <p className="text-xs text-muted-foreground font-mono">Add multiple utility or recurring bills at once in desktop spreadsheet layout</p>
+                        <p className="text-xs text-muted-foreground font-mono">Add multiple utility or recurring bills at once using interactive bill cards</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    {onSwitchToBulkExpense && (
+                        <button type="button" onClick={onSwitchToBulkExpense} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-primary/40 text-primary bg-primary/10 hover:bg-primary/20 text-xs font-bold transition-all cursor-pointer">
+                            <Plus className="w-3.5 h-3.5" /> Bulk Expense
+                        </button>
+                    )}
                     <button type="button" onClick={handleAddRow} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-accent/40 text-accent bg-accent/10 hover:bg-accent/20 text-xs font-bold transition-all cursor-pointer">
-                        <Plus className="w-4 h-4" /> Add Row
+                        <Plus className="w-4 h-4" /> Add Bill Card
                     </button>
                     <button type="button" onClick={handleSubmit} disabled={isLoading} className="flex items-center gap-2 px-6 py-2.5 bg-accent text-white text-sm font-bold rounded-xl hover:opacity-90 transition-all cursor-pointer shadow-lg shadow-accent/20 disabled:opacity-50">
                         {isLoading ? "Saving..." : `Save ${rows.filter((r) => r.title.trim() && Number(r.amount) > 0).length || rows.length} Bills`}
@@ -98,84 +103,73 @@ export function WebBulkBillScreen({ onBack, onDone }: { onBack: () => void; onDo
                 </div>
             </div>
 
-            {/* Desktop Items Table Layout */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[850px]">
-                        <thead>
-                            <tr className="border-b border-border/60 text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
-                                <th className="py-3 px-3 w-12 text-center">#</th>
-                                <th className="py-3 px-3 w-56">Category</th>
-                                <th className="py-3 px-3">Bill Title</th>
-                                <th className="py-3 px-3 w-48">Amount (৳)</th>
-                                <th className="py-3 px-3 w-48">Date</th>
-                                <th className="py-3 px-3 w-12 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/30 text-sm">
-                            {rows.map((row, index) => {
-                                const meta = BILL_META[row.category];
-                                return (
-                                    <tr key={row.id} className="hover:bg-[#2e1a0a]/50 transition-colors">
-                                        <td className="py-3 px-3 font-mono text-xs text-muted-foreground text-center">{index + 1}</td>
-                                        {/* Category Select */}
-                                        <td className="py-3 px-3">
-                                            <button type="button" onClick={() => setActiveCategoryPickerId(row.id)} className="w-full px-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-xs flex items-center justify-between text-foreground hover:border-accent/50 transition-colors cursor-pointer">
-                                                <div className="flex items-center gap-2 min-w-0">
-                                                    <div className="w-4 h-4 flex items-center justify-center shrink-0" style={{ color: meta?.color || "#e8a020" }}>
-                                                        {meta?.icon}
-                                                    </div>
-                                                    <span className="truncate font-medium">{meta?.label || row.category}</span>
-                                                </div>
-                                                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                                            </button>
-                                        </td>
-                                        {/* Bill Title */}
-                                        <td className="py-3 px-3">
-                                            <input type="text" value={row.title} onChange={(e) => updateRow(row.id, { title: e.target.value })} placeholder="e.g. House Rent, Wi-Fi" className="w-full px-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground font-sans" />
-                                        </td>
-                                        {/* Amount Input */}
-                                        <td className="py-3 px-3">
-                                            <div className="relative flex items-center">
-                                                <span className="absolute left-3 text-xs font-bold text-muted-foreground">৳</span>
-                                                <input type="number" step="any" value={row.amount} onChange={(e) => updateRow(row.id, { amount: e.target.value })} placeholder="0.00" className="w-full pl-7 pr-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
-                                            </div>
-                                        </td>
-                                        {/* Billing Date */}
-                                        <td className="py-3 px-3">
-                                            <input type="date" value={row.date} onChange={(e) => updateRow(row.id, { date: e.target.value })} className="w-full px-3 py-2 bg-[#2e1a0a] border border-border rounded-xl text-xs outline-none font-mono text-foreground" style={{ colorScheme: "dark" }} />
-                                        </td>
-                                        {/* Remove Action */}
-                                        <td className="py-3 px-3 text-center">
-                                            {rows.length > 1 && (
-                                                <button type="button" onClick={() => handleRemoveRow(row.id)} className="p-1.5 text-destructive/80 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer" title="Remove Row">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+            {/* Desktop Responsive Cards Grid */}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {rows.map((row, index) => {
+                        const meta = BILL_META[row.category];
+                        return (
+                            <div key={row.id} className="p-5 rounded-3xl border border-border/80 bg-[#251508] flex flex-col gap-4 relative shadow-xl hover:border-accent/40 transition-all">
+                                <div className="flex items-center justify-between border-b border-border/40 pb-3">
+                                    <span className="text-xs font-bold text-accent uppercase tracking-wider font-mono">Bill Item #{index + 1}</span>
+                                    {rows.length > 1 && (
+                                        <button type="button" onClick={() => handleRemoveRow(row.id)} className="text-destructive/80 hover:text-destructive p-1.5 hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer" title="Remove Bill">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
 
-                    <div className="mt-4 pt-4 border-t border-border/40 flex items-center justify-between">
-                        <button type="button" onClick={handleAddRow} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-accent/40 text-accent bg-accent/5 hover:bg-accent/10 text-xs font-semibold transition-colors cursor-pointer">
-                            <Plus className="w-4 h-4" /> Add Another Bill Row
-                        </button>
-                        <span className="text-xs text-muted-foreground font-mono">
-                            Total Bills: <span className="text-foreground font-bold">{rows.length}</span>
-                        </span>
-                    </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Category</label>
+                                        <button type="button" onClick={() => setActiveCategoryPickerId(row.id)} className="w-full px-3.5 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-xs flex items-center justify-between text-foreground hover:border-accent/50 transition-colors cursor-pointer">
+                                            <div className="flex items-center gap-2 min-w-0">
+                                                <div className="w-4 h-4 flex items-center justify-center shrink-0" style={{ color: meta?.color || "#e8a020" }}>
+                                                    {meta?.icon}
+                                                </div>
+                                                <span className="truncate font-medium">{meta?.label || row.category}</span>
+                                            </div>
+                                            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Bill Title</label>
+                                        <input type="text" value={row.title} onChange={(e) => updateRow(row.id, { title: e.target.value })} placeholder="e.g. House Rent, Wi-Fi" className="w-full px-3.5 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none text-foreground font-sans" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Amount (৳)</label>
+                                        <div className="relative flex items-center">
+                                            <span className="absolute left-3.5 text-xs font-bold text-muted-foreground">৳</span>
+                                            <input type="number" step="any" value={row.amount} onChange={(e) => updateRow(row.id, { amount: e.target.value })} placeholder="0.00" className="w-full pl-8 pr-3 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Billing Date</label>
+                                        <input type="date" value={row.date} onChange={(e) => updateRow(row.id, { date: e.target.value })} className="w-full px-3.5 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" style={{ colorScheme: "dark" }} />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
 
-                <div className="flex justify-end gap-3 pt-2">
-                    <button type="button" onClick={onBack} className="px-6 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary transition-all cursor-pointer text-sm">
-                        Cancel
+                <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                    <button type="button" onClick={handleAddRow} className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-dashed border-accent/40 text-accent bg-accent/5 hover:bg-accent/10 text-sm font-semibold transition-colors cursor-pointer">
+                        <Plus className="w-4 h-4" /> Add Another Bill Card
                     </button>
-                    <button type="submit" disabled={isLoading} className="px-8 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all cursor-pointer text-sm shadow-lg shadow-accent/20 disabled:opacity-50">
-                        {isLoading ? "Saving Bills..." : `Save ${rows.filter((r) => r.title.trim() && Number(r.amount) > 0).length || rows.length} Bills`}
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button type="button" onClick={onBack} className="px-6 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary transition-all cursor-pointer text-sm">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={isLoading} className="px-8 py-3 bg-accent text-white font-bold rounded-xl hover:opacity-90 transition-all cursor-pointer text-sm shadow-lg shadow-accent/20 disabled:opacity-50">
+                            {isLoading ? "Saving Bills..." : `Save ${rows.filter((r) => r.title.trim() && Number(r.amount) > 0).length || rows.length} Bills`}
+                        </button>
+                    </div>
                 </div>
             </form>
 

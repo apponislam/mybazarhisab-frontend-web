@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingBag, Package, Weight, Plus, Trash2, Calendar, Layers } from "lucide-react";
+import { ShoppingBag, Package, Weight, Plus, Trash2, Calendar, Layers, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
@@ -170,9 +170,26 @@ export function AddMultipleExpenseScreen({ onBack, onDone }: { onBack: () => voi
                                                 value={row.price}
                                                 onChange={(e) => updateRow(row.id, { price: e.target.value })}
                                                 placeholder="0.00"
-                                                className="flex-1 pl-2 pr-2 py-2.5 bg-transparent text-sm outline-none"
-                                                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                                                className="flex-1 pl-2 pr-8 py-2.5 bg-transparent text-sm outline-none font-sans"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const p = Number(row.price);
+                                                    const q = Number(row.quantity);
+                                                    if (row.priceMode === "unit") {
+                                                        if (p > 0 && q > 0) updateRow(row.id, { price: String(Number((p * q).toFixed(2))), priceMode: "total" });
+                                                        else updateRow(row.id, { priceMode: "total" });
+                                                    } else {
+                                                        if (p > 0 && q > 0) updateRow(row.id, { price: String(Number((p / q).toFixed(2))), priceMode: "unit" });
+                                                        else updateRow(row.id, { priceMode: "unit" });
+                                                    }
+                                                }}
+                                                title={row.priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
+                                                className="absolute right-2 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                            >
+                                                <RefreshCw className="w-3.5 h-3.5" />
+                                            </button>
                                         </div>
                                     </FieldBox>
 

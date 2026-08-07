@@ -1,6 +1,7 @@
 import React from "react";
 import { AppSubScreen, MockBazarEntry, MockBill } from "@/types";
 import { AddExpenseScreen } from "@/components/app/screens/AddExpenseScreen";
+import { AddMultipleExpenseScreen } from "@/components/app/screens/AddMultipleExpenseScreen";
 import { AddBillScreen } from "@/components/app/screens/AddBillScreen";
 import { ExpenseDetailScreen } from "@/components/app/screens/ExpenseDetailScreen";
 import { ExpenseEditScreen } from "@/components/app/screens/ExpenseEditScreen";
@@ -32,10 +33,7 @@ export function AppSubScreenRenderer({
         return (
             <ExpenseDetailScreen
                 entry={selectedEntry}
-                onBack={() => {
-                    setSelectedEntry(null);
-                    setSubScreen(null);
-                }}
+                onBack={() => setSubScreen(null)}
                 onEdit={() => setSubScreen("expense-edit")}
                 onDelete={() => {
                     setSelectedEntry(null);
@@ -60,10 +58,7 @@ export function AppSubScreenRenderer({
         return (
             <BillDetailScreen
                 bill={selectedBill}
-                onBack={() => {
-                    setSelectedBill(null);
-                    setSubScreen(null);
-                }}
+                onBack={() => setSubScreen(null)}
                 onEdit={() => setSubScreen("bill-edit")}
                 onDelete={() => {
                     setSelectedBill(null);
@@ -88,6 +83,17 @@ export function AppSubScreenRenderer({
         return (
             <AddExpenseScreen
                 onBack={() => setSubScreen("add-picker")}
+                onAddMultiple={() => setSubScreen("add-multiple-expense")}
+                onDone={() => {
+                    setSubScreen(null);
+                    setTab("expenses");
+                }}
+            />
+        );
+    if (subScreen === "add-multiple-expense")
+        return (
+            <AddMultipleExpenseScreen
+                onBack={() => setSubScreen("add-expense")}
                 onDone={() => {
                     setSubScreen(null);
                     setTab("expenses");

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingBag, Package, Weight, Calendar, RefreshCw } from "lucide-react";
+import { ShoppingBag, Package, Weight, Calendar, RefreshCw, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit } from "@/types";
 import { ScreenShell, BackButton, PrimaryButton, FieldBox } from "@/components/app/ui/Shared";
@@ -7,7 +7,7 @@ import { toInputDate } from "@/lib/mockData";
 import { useCreateBazarEntryMutation } from "@/redux/features/bazar-entry/bazarEntryApi";
 import { ProductSelectInput } from "@/components/dashboard/expenses/ProductSelectInput";
 
-export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+export function AddExpenseScreen({ onBack, onDone, onAddMultiple }: { onBack: () => void; onDone: () => void; onAddMultiple?: () => void }) {
     const [createBazarEntry, { isLoading }] = useCreateBazarEntryMutation();
 
     const [product, setProduct] = useState("");
@@ -75,18 +75,28 @@ export function AddExpenseScreen({ onBack, onDone }: { onBack: () => void; onDon
         <ScreenShell scrollable>
             <div className="flex flex-col px-6 pt-12 pb-8">
                 <BackButton onBack={onBack} label="Cancel" />
-                <div className="flex items-center gap-3 mb-7">
-                    <div className="w-11 h-11 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/30">
-                        <ShoppingBag className="w-5 h-5 text-primary-foreground" strokeWidth={2} />
+                <div className="flex items-center justify-between mb-7">
+                    <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/30">
+                            <ShoppingBag className="w-5 h-5 text-primary-foreground" strokeWidth={2} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                                Add Expense
+                            </h2>
+                            <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                Bazar purchase entry
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                            Add Expense
-                        </h2>
-                        <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                            Bazar purchase entry
-                        </p>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={onAddMultiple}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                        <Plus className="w-3.5 h-3.5" />
+                        Add Multiple
+                    </button>
                 </div>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <FieldBox label="Product Name" focused={fProduct}>

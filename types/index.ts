@@ -48,6 +48,7 @@ export type AppSubScreen =
   | null
   | "add-picker"
   | "add-expense"
+  | "add-multiple-expense"
   | "add-bill"
   | "expense-detail"
   | "expense-edit"

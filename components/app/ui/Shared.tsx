@@ -78,7 +78,7 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
     );
 }
 
-export function FieldBox({ label, focused, error, children }: { label: React.ReactNode; focused: boolean; error?: string; children: React.ReactNode }) {
+export function FieldBox({ label, focused = false, error, children }: { label: React.ReactNode; focused?: boolean; error?: string; children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-1.5">
             <div className="text-sm font-medium text-foreground/80" style={{ fontFamily: "'DM Sans', sans-serif" }}>

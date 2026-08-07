@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Star, Repeat } from "lucide-react";
+import { X, Star, Repeat, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { BazarUnit, BillCategory } from "@/types";
 import { BILL_META } from "@/lib/mockData";
@@ -11,7 +11,7 @@ import { TMyReviewResponse } from "@/redux/features/review/reviewApi";
 import { fetchAndDownloadStatement } from "@/lib/downloadStatement";
 
 // ── Generic Animated Modal ───────────────────────────────────────────────────
-export function WebDialogModal({ show, onClose, title, children }: { show: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
+export function WebDialogModal({ show, onClose, title, headerAction, children }: { show: boolean; onClose: () => void; title: string; headerAction?: React.ReactNode; children: React.ReactNode }) {
     return (
         <AnimatePresence>
             {show && (
@@ -22,9 +22,12 @@ export function WebDialogModal({ show, onClose, title, children }: { show: boole
                             <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                                 {title}
                             </h3>
-                            <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#2e1a0a] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                                <X className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {headerAction}
+                                <button type="button" onClick={onClose} className="w-8 h-8 rounded-full bg-[#2e1a0a] flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
                         {children}
                     </motion.div>
@@ -54,7 +57,7 @@ export function WebFieldBox({ label, focused, error, children }: { label: string
 }
 
 // ── Add Bazar Expense Form ───────────────────────────────────────────────────
-export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: (prod: string, price?: number, qty?: number, unit?: BazarUnit, date?: string, notes?: string, totalPrice?: number) => void; onClose: () => void; isLoading?: boolean }) {
+export function WebAddExpenseForm({ onSubmit, onClose, onAddMultiple, isLoading }: { onSubmit: (prod: string, price?: number, qty?: number, unit?: BazarUnit, date?: string, notes?: string, totalPrice?: number) => void; onClose: () => void; onAddMultiple?: () => void; isLoading?: boolean }) {
     const [product, setProduct] = useState("");
     const [price, setPrice] = useState("");
     const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
@@ -98,24 +101,10 @@ export function WebAddExpenseForm({ onSubmit, onClose, isLoading }: { onSubmit: 
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
-                        {priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}
-                    </label>
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">{priceMode === "unit" ? "Unit Price (৳)" : "Total Price (৳)"}</label>
                     <div className="relative flex items-center">
-                        <input
-                            type="number"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            required
-                            placeholder="0.00"
-                            className="w-full pl-4 pr-9 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground"
-                        />
-                        <button
-                            type="button"
-                            onClick={togglePriceMode}
-                            title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"}
-                            className="absolute right-2.5 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                        >
+                        <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required placeholder="0.00" className="w-full pl-4 pr-9 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none font-mono text-foreground" />
+                        <button type="button" onClick={togglePriceMode} title={priceMode === "unit" ? "Switch to Total Price" : "Switch to Unit Price"} className="absolute right-2.5 p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer">
                             <Repeat className="w-3.5 h-3.5" />
                         </button>
                     </div>
@@ -172,11 +161,7 @@ function CategorySelect({ value, onChange }: { value: BillCategory; onChange: (c
 
     return (
         <div className="relative">
-            <button
-                type="button"
-                onClick={() => setOpen((prev) => !prev)}
-                className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm flex items-center justify-between text-foreground hover:border-primary/50 transition-colors cursor-pointer"
-            >
+            <button type="button" onClick={() => setOpen((prev) => !prev)} className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm flex items-center justify-between text-foreground hover:border-primary/50 transition-colors cursor-pointer">
                 <div className="flex items-center gap-2.5 min-w-0">
                     <div className="w-5 h-5 flex items-center justify-center shrink-0" style={{ color: selectedMeta?.color || "#e8a020" }}>
                         {selectedMeta?.icon}
@@ -190,12 +175,7 @@ function CategorySelect({ value, onChange }: { value: BillCategory; onChange: (c
                 {open && (
                     <>
                         <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-                        <motion.div
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-56 overflow-y-auto bg-[#251508] border border-border rounded-xl shadow-2xl p-1.5 divide-y divide-border/20"
-                        >
+                        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 5 }} className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-56 overflow-y-auto bg-[#251508] border border-border rounded-xl shadow-2xl p-1.5 divide-y divide-border/20">
                             {Object.entries(BILL_META).map(([key, meta]) => {
                                 const isSelected = key === value;
                                 return (
@@ -206,9 +186,7 @@ function CategorySelect({ value, onChange }: { value: BillCategory; onChange: (c
                                             onChange(key as BillCategory);
                                             setOpen(false);
                                         }}
-                                        className={`w-full px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
-                                            isSelected ? "bg-primary/20 text-primary font-bold" : "hover:bg-[#2e1a0a] text-foreground"
-                                        }`}
+                                        className={`w-full px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${isSelected ? "bg-primary/20 text-primary font-bold" : "hover:bg-[#2e1a0a] text-foreground"}`}
                                     >
                                         <div className="flex items-center gap-2.5 min-w-0">
                                             <div className="w-4 h-4 flex items-center justify-center shrink-0" style={{ color: meta.color }}>
@@ -229,7 +207,7 @@ function CategorySelect({ value, onChange }: { value: BillCategory; onChange: (c
 }
 
 // ── Add Monthly Bill Form ────────────────────────────────────────────────────
-export function WebAddBillForm({ onSubmit, onClose, isLoading }: { onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void; onClose: () => void; isLoading?: boolean }) {
+export function WebAddBillForm({ onSubmit, onClose, onAddMultiple, isLoading }: { onSubmit: (cat: BillCategory, title: string, amount: number, date: string, notes: string) => void; onClose: () => void; onAddMultiple?: () => void; isLoading?: boolean }) {
     const [category, setCategory] = useState<BillCategory>("RENT");
     const [title, setTitle] = useState("");
     const [amount, setAmount] = useState("");
@@ -340,14 +318,7 @@ export function WebReviewModalContent({
             </div>
             <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Your Review</label>
-                <textarea
-                    value={reviewComment}
-                    onChange={(e) => setReviewComment(e.target.value)}
-                    required
-                    rows={4}
-                    placeholder="Share your experience using My Bazar Hisab..."
-                    className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none text-foreground"
-                />
+                <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} required rows={4} placeholder="Share your experience using My Bazar Hisab..." className="w-full px-4 py-3 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none resize-none text-foreground" />
             </div>
             <div className="flex gap-3 mt-2">
                 <button type="button" onClick={onClose} className="flex-1 py-3 border border-border text-foreground font-bold rounded-xl hover:bg-secondary cursor-pointer">
@@ -392,9 +363,7 @@ export function WebStatementModal({ show, onClose }: { show: boolean; onClose: (
     return (
         <WebDialogModal show={show} onClose={onClose} title="Generate Expense Statement">
             <form onSubmit={handleGenerate} className="flex flex-col gap-4 text-left font-sans">
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                    Select a date range to generate a combined statement of all Bazar purchases and Monthly Bills.
-                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">Select a date range to generate a combined statement of all Bazar purchases and Monthly Bills.</p>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
@@ -410,22 +379,10 @@ export function WebStatementModal({ show, onClose }: { show: boolean; onClose: (
                 <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">Format</label>
                     <div className="flex gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setFormat("html")}
-                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                                format === "html" ? "bg-primary/20 text-primary border-primary" : "bg-[#2e1a0a] text-muted-foreground border-border/60"
-                            }`}
-                        >
+                        <button type="button" onClick={() => setFormat("html")} className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${format === "html" ? "bg-primary/20 text-primary border-primary" : "bg-[#2e1a0a] text-muted-foreground border-border/60"}`}>
                             🌐 Interactive HTML
                         </button>
-                        <button
-                            type="button"
-                            onClick={() => setFormat("pdf")}
-                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                                format === "pdf" ? "bg-accent/20 text-accent border-accent" : "bg-[#2e1a0a] text-muted-foreground border-border/60"
-                            }`}
-                        >
+                        <button type="button" onClick={() => setFormat("pdf")} className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${format === "pdf" ? "bg-accent/20 text-accent border-accent" : "bg-[#2e1a0a] text-muted-foreground border-border/60"}`}>
                             📄 Download PDF
                         </button>
                     </div>

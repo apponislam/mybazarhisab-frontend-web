@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, Star, Calendar, TrendingUp, Minus, BookOpen, Package, BarChart2, Edit2 } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Search, X, ChevronUp, ChevronDown, Star, Calendar, TrendingUp, Minus, BookOpen, Package, BarChart2, Edit2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { BazarUnit, BillCategory, GroupStats } from "@/types";
 import { BILL_META, fmt } from "@/lib/mockData";
@@ -21,6 +21,8 @@ import { WebProfileTab } from "@/components/web/shell/WebProfileTab";
 import { WebNotificationsTab } from "@/components/web/shell/WebNotificationsTab";
 import { WebProductsTab } from "@/components/web/shell/WebProductsTab";
 import { WebDialogModal as Modal, WebAddExpenseForm as AddExpenseForm, WebAddBillForm as AddBillForm, WebReviewModalContent, WebStatementModal } from "@/components/web/shell/WebDialogs";
+import { WebBulkExpenseScreen } from "@/components/web/shell/WebBulkExpenseScreen";
+import { WebBulkBillScreen } from "@/components/web/shell/WebBulkBillScreen";
 import { avatarColor, initials } from "@/components/web/shell/WebMetricCard";
 import { EditExpenseModal } from "@/components/dashboard/expenses/EditExpenseModal";
 import { EditBillModal } from "@/components/dashboard/bills/EditBillModal";
@@ -152,7 +154,9 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
     // Onboarding & Interaction Modal States
     const [showAddExpense, setShowAddExpense] = useState(false);
+    const [showBulkExpense, setShowBulkExpense] = useState(false);
     const [showAddBill, setShowAddBill] = useState(false);
+    const [showBulkBill, setShowBulkBill] = useState(false);
     const [showStatement, setShowStatement] = useState(false);
     const [showContact, setShowContact] = useState(false);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -308,7 +312,11 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                 scrolled={scrolled}
                 stats={stats}
                 tab={tab}
-                setTab={setTab}
+                setTab={(newTab) => {
+                    setShowBulkExpense(false);
+                    setShowBulkBill(false);
+                    setTab(newTab);
+                }}
                 setShowAddExpense={setShowAddExpense}
                 setShowAddBill={setShowAddBill}
                 onOpenStatement={() => setShowStatement(true)}
@@ -330,20 +338,38 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
             {/* ─── Main Website Content Area ───────────────────────────────────────── */}
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 flex flex-col min-h-0 relative">
-                {/* Mobile View Navigation Helper */}
-                <div className="md:hidden flex items-center justify-around bg-[#251508] border border-border p-1.5 rounded-2xl mb-6 select-none shadow-lg">
-                    {[
-                        { id: "home", label: "Home", icon: <Home className="w-4 h-4" /> },
-                        { id: "expenses", label: "Expenses", icon: <ShoppingBag className="w-4 h-4" /> },
-                        { id: "bills", label: "Bills", icon: <Receipt className="w-4 h-4" /> },
-                        { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
-                    ].map((item) => (
-                        <button key={item.id} onClick={() => setTab(item.id as never)} className="flex-1 py-2 flex flex-col items-center gap-1 rounded-xl text-xs font-medium cursor-pointer" style={{ color: tab === item.id ? "#e8a020" : "#a08060" }}>
-                            {item.icon}
-                            <span>{item.label}</span>
-                        </button>
-                    ))}
-                </div>
+                {showBulkExpense ? (
+                    <WebBulkExpenseScreen
+                        onBack={() => setShowBulkExpense(false)}
+                        onDone={() => {
+                            setShowBulkExpense(false);
+                            setTab("expenses");
+                        }}
+                    />
+                ) : showBulkBill ? (
+                    <WebBulkBillScreen
+                        onBack={() => setShowBulkBill(false)}
+                        onDone={() => {
+                            setShowBulkBill(false);
+                            setTab("bills");
+                        }}
+                    />
+                ) : (
+                    <>
+                        {/* Mobile View Navigation Helper */}
+                        <div className="md:hidden flex items-center justify-around bg-[#251508] border border-border p-1.5 rounded-2xl mb-6 select-none shadow-lg">
+                            {[
+                                { id: "home", label: "Home", icon: <Home className="w-4 h-4" /> },
+                                { id: "expenses", label: "Expenses", icon: <ShoppingBag className="w-4 h-4" /> },
+                                { id: "bills", label: "Bills", icon: <Receipt className="w-4 h-4" /> },
+                                { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
+                            ].map((item) => (
+                                <button key={item.id} onClick={() => setTab(item.id as never)} className="flex-1 py-2 flex flex-col items-center gap-1 rounded-xl text-xs font-medium cursor-pointer" style={{ color: tab === item.id ? "#e8a020" : "#a08060" }}>
+                                    {item.icon}
+                                    <span>{item.label}</span>
+                                </button>
+                            ))}
+                        </div>
 
                 <AnimatePresence mode="wait">
                     <motion.div key={tab} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25 }} className="flex-1 flex flex-col gap-8 min-h-0">
@@ -886,10 +912,28 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                         )}
                     </motion.div>
                 </AnimatePresence>
+                </>
+                )}
             </main>
 
             {/* Website Dialog: Add Bazar Expense */}
-            <Modal show={showAddExpense} onClose={() => setShowAddExpense(false)} title="Add Bazar Expense">
+            <Modal
+                show={showAddExpense}
+                onClose={() => setShowAddExpense(false)}
+                title="Add Bazar Expense"
+                headerAction={
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setShowAddExpense(false);
+                            setShowBulkExpense(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-all cursor-pointer border border-primary/20"
+                    >
+                        <Plus className="w-3.5 h-3.5" /> Add Multiple
+                    </button>
+                }
+            >
                 <AddExpenseForm
                     isLoading={bazarLoading}
                     onSubmit={(prod, price, qty, unit, date, notes, totalPrice) => {
@@ -901,7 +945,23 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             </Modal>
 
             {/* Website Dialog: Add Monthly Bill */}
-            <Modal show={showAddBill} onClose={() => setShowAddBill(false)} title="Add Monthly Bill">
+            <Modal
+                show={showAddBill}
+                onClose={() => setShowAddBill(false)}
+                title="Add Monthly Bill"
+                headerAction={
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setShowAddBill(false);
+                            setShowBulkBill(true);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-accent/10 hover:bg-accent/20 text-accent text-xs font-bold transition-all cursor-pointer border border-accent/20"
+                    >
+                        <Plus className="w-3.5 h-3.5" /> Add Multiple
+                    </button>
+                }
+            >
                 <AddBillForm
                     isLoading={billMutationLoading}
                     onSubmit={(cat, title, amount, date, notes) => {

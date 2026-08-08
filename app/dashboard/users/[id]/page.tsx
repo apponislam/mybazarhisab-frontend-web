@@ -190,7 +190,7 @@ export default function UserDetailPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-[#251508] border border-primary/40 rounded-3xl p-5 shadow-xl flex items-center justify-between bg-primary/5">
+                                <div className="bg-[#251508] border border-primary/40 rounded-3xl p-5 shadow-xl flex items-center justify-between">
                                     <div>
                                         <p className="text-xs text-primary font-mono font-bold">Total Overall Spent</p>
                                         <h3 className="text-2xl font-bold text-primary font-mono mt-1">৳{(stats?.totalOverallSpent || 0).toLocaleString()}</h3>
@@ -221,7 +221,7 @@ export default function UserDetailPage() {
                                             <Receipt className="w-6 h-6" />
                                         </div>
                                     </div>
-                                    <div className="bg-[#251508] border border-primary/40 rounded-3xl p-5 shadow-xl flex items-center justify-between bg-primary/5">
+                                    <div className="bg-[#251508] border border-primary/40 rounded-3xl p-5 shadow-xl flex items-center justify-between">
                                         <div>
                                             <p className="text-xs text-primary font-mono font-bold">Group Overall Spent</p>
                                             <h3 className="text-2xl font-bold text-primary font-mono mt-1">৳{(groupStats?.totalOverallSpent || 0).toLocaleString()}</h3>
@@ -234,7 +234,7 @@ export default function UserDetailPage() {
                             )}
 
                             {/* Sub-Resource Navigation Tabs */}
-                            <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl flex flex-col gap-6 flex-1 min-h-[400px] overflow-y-auto">
+                            <div className="bg-[#251508] border border-border rounded-3xl p-6 shadow-xl flex flex-col gap-6 flex-1 min-h-100 overflow-y-auto">
                                 <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border/60 scrollbar-none">
                                     {[
                                         { id: "overview", label: "Overview Metrics", icon: <User className="w-4 h-4" /> },

@@ -16,9 +16,7 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
     if (isLoading) {
         return (
             <div className="bg-[#251508] border border-[rgba(232,160,32,0.18)] rounded-3xl p-6 shadow-2xl relative overflow-hidden">
-                <div className="h-64 rounded-2xl bg-[#1a0e07] animate-pulse flex items-center justify-center text-xs font-mono text-muted-foreground">
-                    Loading monthly spending trends...
-                </div>
+                <div className="h-64 rounded-2xl bg-[#1a0e07] animate-pulse flex items-center justify-center text-xs font-mono text-muted-foreground">Loading monthly spending trends...</div>
             </div>
         );
     }
@@ -59,7 +57,7 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
                 <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 flex items-center justify-center text-primary shadow-inner">
+                    <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 flex items-center justify-center text-primary shadow-inner">
                         <TrendingUp className="w-6 h-6" />
                     </div>
                     <div>
@@ -96,7 +94,7 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
 
             {/* SVG Chart Container */}
             <div className="relative w-full overflow-x-auto select-none py-2">
-                <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-auto min-w-[680px] overflow-visible">
+                <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-auto min-w-170 overflow-visible">
                     <defs>
                         <linearGradient id="primaryAreaGrad" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor="#e8a020" stopOpacity="0.45" />
@@ -157,43 +155,17 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                                 {/* Point Markers for each line */}
                                 <circle cx={p.x} cy={p.yBazar} r={isHovered ? "4" : "2.5"} fill="#10b981" />
                                 <circle cx={p.x} cy={p.yBill} r={isHovered ? "4" : "2.5"} fill="#3b82f6" />
-                                <circle
-                                    cx={p.x}
-                                    cy={p.yTotal}
-                                    r={isHovered ? "6" : isCurrent ? "4.5" : "3"}
-                                    fill={isHovered || isCurrent ? "#e8a020" : "#1a0e07"}
-                                    stroke="#e8a020"
-                                    strokeWidth={isHovered ? "2.5" : "1.5"}
-                                    className="transition-all duration-150"
-                                />
+                                <circle cx={p.x} cy={p.yTotal} r={isHovered ? "6" : isCurrent ? "4.5" : "3"} fill={isHovered || isCurrent ? "#e8a020" : "#1a0e07"} stroke="#e8a020" strokeWidth={isHovered ? "2.5" : "1.5"} className="transition-all duration-150" />
 
                                 {/* X-Axis Month Label */}
-                                <text
-                                    x={p.x}
-                                    y={svgH - 8}
-                                    textAnchor="middle"
-                                    fill={isHovered || isCurrent ? "#e8a020" : "#a08060"}
-                                    fontSize={isHovered || isCurrent ? "12" : "11"}
-                                    fontFamily="monospace"
-                                    fontWeight={isHovered || isCurrent ? "800" : "500"}
-                                >
+                                <text x={p.x} y={svgH - 8} textAnchor="middle" fill={isHovered || isCurrent ? "#e8a020" : "#a08060"} fontSize={isHovered || isCurrent ? "12" : "11"} fontFamily="monospace" fontWeight={isHovered || isCurrent ? "800" : "500"}>
                                     {p.item.label}
                                 </text>
 
                                 {/* Floating Tooltip Popup Card */}
                                 {isHovered && (
                                     <g pointerEvents="none" className="transition-all duration-150">
-                                        <rect
-                                            x={tooltipX}
-                                            y={tooltipY}
-                                            width={tooltipW}
-                                            height={tooltipH}
-                                            rx="10"
-                                            fill="#1a0e07"
-                                            stroke="#e8a020"
-                                            strokeWidth="1.5"
-                                            className="shadow-2xl"
-                                        />
+                                        <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx="10" fill="#1a0e07" stroke="#e8a020" strokeWidth="1.5" className="shadow-2xl" />
                                         <text x={tooltipX + 10} y={tooltipY + 18} fill="#e8a020" fontSize="11" fontWeight="bold" fontFamily="monospace">
                                             {p.item.label} Overview
                                         </text>
@@ -217,9 +189,7 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
             {/* Active Month Detail Bar */}
             <div className="mt-4 pt-4 border-t border-border/60 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#1a0e07] p-4 rounded-2xl">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs font-mono">
-                        {activePoint?.item.label}
-                    </div>
+                    <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs font-mono">{activePoint?.item.label}</div>
                     <div>
                         <span className="text-xs font-bold text-foreground font-mono">{activePoint?.item.label} Breakdown</span>
                         <span className="text-[10px] text-muted-foreground ml-2 font-mono">Total: ৳{activePoint?.item.totalExpense.toLocaleString()}</span>

@@ -60,13 +60,13 @@ function WebLoadingDots({ currency = true, size = "md" }: { currency?: boolean; 
 
 function ExpenseRow({ label, value, prev, isLoading, color = "text-foreground" }: { label: string; value: number; prev?: number; isLoading: boolean; color?: string }) {
     return (
-        <div className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/[0.02] transition-colors">
-            <span className="text-sm text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+        <div className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/2 transition-colors">
+            <span className="text-sm text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                {label}
+            </span>
             <div className="flex items-center gap-3">
                 {!isLoading && prev !== undefined && <WebDelta current={value} prev={prev} />}
-                <span className={`text-sm font-bold font-mono ${color}`}>
-                    {isLoading ? <WebLoadingDots currency size="sm" /> : fmt(value)}
-                </span>
+                <span className={`text-sm font-bold font-mono ${color}`}>{isLoading ? <WebLoadingDots currency size="sm" /> : fmt(value)}</span>
             </div>
         </div>
     );
@@ -379,548 +379,529 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                             ))}
                         </div>
 
-                <AnimatePresence mode="wait">
-                    <motion.div key={tab} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25 }} className="flex-1 flex flex-col gap-8 min-h-0">
-                        {/* ─── TAB: HOME (WEBSITE DESIGN) ─────────────────────────────── */}
-                        {tab === "home" && (
-                            <>
-                                {/* ─── Group Header ───────────────────────────────────────── */}
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                                            {dashboardStats?.groupName || stats?.groupName || "My Bazar Group"}
-                                        </h1>
-                                        <p className="text-muted-foreground text-xs mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                            {mn} {yr} — Hisab Overview
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10">
-                                            <Star className="w-3 h-3 text-primary" strokeWidth={2} />
-                                            <span className="text-primary text-xs font-semibold font-mono">{dashboardStats?.totalMembers ?? stats?.totalMembers ?? 1} members</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-[#251508]">
-                                            <BookOpen className="w-3 h-3 text-muted-foreground" strokeWidth={2} />
-                                            <span className="text-muted-foreground text-xs font-semibold font-mono">
-                                                {isDashboardLoading ? <WebLoadingDots currency={false} size="sm" /> : (dashboardStats?.totalGroupBazarAndBills ?? dashboardStats?.totalGroupBazarEntries ?? 0)} entries
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* ─── 3 Hero Summary Cards ──────────────────────────────── */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                                    {/* Total Expense Card */}
-                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-                                        className="rounded-2xl border border-primary/30 p-6 relative overflow-hidden"
-                                        style={{ background: "linear-gradient(145deg, rgba(232,160,32,0.15) 0%, rgba(192,96,16,0.06) 100%)", boxShadow: "0 4px 32px rgba(232,160,32,0.12)" }}
-                                    >
-                                        <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-primary/5 -translate-y-6 translate-x-6 pointer-events-none" />
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
-                                                <TrendingUp className="w-4 h-4 text-primary" />
+                        <AnimatePresence mode="wait">
+                            <motion.div key={tab} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25 }} className="flex-1 flex flex-col gap-8 min-h-0">
+                                {/* ─── TAB: HOME (WEBSITE DESIGN) ─────────────────────────────── */}
+                                {tab === "home" && (
+                                    <>
+                                        {/* ─── Group Header ───────────────────────────────────────── */}
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+                                                    {dashboardStats?.groupName || stats?.groupName || "My Bazar Group"}
+                                                </h1>
+                                                <p className="text-muted-foreground text-xs mt-0.5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                                    {mn} {yr} — Hisab Overview
+                                                </p>
                                             </div>
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Total Expense</span>
-                                        </div>
-                                        <div className="min-h-[2.5rem] flex items-center text-3xl font-bold text-primary font-mono mb-1">
-                                            {isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthTotalExpense ?? 0)}
-                                        </div>
-                                        {!isDashboardLoading && (
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <WebDelta current={dashboardStats?.thisMonthTotalExpense ?? 0} prev={dashboardStats?.prevMonthTotalExpense ?? 0} />
-                                                <span className="text-[11px] text-muted-foreground">vs last month</span>
-                                            </div>
-                                        )}
-                                    </motion.div>
-
-                                    {/* Bazar Expense Card */}
-                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
-                                        className="rounded-2xl border border-border bg-[#251508] p-6 relative overflow-hidden"
-                                        style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
-                                    >
-                                        <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-primary/3 -translate-y-6 translate-x-6 pointer-events-none" />
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-8 h-8 rounded-lg bg-primary/12 border border-primary/20 flex items-center justify-center">
-                                                <ShoppingBag className="w-4 h-4 text-primary" />
-                                            </div>
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Bazar Expense</span>
-                                        </div>
-                                        <div className="min-h-[2.5rem] flex items-center text-3xl font-bold text-foreground font-mono mb-1">
-                                            {isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthBazarExpense ?? 0)}
-                                        </div>
-                                        {!isDashboardLoading && (
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <WebDelta current={dashboardStats?.thisMonthBazarExpense ?? 0} prev={dashboardStats?.prevMonthBazarExpense ?? 0} />
-                                                <span className="text-[11px] text-muted-foreground">vs last month</span>
-                                            </div>
-                                        )}
-                                    </motion.div>
-
-                                    {/* Bill Expense Card */}
-                                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.19 }}
-                                        className="rounded-2xl border border-border bg-[#251508] p-6 relative overflow-hidden"
-                                        style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
-                                    >
-                                        <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-accent/3 -translate-y-6 translate-x-6 pointer-events-none" />
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-8 h-8 rounded-lg bg-accent/15 border border-accent/25 flex items-center justify-center">
-                                                <Receipt className="w-4 h-4 text-accent" />
-                                            </div>
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Bill Expense</span>
-                                        </div>
-                                        <div className="min-h-[2.5rem] flex items-center text-3xl font-bold text-foreground font-mono mb-1">
-                                            {isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthBillExpense ?? 0)}
-                                        </div>
-                                        {!isDashboardLoading && (
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <WebDelta current={dashboardStats?.thisMonthBillExpense ?? 0} prev={dashboardStats?.prevMonthBillExpense ?? 0} />
-                                                <span className="text-[11px] text-muted-foreground">vs last month</span>
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                </div>
-
-                                {/* ─── Expense Breakdown Panels + Recent Logs ─────────────── */}
-                                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                                    {/* Left: Breakdown panels (3 cols) */}
-                                    <div className="lg:col-span-3 flex flex-col gap-5">
-                                        {/* Bazar Breakdown */}
-                                        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                                            className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
-                                        >
-                                            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
-                                                <ShoppingBag className="w-4 h-4 text-primary" />
-                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Bazar Breakdown</span>
-                                            </div>
-                                            <div className="divide-y divide-border/50">
-                                                <ExpenseRow label={`${mn} ${yr}`} value={dashboardStats?.thisMonthBazarExpense ?? 0} prev={dashboardStats?.prevMonthBazarExpense ?? 0} isLoading={isDashboardLoading} color="text-primary" />
-                                                <ExpenseRow label="Previous Month" value={dashboardStats?.prevMonthBazarExpense ?? 0} isLoading={isDashboardLoading} />
-                                                <ExpenseRow label={`Year ${yr}`} value={dashboardStats?.thisYearBazarExpense ?? 0} prev={dashboardStats?.prevYearBazarExpense ?? 0} isLoading={isDashboardLoading} color="text-primary" />
-                                                <ExpenseRow label={`Year ${yr - 1}`} value={dashboardStats?.prevYearBazarExpense ?? 0} isLoading={isDashboardLoading} />
-                                            </div>
-                                        </motion.div>
-
-                                        {/* Bill Breakdown */}
-                                        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                                            className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
-                                        >
-                                            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
-                                                <Receipt className="w-4 h-4 text-accent" />
-                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Bill Breakdown</span>
-                                            </div>
-                                            <div className="divide-y divide-border/50">
-                                                <ExpenseRow label={`${mn} ${yr}`} value={dashboardStats?.thisMonthBillExpense ?? 0} prev={dashboardStats?.prevMonthBillExpense ?? 0} isLoading={isDashboardLoading} color="text-accent" />
-                                                <ExpenseRow label="Previous Month" value={dashboardStats?.prevMonthBillExpense ?? 0} isLoading={isDashboardLoading} />
-                                                <ExpenseRow label={`Year ${yr}`} value={dashboardStats?.thisYearBillExpense ?? 0} prev={dashboardStats?.prevYearBillExpense ?? 0} isLoading={isDashboardLoading} color="text-accent" />
-                                                <ExpenseRow label={`Year ${yr - 1}`} value={dashboardStats?.prevYearBillExpense ?? 0} isLoading={isDashboardLoading} />
-                                            </div>
-                                        </motion.div>
-
-                                        {/* Year Totals */}
-                                        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-                                            className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
-                                        >
-                                            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
-                                                <BarChart2 className="w-4 h-4 text-green-400" />
-                                                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Yearly Summary</span>
-                                            </div>
-                                            <div className="divide-y divide-border/50">
-                                                <ExpenseRow label={`${yr} Grand Total`} value={dashboardStats?.thisYearTotalExpense ?? 0} prev={dashboardStats?.prevYearTotalExpense ?? 0} isLoading={isDashboardLoading} color="text-green-400" />
-                                                <ExpenseRow label={`${yr - 1} Grand Total`} value={dashboardStats?.prevYearTotalExpense ?? 0} isLoading={isDashboardLoading} />
-                                            </div>
-                                        </motion.div>
-                                    </div>
-
-                                    {/* Right: Recent Bazar Logs (2 cols) */}
-                                    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                                        className="lg:col-span-2 bg-[#251508] border border-border rounded-2xl overflow-hidden flex flex-col"
-                                        style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
-                                    >
-                                        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50 shrink-0">
-                                            <ShoppingBag className="w-4 h-4 text-primary" />
-                                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Recent Bazar Logs</span>
-                                        </div>
-
-                                        <div className="flex-1 overflow-y-auto">
-                                            {bazarEntriesLoading ? (
-                                                <div className="divide-y divide-border/30">
-                                                    {[1, 2, 3, 4, 5, 6].map((i) => (
-                                                        <div key={i} className="flex items-center justify-between px-5 py-3 animate-pulse">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-[#2e1a0a]" />
-                                                                <div>
-                                                                    <div className="h-3 w-28 bg-[#2e1a0a] rounded mb-1.5" />
-                                                                    <div className="h-2.5 w-20 bg-[#2e1a0a] rounded" />
-                                                                </div>
-                                                            </div>
-                                                            <div className="h-3.5 w-14 bg-[#2e1a0a] rounded" />
-                                                        </div>
-                                                    ))}
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10">
+                                                    <Star className="w-3 h-3 text-primary" strokeWidth={2} />
+                                                    <span className="text-primary text-xs font-semibold font-mono">{dashboardStats?.totalMembers ?? stats?.totalMembers ?? 1} members</span>
                                                 </div>
-                                            ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
-                                                <div className="divide-y divide-border/30">
-                                                    {bazarEntriesResponse.data.slice(0, 10).map((e: any) => (
-                                                        <div key={e._id} className="flex items-center justify-between px-5 py-3 hover:bg-white/[0.02] transition-colors">
-                                                            <div className="flex items-center gap-3 min-w-0">
-                                                                <div className="w-8 h-8 rounded-lg overflow-hidden bg-primary/8 border border-primary/15 flex items-center justify-center shrink-0">
-                                                                    {e.product?.photo ? (
-                                                                        <Image src={e.product.photo} alt={e.product?.name || e.name} width={32} height={32} className="w-full h-full object-cover" />
-                                                                    ) : (
-                                                                        <ShoppingBag className="w-3.5 h-3.5 text-primary" />
-                                                                    )}
-                                                                </div>
-                                                                <div className="min-w-0">
-                                                                    <p className="text-sm font-medium truncate text-[#f5ede2]">{e.product?.name || e.name}</p>
-                                                                    <p className="text-[11px] text-muted-foreground font-mono">
-                                                                        {e.user?.name || "Unknown"} · {new Date(e.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-right shrink-0 pl-3">
-                                                                <p className="text-sm font-bold text-primary font-mono">৳{(e.totalPrice ?? ((e.price || 0) * (e.quantity || 1))).toLocaleString()}</p>
-                                                                <p className="text-[10px] text-muted-foreground font-mono">{e.quantity} {e.unit}</p>
-                                                            </div>
-                                                        </div>
-                                                    ))}
+                                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-[#251508]">
+                                                    <BookOpen className="w-3 h-3 text-muted-foreground" strokeWidth={2} />
+                                                    <span className="text-muted-foreground text-xs font-semibold font-mono">{isDashboardLoading ? <WebLoadingDots currency={false} size="sm" /> : (dashboardStats?.totalGroupBazarAndBills ?? dashboardStats?.totalGroupBazarEntries ?? 0)} entries</span>
                                                 </div>
-                                            ) : (
-                                                <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-12">
-                                                    <ShoppingBag className="w-8 h-8 mb-2 opacity-20" />
-                                                    <p className="text-sm">No bazar entries yet</p>
-                                                </div>
-                                            )}
+                                            </div>
                                         </div>
-                                    </motion.div>
-                                </div>
 
-                                {/* ─── Monthly Expense Trend Component ─── */}
-                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                                    <WebMonthlyTrendChart data={monthlyTrendData} isLoading={isMonthlyTrendLoading} />
-                                </motion.div>
-                            </>
-                        )}
-
-                        {/* ─── TAB: EXPENSES (WEBSITE LIST VIEW) ───────────────────────── */}
-                        {tab === "expenses" && (
-                            <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
-                                {/* Search & Actions */}
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
-                                    <div className="relative w-full sm:w-80">
-                                        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                        <input type="text" value={expenseSearch} onChange={(e) => setExpenseSearch(e.target.value)} placeholder="Search bazar items or buyers..." className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
-                                    </div>
-
-                                    <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">
-                                        {(["month", "all"] as const).map((f) => (
-                                            <button
-                                                key={f}
-                                                onClick={() => {
-                                                    setExpenseFilter(f);
-                                                    setExpensePage(1);
-                                                }}
-                                                className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
-                                                style={{
-                                                    background: expenseFilter === f ? "#e8a020" : "transparent",
-                                                    color: expenseFilter === f ? "#1a0e07" : "#a08060",
-                                                }}
+                                        {/* ─── 3 Hero Summary Cards ──────────────────────────────── */}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                            {/* Total Expense Card */}
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.05 }}
+                                                className="rounded-2xl border border-primary/30 p-6 relative overflow-hidden"
+                                                style={{ background: "linear-gradient(145deg, rgba(232,160,32,0.15) 0%, rgba(192,96,16,0.06) 100%)", boxShadow: "0 4px 32px rgba(232,160,32,0.12)" }}
                                             >
-                                                {f === "month" ? "This Month" : "All Time"}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                                                <div className="absolute top-0 right-0 w-28 h-28 rounded-full bg-primary/5 -translate-y-6 translate-x-6 pointer-events-none" />
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center">
+                                                        <TrendingUp className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Total Expense</span>
+                                                </div>
+                                                <div className="min-h-10 flex items-center text-3xl font-bold text-primary font-mono mb-1">{isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthTotalExpense ?? 0)}</div>
+                                                {!isDashboardLoading && (
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <WebDelta current={dashboardStats?.thisMonthTotalExpense ?? 0} prev={dashboardStats?.prevMonthTotalExpense ?? 0} />
+                                                        <span className="text-[11px] text-muted-foreground">vs last month</span>
+                                                    </div>
+                                                )}
+                                            </motion.div>
 
-                                {/* Table Feed */}
-                                <div className="flex-1 overflow-auto rounded-2xl border border-[rgba(232,160,32,0.1)]">
-                                    <table className="w-full border-collapse text-left text-sm">
-                                        <thead className="bg-[#2e1a0a] text-muted-foreground font-mono text-xs border-b border-[rgba(232,160,32,0.1)] sticky top-0">
-                                            <tr>
-                                                <th className="p-4">Item</th>
-                                                <th className="p-4">Buyer</th>
-                                                <th className="p-4">Date</th>
-                                                <th className="p-4 text-right">Price</th>
-                                                <th className="p-4 text-right">Qty</th>
-                                                 <th className="p-4 text-right">Total</th>
-                                                <th className="p-4 text-center">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-[rgba(232,160,32,0.06)] bg-[#251508]">
-                                            {bazarEntriesLoading || (bazarEntriesFetching && (!bazarEntriesResponse?.data || bazarEntriesResponse.data.length === 0)) ? (
-                                                [1, 2, 3, 4, 5].map((i) => (
-                                                    <tr key={i} className="animate-pulse">
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-32" />
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-24" />
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-20" />
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-12 ml-auto" />
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <div className="h-4 bg-[#2e1a0a] rounded-md w-12 mx-auto" />
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
-                                                bazarEntriesResponse.data
-                                                    .filter((e: any) => {
-                                                        const query = expenseSearch.toLowerCase();
-                                                        const pName = e.product?.name || "";
-                                                        const uName = e.user?.name || "";
-                                                        const notes = e.notes || "";
-                                                        return pName.toLowerCase().includes(query) || uName.toLowerCase().includes(query) || notes.toLowerCase().includes(query);
-                                                    })
-                                                    .map((e: any) => (
-                                                        <tr key={e._id} className="hover:bg-primary/5 transition-colors">
-                                                            <td className="p-4 font-semibold flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-xl overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                                                                    {e.product?.photo ? (
-                                                                        <Image src={e.product.photo} alt={e.product?.name || "Bazar Item"} width={32} height={32} className="w-full h-full object-cover" />
-                                                                    ) : (
-                                                                        <span className="text-base">🛒</span>
-                                                                    )}
-                                                                </div>
-                                                                <div>
-                                                                    <p>{e.product?.name || "Bazar Item"}</p>
-                                                                    {e.notes && <p className="text-[10px] text-muted-foreground font-normal italic">{e.notes}</p>}
-                                                                </div>
-                                                            </td>
-                                                            <td className="p-4">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "u") }}>
-                                                                        {e.user?.profileImage ? (
-                                                                            <Image src={e.user.profileImage} alt={e.user?.name || "User"} width={24} height={24} className="w-full h-full object-cover" />
-                                                                        ) : (
-                                                                            initials(e.user?.name || "U")
-                                                                        )}
+                                            {/* Bazar Expense Card */}
+                                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="rounded-2xl border border-border bg-[#251508] p-6 relative overflow-hidden" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
+                                                <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-primary/3 -translate-y-6 translate-x-6 pointer-events-none" />
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-primary/12 border border-primary/20 flex items-center justify-center">
+                                                        <ShoppingBag className="w-4 h-4 text-primary" />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Bazar Expense</span>
+                                                </div>
+                                                <div className="min-h-10 flex items-center text-3xl font-bold text-foreground font-mono mb-1">{isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthBazarExpense ?? 0)}</div>
+                                                {!isDashboardLoading && (
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <WebDelta current={dashboardStats?.thisMonthBazarExpense ?? 0} prev={dashboardStats?.prevMonthBazarExpense ?? 0} />
+                                                        <span className="text-[11px] text-muted-foreground">vs last month</span>
+                                                    </div>
+                                                )}
+                                            </motion.div>
+
+                                            {/* Bill Expense Card */}
+                                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.19 }} className="rounded-2xl border border-border bg-[#251508] p-6 relative overflow-hidden" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.3)" }}>
+                                                <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-accent/3 -translate-y-6 translate-x-6 pointer-events-none" />
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-accent/15 border border-accent/25 flex items-center justify-center">
+                                                        <Receipt className="w-4 h-4 text-accent" />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">Bill Expense</span>
+                                                </div>
+                                                <div className="min-h-10 flex items-center text-3xl font-bold text-foreground font-mono mb-1">{isDashboardLoading ? <WebLoadingDots currency size="lg" /> : fmt(dashboardStats?.thisMonthBillExpense ?? 0)}</div>
+                                                {!isDashboardLoading && (
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <WebDelta current={dashboardStats?.thisMonthBillExpense ?? 0} prev={dashboardStats?.prevMonthBillExpense ?? 0} />
+                                                        <span className="text-[11px] text-muted-foreground">vs last month</span>
+                                                    </div>
+                                                )}
+                                            </motion.div>
+                                        </div>
+
+                                        {/* ─── Expense Breakdown Panels + Recent Logs ─────────────── */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                                            {/* Left: Breakdown panels (3 cols) */}
+                                            <div className="lg:col-span-3 flex flex-col gap-5">
+                                                {/* Bazar Breakdown */}
+                                                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}>
+                                                    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
+                                                        <ShoppingBag className="w-4 h-4 text-primary" />
+                                                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Bazar Breakdown</span>
+                                                    </div>
+                                                    <div className="divide-y divide-border/50">
+                                                        <ExpenseRow label={`${mn} ${yr}`} value={dashboardStats?.thisMonthBazarExpense ?? 0} prev={dashboardStats?.prevMonthBazarExpense ?? 0} isLoading={isDashboardLoading} color="text-primary" />
+                                                        <ExpenseRow label="Previous Month" value={dashboardStats?.prevMonthBazarExpense ?? 0} isLoading={isDashboardLoading} />
+                                                        <ExpenseRow label={`Year ${yr}`} value={dashboardStats?.thisYearBazarExpense ?? 0} prev={dashboardStats?.prevYearBazarExpense ?? 0} isLoading={isDashboardLoading} color="text-primary" />
+                                                        <ExpenseRow label={`Year ${yr - 1}`} value={dashboardStats?.prevYearBazarExpense ?? 0} isLoading={isDashboardLoading} />
+                                                    </div>
+                                                </motion.div>
+
+                                                {/* Bill Breakdown */}
+                                                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}>
+                                                    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
+                                                        <Receipt className="w-4 h-4 text-accent" />
+                                                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Bill Breakdown</span>
+                                                    </div>
+                                                    <div className="divide-y divide-border/50">
+                                                        <ExpenseRow label={`${mn} ${yr}`} value={dashboardStats?.thisMonthBillExpense ?? 0} prev={dashboardStats?.prevMonthBillExpense ?? 0} isLoading={isDashboardLoading} color="text-accent" />
+                                                        <ExpenseRow label="Previous Month" value={dashboardStats?.prevMonthBillExpense ?? 0} isLoading={isDashboardLoading} />
+                                                        <ExpenseRow label={`Year ${yr}`} value={dashboardStats?.thisYearBillExpense ?? 0} prev={dashboardStats?.prevYearBillExpense ?? 0} isLoading={isDashboardLoading} color="text-accent" />
+                                                        <ExpenseRow label={`Year ${yr - 1}`} value={dashboardStats?.prevYearBillExpense ?? 0} isLoading={isDashboardLoading} />
+                                                    </div>
+                                                </motion.div>
+
+                                                {/* Year Totals */}
+                                                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="bg-[#251508] border border-border rounded-2xl overflow-hidden" style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}>
+                                                    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50">
+                                                        <BarChart2 className="w-4 h-4 text-green-400" />
+                                                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Yearly Summary</span>
+                                                    </div>
+                                                    <div className="divide-y divide-border/50">
+                                                        <ExpenseRow label={`${yr} Grand Total`} value={dashboardStats?.thisYearTotalExpense ?? 0} prev={dashboardStats?.prevYearTotalExpense ?? 0} isLoading={isDashboardLoading} color="text-green-400" />
+                                                        <ExpenseRow label={`${yr - 1} Grand Total`} value={dashboardStats?.prevYearTotalExpense ?? 0} isLoading={isDashboardLoading} />
+                                                    </div>
+                                                </motion.div>
+                                            </div>
+
+                                            {/* Right: Recent Bazar Logs (2 cols) */}
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 16 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.3 }}
+                                                className="lg:col-span-2 bg-[#251508] border border-border rounded-2xl overflow-hidden flex flex-col"
+                                                style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.25)" }}
+                                            >
+                                                <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-[#2e1a0a]/50 shrink-0">
+                                                    <ShoppingBag className="w-4 h-4 text-primary" />
+                                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest font-mono">Recent Bazar Logs</span>
+                                                </div>
+
+                                                <div className="flex-1 overflow-y-auto">
+                                                    {bazarEntriesLoading ? (
+                                                        <div className="divide-y divide-border/30">
+                                                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                                                <div key={i} className="flex items-center justify-between px-5 py-3 animate-pulse">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-8 h-8 rounded-lg bg-[#2e1a0a]" />
+                                                                        <div>
+                                                                            <div className="h-3 w-28 bg-[#2e1a0a] rounded mb-1.5" />
+                                                                            <div className="h-2.5 w-20 bg-[#2e1a0a] rounded" />
+                                                                        </div>
                                                                     </div>
-                                                                    <span>{e.user?.name || "User"}</span>
+                                                                    <div className="h-3.5 w-14 bg-[#2e1a0a] rounded" />
                                                                 </div>
-                                                            </td>
-                                                            <td className="p-4 text-muted-foreground font-mono text-xs">{new Date(e.date).toLocaleDateString()}</td>
-                                                            <td className="p-4 text-right font-mono">৳{e.price.toLocaleString()}</td>
-                                                            <td className="p-4 text-right font-mono text-xs">
-                                                                {e.quantity} {e.unit}
-                                                            </td>
-                                                            <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.totalPrice ?? (e.price * e.quantity)).toLocaleString()}</td>
-                                                            <td className="p-4 text-center">
-                                                                <div className="flex items-center justify-center gap-1">
-                                                                    <button onClick={() => setEditingExpense(e)} className="p-1.5 text-muted-foreground hover:text-primary rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" title="Edit Expense">
-                                                                        <Edit2 className="w-3.5 h-3.5" />
-                                                                    </button>
-                                                                    <button onClick={() => setDeletingExpenseId(e._id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Delete Expense">
-                                                                        <X className="w-4 h-4" />
-                                                                    </button>
+                                                            ))}
+                                                        </div>
+                                                    ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
+                                                        <div className="divide-y divide-border/30">
+                                                            {bazarEntriesResponse.data.slice(0, 10).map((e: any) => (
+                                                                <div key={e._id} className="flex items-center justify-between px-5 py-3 hover:bg-white/2 transition-colors">
+                                                                    <div className="flex items-center gap-3 min-w-0">
+                                                                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-primary/8 border border-primary/15 flex items-center justify-center shrink-0">
+                                                                            {e.product?.photo ? <Image src={e.product.photo} alt={e.product?.name || e.name} width={32} height={32} className="w-full h-full object-cover" /> : <ShoppingBag className="w-3.5 h-3.5 text-primary" />}
+                                                                        </div>
+                                                                        <div className="min-w-0">
+                                                                            <p className="text-sm font-medium truncate text-[#f5ede2]">{e.product?.name || e.name}</p>
+                                                                            <p className="text-[11px] text-muted-foreground font-mono">
+                                                                                {e.user?.name || "Unknown"} · {new Date(e.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-right shrink-0 pl-3">
+                                                                        <p className="text-sm font-bold text-primary font-mono">৳{(e.totalPrice ?? (e.price || 0) * (e.quantity || 1)).toLocaleString()}</p>
+                                                                        <p className="text-[10px] text-muted-foreground font-mono">
+                                                                            {e.quantity} {e.unit}
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-12">
+                                                            <ShoppingBag className="w-8 h-8 mb-2 opacity-20" />
+                                                            <p className="text-sm">No bazar entries yet</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </motion.div>
+                                        </div>
+
+                                        {/* ─── Monthly Expense Trend Component ─── */}
+                                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+                                            <WebMonthlyTrendChart data={monthlyTrendData} isLoading={isMonthlyTrendLoading} />
+                                        </motion.div>
+                                    </>
+                                )}
+
+                                {/* ─── TAB: EXPENSES (WEBSITE LIST VIEW) ───────────────────────── */}
+                                {tab === "expenses" && (
+                                    <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
+                                        {/* Search & Actions */}
+                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
+                                            <div className="relative w-full sm:w-80">
+                                                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                                <input type="text" value={expenseSearch} onChange={(e) => setExpenseSearch(e.target.value)} placeholder="Search bazar items or buyers..." className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
+                                            </div>
+
+                                            <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">
+                                                {(["month", "all"] as const).map((f) => (
+                                                    <button
+                                                        key={f}
+                                                        onClick={() => {
+                                                            setExpenseFilter(f);
+                                                            setExpensePage(1);
+                                                        }}
+                                                        className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                                                        style={{
+                                                            background: expenseFilter === f ? "#e8a020" : "transparent",
+                                                            color: expenseFilter === f ? "#1a0e07" : "#a08060",
+                                                        }}
+                                                    >
+                                                        {f === "month" ? "This Month" : "All Time"}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Table Feed */}
+                                        <div className="flex-1 overflow-auto rounded-2xl border border-[rgba(232,160,32,0.1)]">
+                                            <table className="w-full border-collapse text-left text-sm">
+                                                <thead className="bg-[#2e1a0a] text-muted-foreground font-mono text-xs border-b border-[rgba(232,160,32,0.1)] sticky top-0">
+                                                    <tr>
+                                                        <th className="p-4">Item</th>
+                                                        <th className="p-4">Buyer</th>
+                                                        <th className="p-4">Date</th>
+                                                        <th className="p-4 text-right">Price</th>
+                                                        <th className="p-4 text-right">Qty</th>
+                                                        <th className="p-4 text-right">Total</th>
+                                                        <th className="p-4 text-center">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-[rgba(232,160,32,0.06)] bg-[#251508]">
+                                                    {bazarEntriesLoading || (bazarEntriesFetching && (!bazarEntriesResponse?.data || bazarEntriesResponse.data.length === 0)) ? (
+                                                        [1, 2, 3, 4, 5].map((i) => (
+                                                            <tr key={i} className="animate-pulse">
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-32" />
+                                                                </td>
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-24" />
+                                                                </td>
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-20" />
+                                                                </td>
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
+                                                                </td>
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-12 ml-auto" />
+                                                                </td>
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-16 ml-auto" />
+                                                                </td>
+                                                                <td className="p-4">
+                                                                    <div className="h-4 bg-[#2e1a0a] rounded-md w-12 mx-auto" />
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    ) : bazarEntriesResponse?.data && bazarEntriesResponse.data.length > 0 ? (
+                                                        bazarEntriesResponse.data
+                                                            .filter((e: any) => {
+                                                                const query = expenseSearch.toLowerCase();
+                                                                const pName = e.product?.name || "";
+                                                                const uName = e.user?.name || "";
+                                                                const notes = e.notes || "";
+                                                                return pName.toLowerCase().includes(query) || uName.toLowerCase().includes(query) || notes.toLowerCase().includes(query);
+                                                            })
+                                                            .map((e: any) => (
+                                                                <tr key={e._id} className="hover:bg-primary/5 transition-colors">
+                                                                    <td className="p-4 font-semibold flex items-center gap-3">
+                                                                        <div className="w-8 h-8 rounded-xl overflow-hidden bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                                                                            {e.product?.photo ? <Image src={e.product.photo} alt={e.product?.name || "Bazar Item"} width={32} height={32} className="w-full h-full object-cover" /> : <span className="text-base">🛒</span>}
+                                                                        </div>
+                                                                        <div>
+                                                                            <p>{e.product?.name || "Bazar Item"}</p>
+                                                                            {e.notes && <p className="text-[10px] text-muted-foreground font-normal italic">{e.notes}</p>}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="p-4">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center font-bold text-[9px] text-[#f5ede2] shrink-0" style={{ background: avatarColor(e.user?._id || "u") }}>
+                                                                                {e.user?.profileImage ? <Image src={e.user.profileImage} alt={e.user?.name || "User"} width={24} height={24} className="w-full h-full object-cover" /> : initials(e.user?.name || "U")}
+                                                                            </div>
+                                                                            <span>{e.user?.name || "User"}</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="p-4 text-muted-foreground font-mono text-xs">{new Date(e.date).toLocaleDateString()}</td>
+                                                                    <td className="p-4 text-right font-mono">৳{e.price.toLocaleString()}</td>
+                                                                    <td className="p-4 text-right font-mono text-xs">
+                                                                        {e.quantity} {e.unit}
+                                                                    </td>
+                                                                    <td className="p-4 text-right font-bold text-primary font-mono">৳{(e.totalPrice ?? e.price * e.quantity).toLocaleString()}</td>
+                                                                    <td className="p-4 text-center">
+                                                                        <div className="flex items-center justify-center gap-1">
+                                                                            <button onClick={() => setEditingExpense(e)} className="p-1.5 text-muted-foreground hover:text-primary rounded-lg hover:bg-primary/10 transition-colors cursor-pointer" title="Edit Expense">
+                                                                                <Edit2 className="w-3.5 h-3.5" />
+                                                                            </button>
+                                                                            <button onClick={() => setDeletingExpenseId(e._id)} className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Delete Expense">
+                                                                                <X className="w-4 h-4" />
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                    ) : (
+                                                        <tr>
+                                                            <td colSpan={7} className="p-12 text-center text-xs font-mono text-muted-foreground">
+                                                                No bazar entries found.
                                                             </td>
                                                         </tr>
-                                                    ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan={7} className="p-12 text-center text-xs font-mono text-muted-foreground">
-                                                        No bazar entries found.
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                {/* Expenses Pagination Footer */}
-                                {bazarEntriesResponse?.meta && (
-                                    <WebPagination
-                                        page={bazarEntriesResponse.meta.page}
-                                        totalPages={bazarEntriesResponse.meta.totalPages}
-                                        total={bazarEntriesResponse.meta.total}
-                                        itemLabel="entries"
-                                        hasPrev={bazarEntriesResponse.meta.hasPrev}
-                                        hasNext={bazarEntriesResponse.meta.hasNext}
-                                        onPrev={() => setExpensePage((p) => Math.max(p - 1, 1))}
-                                        onNext={() => setExpensePage((p) => p + 1)}
-                                    />
-                                )}
-                            </div>
-                        )}
-
-                        {/* ─── TAB: BILLS (WEBSITE CARD GRID VIEW) ────────────────────── */}
-                        {tab === "bills" && (
-                            <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
-                                {/* Search & Actions */}
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
-                                    <div className="relative w-full sm:w-80">
-                                        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                        <input type="text" value={billSearch} onChange={(e) => setBillSearch(e.target.value)} placeholder="Search bills or titles..." className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
-                                    </div>
-
-                                    <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">
-                                        {(["month", "all"] as const).map((f) => (
-                                            <button
-                                                key={f}
-                                                onClick={() => {
-                                                    setBillFilter(f);
-                                                    setBillPage(1);
-                                                }}
-                                                className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
-                                                style={{
-                                                    background: billFilter === f ? "#e8a020" : "transparent",
-                                                    color: billFilter === f ? "#1a0e07" : "#a08060",
-                                                }}
-                                            >
-                                                {f === "month" ? "This Month" : "All Time"}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Grid layout */}
-                                <div className="flex-1 overflow-y-auto">
-                                    {billsLoading || (billsFetching && (!billsResponse?.data || billsResponse.data.length === 0)) ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
-                                            {[1, 2, 3, 4, 5, 6].map((i) => (
-                                                <div key={i} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 animate-pulse">
-                                                    <div className="space-y-3">
-                                                        <div className="h-5 bg-[#2e1a0a] rounded-lg w-24" />
-                                                        <div className="h-5 bg-[#2e1a0a] rounded-md w-3/4" />
-                                                    </div>
-                                                    <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
-                                                        <div className="h-4 bg-[#2e1a0a] rounded-md w-20" />
-                                                        <div className="h-6 bg-[#2e1a0a] rounded-md w-16" />
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                    )}
+                                                </tbody>
+                                            </table>
                                         </div>
-                                    ) : billsResponse?.data && billsResponse.data.length > 0 ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
-                                            {billsResponse.data
-                                                .filter((b: any) => {
-                                                    const query = billSearch.toLowerCase();
-                                                    const title = b.title || "";
-                                                    const uName = b.user?.name || "";
-                                                    const cat = b.category || "";
-                                                    return title.toLowerCase().includes(query) || uName.toLowerCase().includes(query) || cat.toLowerCase().includes(query);
-                                                })
-                                                .map((b: any) => {
-                                                    const meta = BILL_META[b.category as keyof typeof BILL_META] || { icon: "📄", label: b.category, color: "#e8a020" };
-                                                    return (
-                                                        <motion.div
-                                                            key={b._id}
-                                                            initial={{ opacity: 0, y: 15 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            whileHover={{ y: -4, scale: 1.015, boxShadow: `0 8px 30px ${meta.color}25` }}
-                                                            transition={{ duration: 0.2 }}
-                                                            className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden transition-colors hover:border-primary/40 group"
-                                                        >
-                                                            <div>
-                                                                <div className="flex items-center justify-between gap-2 mb-3">
-                                                                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono border shadow-sm transition-transform group-hover:scale-105" style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}>
-                                                                        {meta.icon} {meta.label}
-                                                                    </span>
-                                                                    <div className="flex items-center gap-1">
-                                                                        <button onClick={() => setEditingBill(b)} className="text-muted-foreground hover:text-primary p-1 rounded-md transition-colors cursor-pointer" title="Edit Bill">
-                                                                            <Edit2 className="w-3.5 h-3.5" />
-                                                                        </button>
-                                                                        <button onClick={() => setDeletingBillId(b._id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer" title="Delete Bill">
-                                                                            <X className="w-3.5 h-3.5" />
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                                <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">{b.title}</h4>
-                                                                {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
-                                                            </div>
 
+                                        {/* Expenses Pagination Footer */}
+                                        {bazarEntriesResponse?.meta && (
+                                            <WebPagination
+                                                page={bazarEntriesResponse.meta.page}
+                                                totalPages={bazarEntriesResponse.meta.totalPages}
+                                                total={bazarEntriesResponse.meta.total}
+                                                itemLabel="entries"
+                                                hasPrev={bazarEntriesResponse.meta.hasPrev}
+                                                hasNext={bazarEntriesResponse.meta.hasNext}
+                                                onPrev={() => setExpensePage((p) => Math.max(p - 1, 1))}
+                                                onNext={() => setExpensePage((p) => p + 1)}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* ─── TAB: BILLS (WEBSITE CARD GRID VIEW) ────────────────────── */}
+                                {tab === "bills" && (
+                                    <div className="flex-1 flex flex-col gap-6 min-h-0 bg-[#251508] border border-border rounded-3xl p-6 shadow-xl">
+                                        {/* Search & Actions */}
+                                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 select-none">
+                                            <div className="relative w-full sm:w-80">
+                                                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                                <input type="text" value={billSearch} onChange={(e) => setBillSearch(e.target.value)} placeholder="Search bills or titles..." className="w-full pl-10 pr-4 py-2.5 bg-[#2e1a0a] border border-border rounded-xl text-sm outline-none" />
+                                            </div>
+
+                                            <div className="flex gap-2 p-0.5 border border-border rounded-xl bg-[#1a0e07]">
+                                                {(["month", "all"] as const).map((f) => (
+                                                    <button
+                                                        key={f}
+                                                        onClick={() => {
+                                                            setBillFilter(f);
+                                                            setBillPage(1);
+                                                        }}
+                                                        className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                                                        style={{
+                                                            background: billFilter === f ? "#e8a020" : "transparent",
+                                                            color: billFilter === f ? "#1a0e07" : "#a08060",
+                                                        }}
+                                                    >
+                                                        {f === "month" ? "This Month" : "All Time"}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Grid layout */}
+                                        <div className="flex-1 overflow-y-auto">
+                                            {billsLoading || (billsFetching && (!billsResponse?.data || billsResponse.data.length === 0)) ? (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
+                                                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                                                        <div key={i} className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 animate-pulse">
+                                                            <div className="space-y-3">
+                                                                <div className="h-5 bg-[#2e1a0a] rounded-lg w-24" />
+                                                                <div className="h-5 bg-[#2e1a0a] rounded-md w-3/4" />
+                                                            </div>
                                                             <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
-                                                                <div>
-                                                                    <p className="text-xs font-medium text-muted-foreground font-mono">Added by: <span className="text-foreground font-semibold">{b.user?.name || "User"}</span></p>
-                                                                    <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{new Date(b.date).toLocaleDateString()}</p>
-                                                                </div>
-                                                                <p className="text-xl font-extrabold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
+                                                                <div className="h-4 bg-[#2e1a0a] rounded-md w-20" />
+                                                                <div className="h-6 bg-[#2e1a0a] rounded-md w-16" />
                                                             </div>
-                                                        </motion.div>
-                                                    );
-                                                })}
-                                        </div>
-                                    ) : (
-                                        <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">No monthly bills found.</div>
-                                    )}
-                                </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : billsResponse?.data && billsResponse.data.length > 0 ? (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pr-1">
+                                                    {billsResponse.data
+                                                        .filter((b: any) => {
+                                                            const query = billSearch.toLowerCase();
+                                                            const title = b.title || "";
+                                                            const uName = b.user?.name || "";
+                                                            const cat = b.category || "";
+                                                            return title.toLowerCase().includes(query) || uName.toLowerCase().includes(query) || cat.toLowerCase().includes(query);
+                                                        })
+                                                        .map((b: any) => {
+                                                            const meta = BILL_META[b.category as keyof typeof BILL_META] || { icon: "📄", label: b.category, color: "#e8a020" };
+                                                            return (
+                                                                <motion.div
+                                                                    key={b._id}
+                                                                    initial={{ opacity: 0, y: 15 }}
+                                                                    animate={{ opacity: 1, y: 0 }}
+                                                                    whileHover={{ y: -4, scale: 1.015, boxShadow: `0 8px 30px ${meta.color}25` }}
+                                                                    transition={{ duration: 0.2 }}
+                                                                    className="rounded-2xl border border-border bg-[#1a0e07] p-5 flex flex-col justify-between gap-4 relative overflow-hidden transition-colors hover:border-primary/40 group"
+                                                                >
+                                                                    <div>
+                                                                        <div className="flex items-center justify-between gap-2 mb-3">
+                                                                            <span
+                                                                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold font-mono border shadow-sm transition-transform group-hover:scale-105"
+                                                                                style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}30` }}
+                                                                            >
+                                                                                {meta.icon} {meta.label}
+                                                                            </span>
+                                                                            <div className="flex items-center gap-1">
+                                                                                <button onClick={() => setEditingBill(b)} className="text-muted-foreground hover:text-primary p-1 rounded-md transition-colors cursor-pointer" title="Edit Bill">
+                                                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                                                </button>
+                                                                                <button onClick={() => setDeletingBillId(b._id)} className="text-muted-foreground hover:text-destructive p-1 rounded-md transition-colors cursor-pointer" title="Delete Bill">
+                                                                                    <X className="w-3.5 h-3.5" />
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">{b.title}</h4>
+                                                                        {b.notes && <p className="text-xs text-muted-foreground mt-1.5 italic font-sans">"{b.notes}"</p>}
+                                                                    </div>
 
-                                {/* Bills Pagination Footer */}
-                                {billsResponse?.meta && (
-                                    <WebPagination
-                                        page={billsResponse.meta.page}
-                                        totalPages={billsResponse.meta.totalPages}
-                                        total={billsResponse.meta.total}
-                                        itemLabel="bills"
-                                        hasPrev={billsResponse.meta.hasPrev}
-                                        hasNext={billsResponse.meta.hasNext}
-                                        onPrev={() => setBillPage((p) => Math.max(p - 1, 1))}
-                                        onNext={() => setBillPage((p) => p + 1)}
+                                                                    <div className="pt-3 border-t border-[rgba(232,160,32,0.06)] flex items-center justify-between">
+                                                                        <div>
+                                                                            <p className="text-xs font-medium text-muted-foreground font-mono">
+                                                                                Added by: <span className="text-foreground font-semibold">{b.user?.name || "User"}</span>
+                                                                            </p>
+                                                                            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{new Date(b.date).toLocaleDateString()}</p>
+                                                                        </div>
+                                                                        <p className="text-xl font-extrabold text-accent font-mono">৳{b.amount.toLocaleString()}</p>
+                                                                    </div>
+                                                                </motion.div>
+                                                            );
+                                                        })}
+                                                </div>
+                                            ) : (
+                                                <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">No monthly bills found.</div>
+                                            )}
+                                        </div>
+
+                                        {/* Bills Pagination Footer */}
+                                        {billsResponse?.meta && (
+                                            <WebPagination
+                                                page={billsResponse.meta.page}
+                                                totalPages={billsResponse.meta.totalPages}
+                                                total={billsResponse.meta.total}
+                                                itemLabel="bills"
+                                                hasPrev={billsResponse.meta.hasPrev}
+                                                hasNext={billsResponse.meta.hasNext}
+                                                onPrev={() => setBillPage((p) => Math.max(p - 1, 1))}
+                                                onNext={() => setBillPage((p) => p + 1)}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* ─── TAB: PRODUCTS (GROUP CATALOG & PRICE GROWTH) ───────── */}
+                                {tab === "products" && <WebProductsTab />}
+
+                                {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
+                                {tab === "notifications" && <WebNotificationsTab markAllAsRead={markAllAsRead} deleteAllNotifications={deleteAllNotifications} notifLoading={notifLoading} notifData={notifData} deleteNotification={deleteNotification} />}
+
+                                {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
+                                {tab === "profile" && (
+                                    <WebProfileTab
+                                        currentUser={currentUser}
+                                        isEditingProfile={isEditingProfile}
+                                        setIsEditingProfile={setIsEditingProfile}
+                                        profileImage={profileImage}
+                                        setProfileImage={setProfileImage}
+                                        name={name}
+                                        setName={setName}
+                                        email={email}
+                                        phone={phone}
+                                        setPhone={setPhone}
+                                        language={language}
+                                        setLanguage={setLanguage}
+                                        aboutme={aboutme}
+                                        setAboutme={setAboutme}
+                                        street={street}
+                                        setStreet={setStreet}
+                                        city={city}
+                                        setCity={setCity}
+                                        state={state}
+                                        setState={setState}
+                                        zipCode={zipCode}
+                                        setZipCode={setZipCode}
+                                        country={country}
+                                        setCountry={setCountry}
+                                        updateProfile={updateProfile}
+                                        profileLoading={profileLoading}
+                                        currentPassword={currentPassword}
+                                        setCurrentPassword={setCurrentPassword}
+                                        newPassword={newPassword}
+                                        setNewPassword={setNewPassword}
+                                        repeatPassword={repeatPassword}
+                                        setRepeatPassword={setRepeatPassword}
+                                        changePassword={changePassword}
+                                        passLoading={passLoading}
+                                        setShowFeedback={setShowFeedback}
+                                        setShowContact={setShowContact}
+                                        setShowReview={setShowReview}
                                     />
                                 )}
-                            </div>
-                        )}
-
-                        {/* ─── TAB: PRODUCTS (GROUP CATALOG & PRICE GROWTH) ───────── */}
-                        {tab === "products" && <WebProductsTab />}
-
-                        {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
-                        {tab === "notifications" && <WebNotificationsTab markAllAsRead={markAllAsRead} deleteAllNotifications={deleteAllNotifications} notifLoading={notifLoading} notifData={notifData} deleteNotification={deleteNotification} />}
-
-                        {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
-                        {tab === "profile" && (
-                            <WebProfileTab
-                                currentUser={currentUser}
-                                isEditingProfile={isEditingProfile}
-                                setIsEditingProfile={setIsEditingProfile}
-                                profileImage={profileImage}
-                                setProfileImage={setProfileImage}
-                                name={name}
-                                setName={setName}
-                                email={email}
-                                phone={phone}
-                                setPhone={setPhone}
-                                language={language}
-                                setLanguage={setLanguage}
-                                aboutme={aboutme}
-                                setAboutme={setAboutme}
-                                street={street}
-                                setStreet={setStreet}
-                                city={city}
-                                setCity={setCity}
-                                state={state}
-                                setState={setState}
-                                zipCode={zipCode}
-                                setZipCode={setZipCode}
-                                country={country}
-                                setCountry={setCountry}
-                                updateProfile={updateProfile}
-                                profileLoading={profileLoading}
-                                currentPassword={currentPassword}
-                                setCurrentPassword={setCurrentPassword}
-                                newPassword={newPassword}
-                                setNewPassword={setNewPassword}
-                                repeatPassword={repeatPassword}
-                                setRepeatPassword={setRepeatPassword}
-                                changePassword={changePassword}
-                                passLoading={passLoading}
-                                setShowFeedback={setShowFeedback}
-                                setShowContact={setShowContact}
-                                setShowReview={setShowReview}
-                            />
-                        )}
-                    </motion.div>
-                </AnimatePresence>
-                </>
+                            </motion.div>
+                        </AnimatePresence>
+                    </>
                 )}
             </main>
 
@@ -1116,7 +1097,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                         )}
                     </div>
 
-                    <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
+                    <div className="flex flex-col gap-3 max-h-105 overflow-y-auto pr-1">
                         {notifData?.data && notifData.data.length > 0 ? (
                             notifData.data.map((n: any) => (
                                 <div key={n._id} className={`p-4 rounded-2xl border transition-all text-left flex items-start justify-between gap-3 ${!n.isRead ? "bg-primary/10 border-primary/40 shadow-sm" : "bg-[#1a0e07] border-border/60 hover:bg-white/5"}`}>

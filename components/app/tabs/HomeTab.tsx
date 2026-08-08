@@ -50,9 +50,7 @@ function StatCard({ label, value, prev, icon, delay = 0, accent = false, isLoadi
                 </motion.div>
                 {!isLoading && prev !== undefined && <Delta current={value} prev={prev} />}
             </div>
-            <div className="min-h-[2rem] flex items-center text-2xl font-bold text-foreground font-mono">
-                {isLoading ? <LoadingDots currency /> : <p>{fmt(value)}</p>}
-            </div>
+            <div className="min-h-8 flex items-center text-2xl font-bold text-foreground font-mono">{isLoading ? <LoadingDots currency /> : <p>{fmt(value)}</p>}</div>
             <p className="text-xs text-muted-foreground leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 {label}
             </p>
@@ -74,9 +72,7 @@ function CountCard({ label, value, icon, delay = 0, isLoading = false }: { label
                 {icon}
             </motion.div>
             <div>
-                <div className="min-h-[1.75rem] flex items-center text-xl font-bold text-foreground font-mono">
-                    {isLoading ? <LoadingDots currency={false} /> : <p>{value.toLocaleString()}</p>}
-                </div>
+                <div className="min-h-7 flex items-center text-xl font-bold text-foreground font-mono">{isLoading ? <LoadingDots currency={false} /> : <p>{value.toLocaleString()}</p>}</div>
                 <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     {label}
                 </p>
@@ -119,9 +115,7 @@ export function HomeTab({ stats, isLoading = false }: { stats: GroupStats; isLoa
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-widest font-mono">
                         {mn} {yr} — Total
                     </p>
-                    <div className="min-h-[2.5rem] flex items-center mb-2 text-4xl font-bold text-primary font-mono">
-                        {isLoading ? <LoadingDots currency /> : <p>{fmt(stats.thisMonthTotalExpense)}</p>}
-                    </div>
+                    <div className="min-h-10 flex items-center mb-2 text-4xl font-bold text-primary font-mono">{isLoading ? <LoadingDots currency /> : <p>{fmt(stats.thisMonthTotalExpense)}</p>}</div>
                     {!isLoading && (
                         <div className="flex items-center gap-2">
                             <Delta current={stats.thisMonthTotalExpense} prev={stats.prevMonthTotalExpense} />

@@ -100,12 +100,8 @@ export function EditProductModal({ product, onClose }: EditProductModalProps) {
                                     <p className="text-xs font-bold text-foreground">18+ Restricted Product</p>
                                     <p className="text-[10px] text-muted-foreground">Mark if item requires age verification</p>
                                 </div>
-                                <div
-                                    className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${
-                                        formData.is18Plus ? "bg-accent border-accent text-accent-foreground shadow-xs shadow-accent/40" : "bg-[#2e1a0a] border-border text-transparent"
-                                    }`}
-                                >
-                                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-200 ${formData.is18Plus ? "bg-accent border-accent text-accent-foreground shadow-xs shadow-accent/40" : "bg-[#2e1a0a] border-border text-transparent"}`}>
+                                    <Check className="w-3.5 h-3.5 stroke-3" />
                                 </div>
                             </div>
 

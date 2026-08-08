@@ -58,9 +58,7 @@ export function AdminMonthlyAnalysisChart() {
                         <TrendingUp className="w-5 h-5" />
                     </div>
                     <div>
-                        <h2 className="text-sm font-bold text-foreground uppercase tracking-widest font-mono">
-                            Admin Monthly Analysis ({selectedYear})
-                        </h2>
+                        <h2 className="text-sm font-bold text-foreground uppercase tracking-widest font-mono">Admin Monthly Analysis ({selectedYear})</h2>
                         <p className="text-xs text-muted-foreground font-mono">12-Month trend analysis across expenses, users, groups & products</p>
                     </div>
                 </div>
@@ -68,11 +66,7 @@ export function AdminMonthlyAnalysisChart() {
                 <div className="flex items-center gap-3">
                     {/* Custom Styled Year Dropdown */}
                     <div className="relative">
-                        <button
-                            type="button"
-                            onClick={() => setIsYearOpen((prev) => !prev)}
-                            className="flex items-center gap-2 bg-[#1a0e07] border border-border hover:border-primary/50 rounded-xl px-3.5 py-1.5 text-xs font-mono text-foreground transition-colors cursor-pointer select-none"
-                        >
+                        <button type="button" onClick={() => setIsYearOpen((prev) => !prev)} className="flex items-center gap-2 bg-[#1a0e07] border border-border hover:border-primary/50 rounded-xl px-3.5 py-1.5 text-xs font-mono text-foreground transition-colors cursor-pointer select-none">
                             <span className="text-muted-foreground">Year:</span>
                             <span className="font-bold text-primary">{selectedYear}</span>
                             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${isYearOpen ? "rotate-180 text-primary" : ""}`} />
@@ -90,9 +84,7 @@ export function AdminMonthlyAnalysisChart() {
                                                 setSelectedYear(yr);
                                                 setIsYearOpen(false);
                                             }}
-                                            className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
-                                                selectedYear === yr ? "bg-primary/15 text-primary" : "text-foreground hover:bg-white/5"
-                                            }`}
+                                            className={`w-full text-left px-3.5 py-2 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${selectedYear === yr ? "bg-primary/15 text-primary" : "text-foreground hover:bg-white/5"}`}
                                         >
                                             <span>{yr}</span>
                                             {selectedYear === yr && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
@@ -103,11 +95,7 @@ export function AdminMonthlyAnalysisChart() {
                         )}
                     </div>
 
-                    <button
-                        onClick={() => refetch()}
-                        className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                        title="Refresh monthly analysis"
-                    >
+                    <button onClick={() => refetch()} className="p-2 rounded-xl border border-border bg-[#1a0e07] hover:border-primary/40 text-muted-foreground hover:text-primary transition-all cursor-pointer" title="Refresh monthly analysis">
                         <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-primary" : ""}`} />
                     </button>
                 </div>
@@ -149,11 +137,9 @@ export function AdminMonthlyAnalysisChart() {
             {/* SVG Line Chart */}
             <div className="relative w-full overflow-x-auto select-none py-2">
                 {isLoading ? (
-                    <div className="h-60 rounded-2xl bg-[#1a0e07] animate-pulse flex items-center justify-center text-xs font-mono text-muted-foreground">
-                        Loading monthly analysis line chart…
-                    </div>
+                    <div className="h-60 rounded-2xl bg-[#1a0e07] animate-pulse flex items-center justify-center text-xs font-mono text-muted-foreground">Loading monthly analysis line chart…</div>
                 ) : (
-                    <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-auto min-w-[680px] overflow-visible">
+                    <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-auto min-w-170 overflow-visible">
                         <defs>
                             <linearGradient id="adminMonthlyAreaGrad" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0%" stopColor="#e8a020" stopOpacity="0.2" />
@@ -208,42 +194,15 @@ export function AdminMonthlyAnalysisChart() {
                                     <circle cx={p.x} cy={p.yProducts} r={isHovered ? "3.5" : "1.5"} fill="#f59e0b" pointerEvents="none" />
                                     <circle cx={p.x} cy={p.yBazar} r={isHovered ? "4" : "2"} fill="#10b981" pointerEvents="none" />
                                     <circle cx={p.x} cy={p.yBill} r={isHovered ? "4" : "2"} fill="#3b82f6" pointerEvents="none" />
-                                    <circle
-                                        cx={p.x}
-                                        cy={p.yTotal}
-                                        r={isHovered ? "5.5" : "2.5"}
-                                        fill={isHovered ? "#e8a020" : "#1a0e07"}
-                                        stroke="#e8a020"
-                                        strokeWidth={isHovered ? "2" : "1"}
-                                        pointerEvents="none"
-                                    />
+                                    <circle cx={p.x} cy={p.yTotal} r={isHovered ? "5.5" : "2.5"} fill={isHovered ? "#e8a020" : "#1a0e07"} stroke="#e8a020" strokeWidth={isHovered ? "2" : "1"} pointerEvents="none" />
 
-                                    <text
-                                        x={p.x}
-                                        y={svgH - 8}
-                                        textAnchor="middle"
-                                        fill={isHovered ? "#e8a020" : "#a08060"}
-                                        fontSize={isHovered ? "12" : "11"}
-                                        fontFamily="monospace"
-                                        fontWeight={isHovered ? "800" : "500"}
-                                        pointerEvents="none"
-                                    >
+                                    <text x={p.x} y={svgH - 8} textAnchor="middle" fill={isHovered ? "#e8a020" : "#a08060"} fontSize={isHovered ? "12" : "11"} fontFamily="monospace" fontWeight={isHovered ? "800" : "500"} pointerEvents="none">
                                         {p.item.month}
                                     </text>
 
                                     {isHovered && (
                                         <g pointerEvents="none">
-                                            <rect
-                                                x={tooltipX}
-                                                y={tooltipY}
-                                                width={tooltipW}
-                                                height={tooltipH}
-                                                rx="10"
-                                                fill="#1a0e07"
-                                                stroke="#e8a020"
-                                                strokeWidth="1.2"
-                                                className="shadow-2xl"
-                                            />
+                                            <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx="10" fill="#1a0e07" stroke="#e8a020" strokeWidth="1.2" className="shadow-2xl" />
                                             <text x={tooltipX + 10} y={tooltipY + 16} fill="#e8a020" fontSize="11" fontWeight="bold" fontFamily="monospace">
                                                 {p.item.month} ({selectedYear})
                                             </text>

@@ -1,6 +1,17 @@
 {
   "name": "mybazarhisab-frontend-web",
   "version": "0.1.0",
+  "description": "My Bazar Hisab — Your family and group market expense tracker, budget planner, and daily bazar account book.",
+  "keywords": [
+    "bazar-hisab",
+    "expense-tracker",
+    "market-account",
+    "budget-planner",
+    "group-expense",
+    "nextjs",
+    "react"
+  ],
+  "author": "Appon Islam",
   "license": "MIT",
   "private": true,
   "scripts": {

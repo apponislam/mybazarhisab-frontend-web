@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, TrendingUp, Receipt, ShoppingBag, CalendarDays, X, Sparkles, ChevronDown, Check, Wallet, ArrowUpRight, PieChart } from "lucide-react";
 import { useGetGroupCalendarQuery, TGroupCalendarDay } from "@/redux/features/dashboard/dashboardApi";
-import { fmt } from "@/lib/mockData";
 
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -453,7 +452,6 @@ export function WebCalendarTab() {
                                                         <span className="font-black text-amber-300 text-base">৳{dayObj.total.toLocaleString()}</span>
                                                     </div>
                                                 </div>
-
                                             </motion.div>
                                         )}
                                     </AnimatePresence>

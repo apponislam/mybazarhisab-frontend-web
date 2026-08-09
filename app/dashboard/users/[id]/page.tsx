@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, RefreshCw, User, Mail, Phone, ShieldCheck, CheckCircle2, XCircle, ShoppingBag, Receipt, Star, Activity, Package, Calendar, Globe, MapPin, DollarSign, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, RefreshCw, User, Mail, Phone, ShieldCheck, CheckCircle2, XCircle, ShoppingBag, Receipt, Star, Activity, Package, Calendar, Globe, MapPin, DollarSign, Clock, ChevronLeft, ChevronRight, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { useGetUserProfileAndSummaryQuery, useGetUserBazarEntriesQuery, useGetUserBillsQuery, useGetUserReviewsQuery, useGetUserProductsQuery, useGetUserActivitiesQuery, useUpdateUserRoleMutation, useUpdateUserStatusMutation } from "@/redux/features/user/userApi";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { AdminSetPasswordModal } from "@/components/dashboard/users/AdminSetPasswordModal";
 
 export default function UserDetailPage() {
     const params = useParams();
@@ -48,6 +49,8 @@ export default function UserDetailPage() {
     // Role & Status Mutations
     const [updateUserRole, { isLoading: roleLoading }] = useUpdateUserRoleMutation();
     const [updateUserStatus, { isLoading: statusLoading }] = useUpdateUserStatusMutation();
+
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
 
     const handleRoleToggle = async () => {
         if (!user) return;
@@ -150,6 +153,11 @@ export default function UserDetailPage() {
 
                                 {/* Quick Action Controls */}
                                 <div className="flex items-center gap-3 shrink-0">
+                                    <button onClick={() => setShowPasswordModal(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-xs hover:bg-amber-500/25 transition-all cursor-pointer">
+                                        <KeyRound className="w-4 h-4" />
+                                        <span>Change Password</span>
+                                    </button>
+
                                     <button onClick={handleRoleToggle} disabled={roleLoading} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary font-bold text-xs hover:bg-primary/25 transition-all cursor-pointer">
                                         <ShieldCheck className="w-4 h-4" />
                                         <span>Make {user.role === "ADMIN" ? "USER" : "ADMIN"}</span>
@@ -502,6 +510,8 @@ export default function UserDetailPage() {
                     )}
                 </div>
             </main>
+
+            <AdminSetPasswordModal user={showPasswordModal && user ? user : null} onClose={() => setShowPasswordModal(false)} />
         </div>
     );
 }

@@ -13,8 +13,8 @@ export function AddExpenseScreen({ onBack, onDone, onAddMultiple }: { onBack: ()
     const [product, setProduct] = useState("");
     const [productId, setProductId] = useState<string | undefined>(undefined);
     const [price, setPrice] = useState("");
-    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
-    const [quantity, setQuantity] = useState("");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("total");
+    const [quantity, setQuantity] = useState("1");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(toInputDate(new Date()));
     const [notes, setNotes] = useState("");

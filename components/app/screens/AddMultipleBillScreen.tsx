@@ -22,7 +22,6 @@ export function AddMultipleBillScreen({ onBack, onDone }: { onBack: () => void; 
 
     const [rows, setRows] = useState<BillRowItem[]>([
         { id: "1", category: "RENT", title: "", amount: "", date: todayDate, notes: "" },
-        { id: "2", category: "UTILITIES", title: "", amount: "", date: todayDate, notes: "" },
     ]);
 
     const [activeCategoryPickerId, setActiveCategoryPickerId] = useState<string | null>(null);

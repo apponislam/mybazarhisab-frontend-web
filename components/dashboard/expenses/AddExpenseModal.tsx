@@ -17,7 +17,7 @@ export function AddExpenseModal({ show, onClose }: AddExpenseModalProps) {
     const [productId, setProductId] = useState<string | undefined>(undefined);
     const [productName, setProductName] = useState("");
     const [price, setPrice] = useState("");
-    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("total");
     const [quantity, setQuantity] = useState("1");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));

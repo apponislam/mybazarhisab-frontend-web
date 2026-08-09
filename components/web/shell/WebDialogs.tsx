@@ -60,8 +60,8 @@ export function WebFieldBox({ label, focused, error, children }: { label: string
 export function WebAddExpenseForm({ onSubmit, onClose, onAddMultiple, isLoading }: { onSubmit: (prod: string, price?: number, qty?: number, unit?: BazarUnit, date?: string, notes?: string, totalPrice?: number) => void; onClose: () => void; onAddMultiple?: () => void; isLoading?: boolean }) {
     const [product, setProduct] = useState("");
     const [price, setPrice] = useState("");
-    const [priceMode, setPriceMode] = useState<"unit" | "total">("unit");
-    const [quantity, setQuantity] = useState("");
+    const [priceMode, setPriceMode] = useState<"unit" | "total">("total");
+    const [quantity, setQuantity] = useState("1");
     const [unit, setUnit] = useState<BazarUnit>("KG");
     const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
     const [notes, setNotes] = useState("");

@@ -24,13 +24,12 @@ export function WebBulkExpenseScreen({ onBack, onDone, onSwitchToBulkBill }: { o
     const todayDate = new Date().toISOString().slice(0, 10);
 
     const [rows, setRows] = useState<RowItem[]>([
-        { id: "1", product: "", price: "", priceMode: "unit", quantity: "1", unit: "KG", date: todayDate, notes: "" },
-        { id: "2", product: "", price: "", priceMode: "unit", quantity: "1", unit: "KG", date: todayDate, notes: "" },
+        { id: "1", product: "", price: "", priceMode: "total", quantity: "1", unit: "KG", date: todayDate, notes: "" },
     ]);
 
     const handleAddRow = () => {
         const lastRowDate = rows.length > 0 ? rows[rows.length - 1].date : todayDate;
-        setRows((prev) => [...prev, { id: Date.now().toString(), product: "", price: "", priceMode: "unit", quantity: "1", unit: "KG", date: lastRowDate, notes: "" }]);
+        setRows((prev) => [...prev, { id: Date.now().toString(), product: "", price: "", priceMode: "total", quantity: "1", unit: "KG", date: lastRowDate, notes: "" }]);
     };
 
     const handleRemoveRow = (id: string) => {

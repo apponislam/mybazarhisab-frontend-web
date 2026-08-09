@@ -24,15 +24,14 @@ export function AddMultipleExpenseScreen({ onBack, onDone }: { onBack: () => voi
     const todayDate = toInputDate(new Date());
 
     const [rows, setRows] = useState<RowItem[]>([
-        { id: "1", product: "", price: "", priceMode: "unit", quantity: "1", unit: "KG", date: todayDate, notes: "" },
-        { id: "2", product: "", price: "", priceMode: "unit", quantity: "1", unit: "KG", date: todayDate, notes: "" },
+        { id: "1", product: "", price: "", priceMode: "total", quantity: "1", unit: "KG", date: todayDate, notes: "" },
     ]);
 
     const handleAddRow = () => {
         const lastRowDate = rows.length > 0 ? rows[rows.length - 1].date : todayDate;
         setRows((prev) => [
             ...prev,
-            { id: Date.now().toString(), product: "", price: "", priceMode: "unit", quantity: "1", unit: "KG", date: lastRowDate, notes: "" },
+            { id: Date.now().toString(), product: "", price: "", priceMode: "total", quantity: "1", unit: "KG", date: lastRowDate, notes: "" },
         ]);
     };
 

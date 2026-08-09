@@ -74,7 +74,6 @@ export function WebHeader({
                         { id: "home", label: "Home", icon: <Home className="w-4 h-4" /> },
                         { id: "expenses", label: "Expenses", icon: <ShoppingBag className="w-4 h-4" /> },
                         { id: "bills", label: "Bills", icon: <Receipt className="w-4 h-4" /> },
-                        { id: "products", label: "Products", icon: <Package className="w-4 h-4" /> },
                         { id: "profile", label: "Profile", icon: <User className="w-4 h-4" /> },
                     ].map((item) => {
                         const active = tab === item.id;

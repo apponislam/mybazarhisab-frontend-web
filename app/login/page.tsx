@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WebAuthForms } from "@/components/web/WebAuthForms";
 import { AuthForms } from "@/components/app/screens/AuthForms";
 import { useAppSelector } from "@/redux/hooks";
@@ -12,11 +12,14 @@ export default function LoginPage() {
     const user = useAppSelector(currentUser);
     const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get("redirect") || "/dashboard";
+
     useEffect(() => {
         if (user) {
-            router.replace("/dashboard");
+            router.replace(redirectUrl);
         }
-    }, [user, router]);
+    }, [user, router, redirectUrl]);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -28,7 +31,7 @@ export default function LoginPage() {
     }, []);
 
     const handleLoginSuccess = () => {
-        router.push("/dashboard");
+        router.push(redirectUrl);
     };
 
     const handleBackHome = () => {

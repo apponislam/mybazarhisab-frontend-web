@@ -7,9 +7,13 @@ import { useGetAllUsersQuery, UserQueryParams } from "@/redux/features/user/user
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { UsersTable } from "@/components/dashboard/users/UsersTable";
+import { DeleteUserModal } from "@/components/dashboard/users/DeleteUserModal";
+import { TUser } from "@/redux/features/auth/authSlice";
 
 export default function DashboardUsersPage() {
     const router = useRouter();
+
+    const [deletingUser, setDeletingUser] = useState<TUser | null>(null);
 
     const [queryParams, setQueryParams] = useState<UserQueryParams>({
         page: 1,
@@ -102,7 +106,10 @@ export default function DashboardUsersPage() {
                     </div>
 
                     {/* Users Table */}
-                    <UsersTable users={users} isLoading={isLoading} />
+                    <UsersTable users={users} isLoading={isLoading} onDeleteUser={(u) => setDeletingUser(u)} />
+
+                    {/* Delete User Modal */}
+                    <DeleteUserModal user={deletingUser} onClose={() => setDeletingUser(null)} />
 
                     {/* Pagination Footer */}
                     {meta && (

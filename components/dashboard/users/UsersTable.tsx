@@ -9,9 +9,10 @@ import { useUpdateUserRoleMutation, useUpdateUserStatusMutation, useDeleteUserMu
 interface UsersTableProps {
     users: TUser[];
     isLoading: boolean;
+    onDeleteUser?: (user: TUser) => void;
 }
 
-export function UsersTable({ users, isLoading }: UsersTableProps) {
+export function UsersTable({ users, isLoading, onDeleteUser }: UsersTableProps) {
     const router = useRouter();
 
     const [updateUserRole, { isLoading: roleLoading }] = useUpdateUserRoleMutation();
@@ -38,14 +39,8 @@ export function UsersTable({ users, isLoading }: UsersTableProps) {
         }
     };
 
-    const handleDelete = async (user: TUser) => {
-        if (!confirm(`Are you sure you want to delete user "${user.name}"? This action is permanent.`)) return;
-        try {
-            await deleteUser(user._id).unwrap();
-            toast.success(`User ${user.name} removed successfully!`);
-        } catch (err: any) {
-            toast.error(err?.data?.message || err?.message || "Failed to delete user");
-        }
+    const handleDelete = (user: TUser) => {
+        onDeleteUser?.(user);
     };
 
     function initials(name?: string) {

@@ -168,7 +168,8 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const [createBazarEntry, { isLoading: bazarLoading }] = useCreateBazarEntryMutation();
     const [createBill, { isLoading: billMutationLoading }] = useCreateBillMutation();
     const { data: unreadData } = useGetUnreadCountQuery();
-    const { data: notifData, isLoading: notifLoading } = useGetMyNotificationsQuery({ limit: 15 });
+    const [notifPage, setNotifPage] = useState(1);
+    const { data: notifData, isLoading: notifLoading } = useGetMyNotificationsQuery({ page: notifPage, limit: 10 });
     const [markAllAsRead] = useMarkAllAsReadMutation();
     const [deleteAllNotifications] = useDeleteAllNotificationsMutation();
     const [deleteNotification] = useDeleteNotificationMutation();
@@ -855,8 +856,17 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                 {/* ─── TAB: PRODUCTS (GROUP CATALOG & PRICE GROWTH) ───────── */}
                                 {tab === "products" && <WebProductsTab />}
 
-                                {/* ─── TAB: NOTIFICATIONS (FULL-PAGE NOTIFICATIONS LOGS VIEW) ─── */}
-                                {tab === "notifications" && <WebNotificationsTab markAllAsRead={markAllAsRead} deleteAllNotifications={deleteAllNotifications} notifLoading={notifLoading} notifData={notifData} deleteNotification={deleteNotification} />}
+                                {tab === "notifications" && (
+                                    <WebNotificationsTab
+                                        markAllAsRead={markAllAsRead}
+                                        deleteAllNotifications={deleteAllNotifications}
+                                        notifLoading={notifLoading}
+                                        notifData={notifData}
+                                        deleteNotification={deleteNotification}
+                                        page={notifPage}
+                                        setPage={setNotifPage}
+                                    />
+                                )}
 
                                 {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
                                 {tab === "profile" && (

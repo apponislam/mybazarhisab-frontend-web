@@ -3,10 +3,30 @@
 import React from "react";
 import { Bell, X } from "lucide-react";
 
-export function WebNotificationsTab({ markAllAsRead, deleteAllNotifications, notifLoading, notifData, deleteNotification }: { markAllAsRead: () => void; deleteAllNotifications: () => void; notifLoading: boolean; notifData?: any; deleteNotification: (id: string) => void }) {
+export function WebNotificationsTab({
+    markAllAsRead,
+    deleteAllNotifications,
+    notifLoading,
+    notifData,
+    deleteNotification,
+    page,
+    setPage,
+}: {
+    markAllAsRead: () => void;
+    deleteAllNotifications: () => void;
+    notifLoading: boolean;
+    notifData?: any;
+    deleteNotification: (id: string) => void;
+    page?: number;
+    setPage?: (p: number | ((prev: number) => number)) => void;
+}) {
+    const meta = notifData?.meta;
+    const totalPages = meta?.totalPages || 1;
+    const currentPage = page || 1;
+
     return (
         <div className="bg-[#251508] border border-border rounded-3xl p-8 shadow-xl flex flex-col gap-6 font-sans">
-            <div className="flex items-center justify-between border-b border-border pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center">
                         <Bell className="w-5 h-5 text-primary" />
@@ -27,7 +47,7 @@ export function WebNotificationsTab({ markAllAsRead, deleteAllNotifications, not
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-80">
                 {notifLoading ? (
                     <div className="p-12 text-center text-xs font-mono text-muted-foreground">Fetching notifications log history…</div>
                 ) : notifData?.data && notifData.data.length > 0 ? (
@@ -49,6 +69,33 @@ export function WebNotificationsTab({ markAllAsRead, deleteAllNotifications, not
                     <div className="p-16 text-center text-xs font-mono text-muted-foreground bg-[#1a0e07] border border-border/60 rounded-2xl">No notifications found in your account logs.</div>
                 )}
             </div>
+
+            {/* Pagination Controls */}
+            {setPage && (
+                <div className="flex items-center justify-between pt-4 border-t border-border/60 text-xs font-mono">
+                    <span className="text-muted-foreground">
+                        Page <strong className="text-foreground">{currentPage}</strong> of <strong className="text-foreground">{totalPages}</strong> (Total: {meta?.total || notifData?.data?.length || 0})
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            disabled={currentPage <= 1 || notifLoading}
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground font-bold hover:bg-secondary disabled:opacity-40 cursor-pointer transition-all"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            type="button"
+                            disabled={meta?.hasNext === false || currentPage >= totalPages || notifLoading}
+                            onClick={() => setPage((p) => p + 1)}
+                            className="px-3.5 py-1.5 rounded-xl border border-border bg-[#1a0e07] text-foreground font-bold hover:bg-secondary disabled:opacity-40 cursor-pointer transition-all"
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

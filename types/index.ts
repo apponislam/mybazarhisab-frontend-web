@@ -58,7 +58,8 @@ export type AppSubScreen =
   | "profile-edit"
   | "profile-change-password"
   | "profile-group"
-  | "profile-notifications";
+  | "profile-notifications"
+  | "profile-calendar";
 
 export interface GroupStats {
   groupName: string;

@@ -112,7 +112,15 @@ export function AppShell({ stats }: { stats: GroupStats }) {
                             }}
                         />
                     )}
-                    {tab === "profile" && <ProfileTab onEditProfile={() => setSubScreen("profile-edit")} onChangePassword={() => setSubScreen("profile-change-password")} onGroup={() => setSubScreen("profile-group")} onNotifications={() => setSubScreen("profile-notifications")} />}
+                    {tab === "profile" && (
+                        <ProfileTab
+                            onEditProfile={() => setSubScreen("profile-edit")}
+                            onChangePassword={() => setSubScreen("profile-change-password")}
+                            onGroup={() => setSubScreen("profile-group")}
+                            onNotifications={() => setSubScreen("profile-notifications")}
+                            onCalendar={() => setSubScreen("profile-calendar")}
+                        />
+                    )}
                     {subScreen === "add-picker" && <AppAddPicker onExpense={() => setSubScreen("add-expense")} onBill={() => setSubScreen("add-bill")} onClose={() => setSubScreen(null)} />}
                 </div>
                 {showNav && (

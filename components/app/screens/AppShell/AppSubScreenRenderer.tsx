@@ -12,6 +12,7 @@ import { EditProfileScreen } from "@/components/app/screens/EditProfileScreen";
 import { ChangePasswordScreen } from "@/components/app/screens/ChangePasswordScreen";
 import { GroupScreen } from "@/components/app/screens/GroupScreen";
 import { NotificationsScreen } from "@/components/app/screens/NotificationsScreen";
+import { CalendarScreen } from "@/components/app/screens/CalendarScreen";
 
 export function AppSubScreenRenderer({
     subScreen,
@@ -126,6 +127,7 @@ export function AppSubScreenRenderer({
     if (subScreen === "profile-change-password") return <ChangePasswordScreen onBack={() => setSubScreen(null)} />;
     if (subScreen === "profile-group") return <GroupScreen onBack={() => setSubScreen(null)} />;
     if (subScreen === "profile-notifications") return <NotificationsScreen onBack={() => setSubScreen(null)} />;
+    if (subScreen === "profile-calendar") return <CalendarScreen onBack={() => setSubScreen(null)} />;
 
     return null;
 }

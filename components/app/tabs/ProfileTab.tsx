@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { User, Shield, Info, Bell, BellOff, Mail, MapPin, FileText, LogOut, Trash2, AlertTriangle, Users } from "lucide-react";
+import { User, Shield, Info, Bell, BellOff, Mail, MapPin, FileText, LogOut, Trash2, AlertTriangle, Users, Calendar } from "lucide-react";
 import { Toggle, SettingsRow } from "@/components/app/ui/Shared";
 import { initials, avatarColor } from "@/lib/mockData";
 import { useLogoutMutation, useGetMeQuery } from "@/redux/features/auth/authApi";
@@ -8,7 +8,7 @@ import { useGetMyGroupQuery } from "@/redux/features/group/groupApi";
 import { logOut } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 
-export function ProfileTab({ onEditProfile, onChangePassword, onGroup, onNotifications }: { onEditProfile: () => void; onChangePassword: () => void; onGroup: () => void; onNotifications: () => void }) {
+export function ProfileTab({ onEditProfile, onChangePassword, onGroup, onNotifications, onCalendar }: { onEditProfile: () => void; onChangePassword: () => void; onGroup: () => void; onNotifications: () => void; onCalendar?: () => void }) {
     const dispatch = useAppDispatch();
     const [logoutMutation, { isLoading: isLoggingOut }] = useLogoutMutation();
     const { data: userData } = useGetMeQuery();
@@ -66,6 +66,8 @@ export function ProfileTab({ onEditProfile, onChangePassword, onGroup, onNotific
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest font-mono">Account</p>
                     </div>
                     <SettingsRow icon={<User className="w-4 h-4" />} label="Edit Profile" sub="Update your name, photo, address & more" onClick={onEditProfile} />
+                    <div className="h-px bg-border mx-4" />
+                    <SettingsRow icon={<Calendar className="w-4 h-4 text-primary" />} label="Expense Calendar" sub="Monthly group expense breakdown & stats" onClick={onCalendar} />
                     <div className="h-px bg-border mx-4" />
                     <SettingsRow icon={<Users className="w-4 h-4" />} label="My Group" sub={group ? `${group.name} · Code: ${group.inviteCode}` : "Manage group & invite code"} onClick={onGroup} />
                     <div className="h-px bg-border mx-4" />

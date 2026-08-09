@@ -336,7 +336,7 @@ export function WebCalendarTab() {
                                     <div className="flex items-center justify-between relative z-10">
                                         <span
                                             className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-extrabold font-mono transition-transform group-hover:scale-110 ${
-                                                isToday ? "bg-accent text-accent-foreground shadow-md font-black" : isSelected ? "bg-primary text-primary-foreground font-black shadow-md" : hasCost ? "bg-white/10 text-foreground" : "text-muted-foreground/80"
+                                                isToday ? "bg-accent text-white shadow-md font-black" : isSelected ? "bg-primary text-white font-black shadow-md" : hasCost ? "bg-white/20 text-white font-black" : "text-white font-bold"
                                             }`}
                                         >
                                             {dayObj.day}

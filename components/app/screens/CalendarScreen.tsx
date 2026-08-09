@@ -75,13 +75,13 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
 
     return (
         <ScreenShell scrollable>
-            <div className="flex flex-col px-4 pt-6 pb-12 gap-5 font-sans">
+            <div className="flex flex-col px-4 pt-6 pb-12 gap-3 font-sans">
                 <BackButton onBack={onBack} label="Profile" />
 
                 {/* Hero Header Card */}
-                <div className="relative p-5 rounded-3xl bg-linear-to-br from-[#2c1809] via-[#231206] to-[#150a03] border border-primary/30 shadow-2xl overflow-hidden backdrop-blur-xl">
+                <div className="relative p-4 rounded-3xl bg-linear-to-br from-[#2c1809] via-[#231206] to-[#150a03] border border-primary/30 shadow-2xl overflow-hidden backdrop-blur-xl">
                     <div className="absolute -right-10 -top-10 w-44 h-44 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
-                    <div className="flex flex-col gap-2 relative z-10">
+                    <div className="flex flex-col gap-1 relative z-10">
                         <div className="inline-flex items-center gap-1.5 self-start px-3 py-0.5 rounded-full bg-primary/15 border border-primary/30 text-primary text-[11px] font-mono font-semibold">
                             <Sparkles className="w-3.5 h-3.5" /> Group Financial Calendar
                         </div>
@@ -89,7 +89,10 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                             Expense <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-amber-400 to-amber-200">Calendar</span>
                         </h2>
                         <p className="text-xs text-muted-foreground font-mono">
-                            Daily breakdown for <span className="text-primary font-bold">{MONTH_NAMES[selectedMonth - 1]} {selectedYear}</span>
+                            Daily breakdown for{" "}
+                            <span className="text-primary font-bold">
+                                {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
+                            </span>
                         </p>
                     </div>
                 </div>
@@ -132,9 +135,7 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                                                         setActiveDay(null);
                                                     }}
                                                     className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-left transition-all ${
-                                                        isSelected
-                                                            ? "bg-linear-to-r from-primary/30 to-amber-500/20 text-primary font-bold border border-primary/40 shadow-xs"
-                                                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                                        isSelected ? "bg-linear-to-r from-primary/30 to-amber-500/20 text-primary font-bold border border-primary/40 shadow-xs" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                                                     }`}
                                                 >
                                                     <span>{name}</span>
@@ -182,9 +183,7 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                                                         setActiveDay(null);
                                                     }}
                                                     className={`w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-left transition-all ${
-                                                        isSelected
-                                                            ? "bg-linear-to-r from-primary/30 to-amber-500/20 text-primary font-bold border border-primary/40 shadow-xs"
-                                                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                                                        isSelected ? "bg-linear-to-r from-primary/30 to-amber-500/20 text-primary font-bold border border-primary/40 shadow-xs" : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                                                     }`}
                                                 >
                                                     <span>{y}</span>
@@ -214,27 +213,21 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                 <div className="grid grid-cols-3 gap-2.5">
                     <div className="p-3.5 rounded-2xl bg-linear-to-br from-[#281508] to-[#1c0d04] border border-primary/30 shadow-lg flex flex-col gap-1">
                         <div className="flex items-center gap-1 text-muted-foreground text-[10px] font-mono uppercase tracking-wider">
-                            <PieChart className="w-3.5 h-3.5 text-amber-400" /> Grand Total
+                            <PieChart className="w-3.5 h-3.5 text-amber-400" /> Total
                         </div>
-                        <p className="text-sm font-extrabold text-primary truncate font-mono">
-                            ৳{calendarData?.summary?.grandTotal?.toLocaleString() ?? 0}
-                        </p>
+                        <p className="text-sm font-extrabold text-primary truncate font-mono">৳{calendarData?.summary?.grandTotal?.toLocaleString() ?? 0}</p>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-linear-to-br from-[#281508] to-[#1c0d04] border border-border/80 shadow-lg flex flex-col gap-1">
                         <div className="flex items-center gap-1 text-muted-foreground text-[10px] font-mono uppercase tracking-wider">
                             <ShoppingBag className="w-3.5 h-3.5 text-amber-400" /> Bazar
                         </div>
-                        <p className="text-sm font-extrabold text-foreground truncate font-mono">
-                            ৳{calendarData?.summary?.totalExpense?.toLocaleString() ?? 0}
-                        </p>
+                        <p className="text-sm font-extrabold text-foreground truncate font-mono">৳{calendarData?.summary?.totalExpense?.toLocaleString() ?? 0}</p>
                     </div>
                     <div className="p-3.5 rounded-2xl bg-linear-to-br from-[#281508] to-[#1c0d04] border border-border/80 shadow-lg flex flex-col gap-1">
                         <div className="flex items-center gap-1 text-muted-foreground text-[10px] font-mono uppercase tracking-wider">
                             <Receipt className="w-3.5 h-3.5 text-blue-400" /> Bills
                         </div>
-                        <p className="text-sm font-extrabold text-foreground truncate font-mono">
-                            ৳{calendarData?.summary?.totalBill?.toLocaleString() ?? 0}
-                        </p>
+                        <p className="text-sm font-extrabold text-foreground truncate font-mono">৳{calendarData?.summary?.totalBill?.toLocaleString() ?? 0}</p>
                     </div>
                 </div>
 
@@ -259,7 +252,7 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                         <div className="grid grid-cols-7 gap-1.5">
                             {/* Empty offset cells */}
                             {Array.from({ length: startOffset }).map((_, i) => (
-                                <div key={`offset-${i}`} className="h-14 rounded-2xl bg-[#140a03]/40 border border-white/5 opacity-20 pointer-events-none" />
+                                <div key={`offset-${i}`} className="h-12 rounded-2xl bg-[#140a03]/40 border border-white/5 opacity-20 pointer-events-none" />
                             ))}
 
                             {/* Calendar Days */}
@@ -270,12 +263,7 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
 
                                 // Compute grid position offset to prevent overflow:
                                 const colIndex = (startOffset + index) % 7;
-                                const positionClass =
-                                    colIndex < 2
-                                        ? "left-0 translate-x-0"
-                                        : colIndex > 4
-                                        ? "right-0 translate-x-0"
-                                        : "left-1/2 -translate-x-1/2";
+                                const positionClass = colIndex < 2 ? "left-0 translate-x-0" : colIndex > 4 ? "right-0 translate-x-0" : "left-1/2 -translate-x-1/2";
 
                                 return (
                                     <div key={dayObj.date} className="relative group">
@@ -283,31 +271,23 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                                             whileHover={{ scale: 1.05, y: -2 }}
                                             whileTap={{ scale: 0.95 }}
                                             onClick={() => setActiveDay((prev) => (prev?.date === dayObj.date ? null : dayObj))}
-                                            className={`w-full h-14 p-1.5 rounded-2xl border flex flex-col items-center justify-center transition-all select-none relative overflow-hidden text-center cursor-pointer ${
+                                            className={`w-full h-10 p-1.5 rounded-2xl border flex flex-col items-center justify-center transition-all select-none relative overflow-hidden text-center cursor-pointer ${
                                                 isSelected
                                                     ? "bg-linear-to-br from-primary/35 via-[#331b0b] to-[#1f0d04] border-primary shadow-xl ring-2 ring-primary/60 z-20"
                                                     : isToday
-                                                    ? "bg-linear-to-br from-amber-500/25 via-[#29160a] to-[#190c04] border-amber-400 shadow-md"
-                                                    : hasCost
-                                                    ? "bg-linear-to-br from-[#2c170a] to-[#1d0e04] border-primary/40 shadow-[0_0_10px_rgba(232,160,32,0.2)] hover:border-primary"
-                                                    : "bg-[#180b03]/60 border-border/30 hover:bg-[#200e04]/80 opacity-60"
+                                                      ? "bg-linear-to-br from-amber-500/25 via-[#29160a] to-[#190c04] border-amber-400 shadow-md"
+                                                      : hasCost
+                                                        ? "bg-linear-to-br from-[#2c170a] to-[#1d0e04] border-primary/40 shadow-[0_0_10px_rgba(232,160,32,0.2)] hover:border-primary"
+                                                        : "bg-[#180b03]/60 border-border/30 hover:bg-[#200e04]/80 opacity-60"
                                             }`}
                                         >
                                             {/* Glowing ambient background glow when day has cost */}
-                                            {hasCost && (
-                                                <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-xs pointer-events-none" />
-                                            )}
+                                            {hasCost && <div className="absolute inset-0 bg-primary/10 rounded-2xl blur-xs pointer-events-none" />}
 
                                             {/* Date Number Header */}
                                             <span
                                                 className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black font-mono transition-all relative z-10 ${
-                                                    isToday
-                                                        ? "bg-amber-400 text-black font-bold shadow-xs"
-                                                        : isSelected
-                                                        ? "bg-primary text-black font-bold shadow-xs"
-                                                        : hasCost
-                                                        ? "text-primary font-black"
-                                                        : "text-muted-foreground/70"
+                                                    isToday ? "bg-amber-400 text-white font-bold shadow-xs" : isSelected ? "bg-primary text-white font-bold shadow-xs" : hasCost ? "text-white font-black" : "text-white font-bold"
                                                 }`}
                                             >
                                                 {dayObj.day}
@@ -336,7 +316,13 @@ export function CalendarScreen({ onBack }: { onBack: () => void }) {
                                                         <span className="font-bold text-foreground text-[10px]">
                                                             {dayObj.dayOfWeek}, {MONTH_NAMES[selectedMonth - 1].slice(0, 3)} {dayObj.day}
                                                         </span>
-                                                        <button onClick={(e) => { e.stopPropagation(); setActiveDay(null); }} className="text-muted-foreground hover:text-foreground">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setActiveDay(null);
+                                                            }}
+                                                            className="text-muted-foreground hover:text-foreground"
+                                                        >
                                                             <X className="w-3 h-3" />
                                                         </button>
                                                     </div>

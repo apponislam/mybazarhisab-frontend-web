@@ -71,7 +71,7 @@ export function BillDetailScreen({ bill, onBack, onEdit, onDelete }: { bill: Moc
                         <Avatar user={bill.user} size={36} />
                         <div>
                             <p className="text-xs text-muted-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                                Paid by
+                                Added by
                             </p>
                             <p className="text-sm font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                                 {bill.user.name}

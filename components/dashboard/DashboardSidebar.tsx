@@ -3,8 +3,11 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { LayoutDashboard, ShoppingBag, Receipt, Package, Mail, Star, BarChart2, Shield, Users, Settings, LogOut, Activity } from "lucide-react";
-
-import { useGetMeQuery } from "@/redux/features/auth/authApi";
+import { useGetMeQuery, useLogoutMutation } from "@/redux/features/auth/authApi";
+import { useAppDispatch } from "@/redux/hooks";
+import { logOut } from "@/redux/features/auth/authSlice";
+import { baseApi } from "@/redux/api/baseApi";
+import { toast } from "sonner";
 
 interface DashboardSidebarProps {
     activeTab: string;
@@ -13,8 +16,10 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarProps) {
     const router = useRouter();
+    const dispatch = useAppDispatch();
     const { data: userData } = useGetMeQuery();
     const user = userData?.data;
+    const [logoutMutation] = useLogoutMutation();
 
     const userName = user?.name || "Admin User";
     const userEmail = user?.email || "admin@mybazarhisab.com";
@@ -29,6 +34,18 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
             .slice(0, 2)
             .toUpperCase();
     }
+
+    const handleLogout = async () => {
+        try {
+            await logoutMutation().unwrap();
+        } catch (err) {
+            // ignore
+        }
+        dispatch(logOut());
+        dispatch(baseApi.util.resetApiState());
+        toast.success("Logged out successfully");
+        router.replace("/login");
+    };
 
     const navItems = [
         { id: "overview", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" />, href: "/dashboard" },
@@ -98,7 +115,7 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
                     <h4 className="text-xs font-bold truncate text-foreground">{userName}</h4>
                     <p className="text-[10px] text-muted-foreground truncate font-mono">{userEmail}</p>
                 </div>
-                <button onClick={() => router.push("/login")} className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Logout">
+                <button onClick={handleLogout} className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer" title="Logout">
                     <LogOut className="w-4 h-4" />
                 </button>
             </div>

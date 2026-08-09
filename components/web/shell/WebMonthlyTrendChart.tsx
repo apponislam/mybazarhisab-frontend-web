@@ -1,17 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { TrendingUp, ShoppingBag, Receipt, Calendar, Sparkles } from "lucide-react";
+import { TrendingUp, ShoppingBag, Receipt, Calendar, Sparkles, ChevronDown } from "lucide-react";
 import { TDashboardMonthlyTrend } from "@/redux/features/dashboard/dashboardApi";
 
 interface WebMonthlyTrendChartProps {
     data: TDashboardMonthlyTrend[];
     isLoading: boolean;
+    selectedYear?: number;
+    onYearChange?: (year: number) => void;
 }
 
-export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartProps) {
+export function WebMonthlyTrendChart({ data, isLoading, selectedYear, onYearChange }: WebMonthlyTrendChartProps) {
+    const currentYear = new Date().getFullYear();
+    const activeYear = selectedYear || currentYear;
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+    const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Dynamic year list: 2027 down to currentYear - 9
+    const yearOptions = Array.from({ length: 12 }, (_, i) => currentYear + 1 - i);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsYearDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     if (isLoading) {
         return (
@@ -63,7 +82,7 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                     <div>
                         <div className="flex items-center gap-2">
                             <h3 className="text-lg font-bold text-foreground tracking-tight" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
-                                Annual Expense Trend ({new Date().getFullYear()})
+                                Annual Expense Trend ({activeYear})
                             </h3>
                             <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-[10px] font-mono font-bold">
                                 <Sparkles className="w-3 h-3" /> Live
@@ -73,21 +92,73 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                     </div>
                 </div>
 
-                {/* Legend Pill */}
-                <div className="flex items-center gap-4 bg-[#1a0e07] border border-border/80 px-4 py-2 rounded-2xl text-xs font-mono shrink-0 shadow-md">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#e8a020] shadow-sm shadow-[#e8a020]" />
-                        <span className="text-foreground font-bold">Total</span>
+                {/* Controls & Legend */}
+                <div className="flex items-center gap-3">
+                    {/* Custom Year Dropdown */}
+                    <div className="relative" ref={dropdownRef}>
+                        <button
+                            type="button"
+                            onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
+                            className="flex items-center gap-2 bg-[#1a0e07] border border-border/80 hover:border-primary/50 px-3.5 py-2 rounded-2xl text-xs font-mono font-bold text-foreground transition-all shadow-md cursor-pointer"
+                        >
+                            <Calendar className="w-3.5 h-3.5 text-primary" />
+                            <span>{activeYear}{activeYear === currentYear ? " (Current)" : ""}</span>
+                            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${isYearDropdownOpen ? "rotate-180 text-primary" : ""}`} />
+                        </button>
+
+                        <AnimatePresence>
+                            {isYearDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 6, scale: 0.95 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute right-0 mt-2 w-44 bg-[#1a0e07] border border-border rounded-2xl shadow-2xl py-1.5 z-50 overflow-hidden max-h-60 overflow-y-auto"
+                                >
+                                    <div className="px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground/70 border-b border-border/40 mb-1">
+                                        Select Year
+                                    </div>
+                                    {yearOptions.map((yr) => {
+                                        const isSelected = yr === activeYear;
+                                        const isCurrent = yr === currentYear;
+                                        return (
+                                            <button
+                                                key={yr}
+                                                type="button"
+                                                onClick={() => {
+                                                    onYearChange?.(yr);
+                                                    setIsYearDropdownOpen(false);
+                                                }}
+                                                className={`w-full text-left px-3.5 py-2 text-xs font-mono font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                                                    isSelected ? "bg-primary/15 text-primary font-bold" : "text-foreground/80 hover:bg-secondary/60 hover:text-foreground"
+                                                }`}
+                                            >
+                                                <span>{yr}</span>
+                                                {isCurrent && <span className="text-[10px] text-primary/80 font-normal">Current</span>}
+                                            </button>
+                                        );
+                                    })}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
-                    <div className="w-px h-3 bg-border/60" />
-                    <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]" />
-                        <span className="text-muted-foreground">Bazar</span>
-                    </div>
-                    <div className="w-px h-3 bg-border/60" />
-                    <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]" />
-                        <span className="text-muted-foreground">Bills</span>
+
+                    {/* Legend Pill */}
+                    <div className="hidden sm:flex items-center gap-3 bg-[#1a0e07] border border-border/80 px-3.5 py-2 rounded-2xl text-xs font-mono shrink-0 shadow-md">
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#e8a020] shadow-sm shadow-[#e8a020]" />
+                            <span className="text-foreground font-bold">Total</span>
+                        </div>
+                        <div className="w-px h-3 bg-border/60" />
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#10b981]" />
+                            <span className="text-muted-foreground">Bazar</span>
+                        </div>
+                        <div className="w-px h-3 bg-border/60" />
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]" />
+                            <span className="text-muted-foreground">Bills</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,17 +193,53 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                     })}
 
                     {/* Gradient Area Fill */}
-                    <path d={areaTotal} fill="url(#primaryAreaGrad)" />
+                    <motion.path
+                        d={areaTotal}
+                        fill="url(#primaryAreaGrad)"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    />
 
-                    {/* 3 Thin Solid Lines */}
+                    {/* 3 Thin Solid Lines with smooth draw animation */}
                     {/* Bazar Expense Line (Emerald Green) */}
-                    <path d={pathBazar} fill="none" stroke="#10b981" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    <motion.path
+                        d={pathBazar}
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 1.2, ease: "easeInOut" }}
+                    />
 
                     {/* Bill Expense Line (Royal Blue) */}
-                    <path d={pathBill} fill="none" stroke="#3b82f6" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    <motion.path
+                        d={pathBill}
+                        fill="none"
+                        stroke="#3b82f6"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 1.2, ease: "easeInOut", delay: 0.1 }}
+                    />
 
                     {/* Total Expense Line (Warm Gold) */}
-                    <path d={pathTotal} fill="none" stroke="#e8a020" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <motion.path
+                        d={pathTotal}
+                        fill="none"
+                        stroke="#e8a020"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 1.4, ease: "easeInOut", delay: 0.2 }}
+                    />
 
                     {/* Interactive Column Hover Lines, Dots & Floating Tooltip */}
                     {points.map((p) => {
@@ -153,9 +260,18 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                                 {isHovered && <line x1={p.x} y1={padTop} x2={p.x} y2={padTop + chartH} stroke="#e8a020" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />}
 
                                 {/* Point Markers for each line */}
-                                <circle cx={p.x} cy={p.yBazar} r={isHovered ? "4" : "2.5"} fill="#10b981" />
-                                <circle cx={p.x} cy={p.yBill} r={isHovered ? "4" : "2.5"} fill="#3b82f6" />
-                                <circle cx={p.x} cy={p.yTotal} r={isHovered ? "6" : isCurrent ? "4.5" : "3"} fill={isHovered || isCurrent ? "#e8a020" : "#1a0e07"} stroke="#e8a020" strokeWidth={isHovered ? "2.5" : "1.5"} className="transition-all duration-150" />
+                                <motion.circle cx={p.x} cy={p.yBazar} r={isHovered ? "4.5" : "2.5"} fill="#10b981" animate={{ r: isHovered ? 4.5 : 2.5 }} transition={{ duration: 0.15 }} />
+                                <motion.circle cx={p.x} cy={p.yBill} r={isHovered ? "4.5" : "2.5"} fill="#3b82f6" animate={{ r: isHovered ? 4.5 : 2.5 }} transition={{ duration: 0.15 }} />
+                                <motion.circle
+                                    cx={p.x}
+                                    cy={p.yTotal}
+                                    r={isHovered ? 6 : isCurrent ? 4.5 : 3}
+                                    fill={isHovered || isCurrent ? "#e8a020" : "#1a0e07"}
+                                    stroke="#e8a020"
+                                    strokeWidth={isHovered ? 2.5 : 1.5}
+                                    animate={{ r: isHovered ? 6.5 : isCurrent ? 4.5 : 3, strokeWidth: isHovered ? 2.5 : 1.5 }}
+                                    transition={{ duration: 0.15 }}
+                                />
 
                                 {/* X-Axis Month Label */}
                                 <text x={p.x} y={svgH - 8} textAnchor="middle" fill={isHovered || isCurrent ? "#e8a020" : "#a08060"} fontSize={isHovered || isCurrent ? "12" : "11"} fontFamily="monospace" fontWeight={isHovered || isCurrent ? "800" : "500"}>
@@ -163,23 +279,31 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                                 </text>
 
                                 {/* Floating Tooltip Popup Card */}
-                                {isHovered && (
-                                    <g pointerEvents="none" className="transition-all duration-150">
-                                        <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx="10" fill="#1a0e07" stroke="#e8a020" strokeWidth="1.5" className="shadow-2xl" />
-                                        <text x={tooltipX + 10} y={tooltipY + 18} fill="#e8a020" fontSize="11" fontWeight="bold" fontFamily="monospace">
-                                            {p.item.label} Overview
-                                        </text>
-                                        <text x={tooltipX + 10} y={tooltipY + 36} fill="#ffffff" fontSize="11" fontWeight="bold" fontFamily="monospace">
-                                            Total: ৳{p.item.totalExpense.toLocaleString()}
-                                        </text>
-                                        <text x={tooltipX + 10} y={tooltipY + 52} fill="#10b981" fontSize="9.5" fontFamily="monospace">
-                                            Bazar: ৳{p.item.bazarExpense.toLocaleString()}
-                                        </text>
-                                        <text x={tooltipX + 10} y={tooltipY + 66} fill="#3b82f6" fontSize="9.5" fontFamily="monospace">
-                                            Bills: ৳{p.item.billExpense.toLocaleString()}
-                                        </text>
-                                    </g>
-                                )}
+                                <AnimatePresence>
+                                    {isHovered && (
+                                        <motion.g
+                                            pointerEvents="none"
+                                            initial={{ opacity: 0, scale: 0.9, y: 4 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.9, y: 4 }}
+                                            transition={{ duration: 0.15 }}
+                                        >
+                                            <rect x={tooltipX} y={tooltipY} width={tooltipW} height={tooltipH} rx="10" fill="#1a0e07" stroke="#e8a020" strokeWidth="1.5" className="shadow-2xl" />
+                                            <text x={tooltipX + 10} y={tooltipY + 18} fill="#e8a020" fontSize="11" fontWeight="bold" fontFamily="monospace">
+                                                {p.item.label} Overview
+                                            </text>
+                                            <text x={tooltipX + 10} y={tooltipY + 36} fill="#ffffff" fontSize="11" fontWeight="bold" fontFamily="monospace">
+                                                Total: ৳{p.item.totalExpense.toLocaleString()}
+                                            </text>
+                                            <text x={tooltipX + 10} y={tooltipY + 52} fill="#10b981" fontSize="9.5" fontFamily="monospace">
+                                                Bazar: ৳{p.item.bazarExpense.toLocaleString()}
+                                            </text>
+                                            <text x={tooltipX + 10} y={tooltipY + 66} fill="#3b82f6" fontSize="9.5" fontFamily="monospace">
+                                                Bills: ৳{p.item.billExpense.toLocaleString()}
+                                            </text>
+                                        </motion.g>
+                                    )}
+                                </AnimatePresence>
                             </g>
                         );
                     })}
@@ -187,7 +311,13 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
             </div>
 
             {/* Active Month Detail Bar */}
-            <div className="mt-4 pt-4 border-t border-border/60 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#1a0e07] p-4 rounded-2xl">
+            <motion.div
+                key={activePoint?.item.label}
+                initial={{ opacity: 0.8, y: 2 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="mt-4 pt-4 border-t border-border/60 flex flex-col md:flex-row items-center justify-between gap-4 bg-[#1a0e07] p-4 rounded-2xl"
+            >
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs font-mono">{activePoint?.item.label}</div>
                     <div>
@@ -208,7 +338,7 @@ export function WebMonthlyTrendChart({ data, isLoading }: WebMonthlyTrendChartPr
                         <span className="font-bold text-foreground">৳{activePoint?.item.billExpense.toLocaleString()}</span>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

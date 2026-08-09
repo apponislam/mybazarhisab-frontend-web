@@ -34,6 +34,7 @@ type CommonResponse<T = null> = {
 
 export type MonthlyTrendParams = {
     view?: string; // "monthly" or default yearly
+    year?: number;
 };
 
 export type ProductPriceGrowthParams = {

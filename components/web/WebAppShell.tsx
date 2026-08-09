@@ -141,7 +141,8 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
     const dashboardStats = dashboardData?.data;
 
     // Monthly Expense Trend (12 Months breakdown)
-    const { data: monthlyTrendResponse, isLoading: isMonthlyTrendLoading } = useGetMonthlyExpenseTrendQuery(undefined, {
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+    const { data: monthlyTrendResponse, isLoading: isMonthlyTrendLoading } = useGetMonthlyExpenseTrendQuery({ year: selectedYear }, {
         skip: tab !== "home",
     });
     const monthlyTrendData = monthlyTrendResponse?.data || [];
@@ -579,7 +580,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
                                         {/* ─── Monthly Expense Trend Component ─── */}
                                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                                            <WebMonthlyTrendChart data={monthlyTrendData} isLoading={isMonthlyTrendLoading} />
+                                            <WebMonthlyTrendChart data={monthlyTrendData} isLoading={isMonthlyTrendLoading} selectedYear={selectedYear} onYearChange={setSelectedYear} />
                                         </motion.div>
                                     </>
                                 )}

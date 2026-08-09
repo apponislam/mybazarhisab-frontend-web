@@ -120,8 +120,47 @@ const dashboardApi = baseApi.injectEndpoints({
             }),
             providesTags: ["Dashboard"],
         }),
+
+        // GET /dashboard/group-calendar
+        getGroupCalendar: builder.query<CommonResponse<TGroupCalendarData>, GroupCalendarParams>({
+            query: (params) => ({
+                url: "/dashboard/group-calendar",
+                method: "GET",
+                params,
+            }),
+            providesTags: ["Dashboard"],
+        }),
     }),
 });
+
+export type TGroupCalendarDay = {
+    date: string;
+    day: number;
+    dayOfWeek: string;
+    expense: number;
+    bill: number;
+    total: number;
+};
+
+export type TGroupCalendarSummary = {
+    totalExpense: number;
+    totalBill: number;
+    grandTotal: number;
+};
+
+export type TGroupCalendarData = {
+    year: number;
+    month: number;
+    monthName: string;
+    daysInMonth: number;
+    summary: TGroupCalendarSummary;
+    days: TGroupCalendarDay[];
+};
+
+export type GroupCalendarParams = {
+    year: number;
+    month: number;
+};
 
 export const {
     useGetAdminDashboardStatsQuery,
@@ -129,4 +168,5 @@ export const {
     useGetUserDashboardStatsQuery,
     useGetMonthlyExpenseTrendQuery,
     useGetProductPriceGrowthTrendQuery,
+    useGetGroupCalendarQuery,
 } = dashboardApi;

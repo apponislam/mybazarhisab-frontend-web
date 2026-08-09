@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { Home, ShoppingBag, Receipt, User, Plus, Bell, ChevronDown, ShieldCheck, Lock, LogOut, X, FileText, Package } from "lucide-react";
+import { Home, ShoppingBag, Receipt, User, Plus, Bell, ChevronDown, ShieldCheck, Lock, LogOut, X, FileText, Package, Calendar } from "lucide-react";
 import { GroupStats } from "@/types";
 import { initials } from "@/components/web/shell/WebMetricCard";
 
@@ -33,7 +33,7 @@ export function WebHeader({
     scrolled: boolean;
     stats?: GroupStats;
     tab: string;
-    setTab: (tab: "home" | "expenses" | "bills" | "products" | "notifications" | "profile") => void;
+    setTab: (tab: "home" | "expenses" | "bills" | "products" | "notifications" | "profile" | "calendar") => void;
     setShowAddExpense: (show: boolean) => void;
     setShowAddBill: (show: boolean) => void;
     onOpenStatement?: () => void;
@@ -268,6 +268,18 @@ export function WebHeader({
                                     >
                                         <Package className="w-4 h-4 text-muted-foreground" />
                                         <span>Group Products Catalog</span>
+                                    </button>
+
+                                    {/* Expense Calendar Button */}
+                                    <button
+                                        onClick={() => {
+                                            setTab("calendar");
+                                            setShowUserDropdown(false);
+                                        }}
+                                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground text-xs font-semibold transition-all cursor-pointer"
+                                    >
+                                        <Calendar className="w-4 h-4 text-primary" />
+                                        <span>Expense Calendar</span>
                                     </button>
 
                                     <div className="h-px bg-border/60 my-0.5" />

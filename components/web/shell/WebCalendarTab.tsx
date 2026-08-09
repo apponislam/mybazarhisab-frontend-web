@@ -17,6 +17,7 @@ export function WebCalendarTab() {
     const [selectedYear, setSelectedYear] = useState<number>(today.getFullYear());
     const [selectedMonth, setSelectedMonth] = useState<number>(today.getMonth() + 1);
     const [activeDay, setActiveDay] = useState<TGroupCalendarDay | null>(null);
+    const [hoveredDay, setHoveredDay] = useState<TGroupCalendarDay | null>(null);
 
     // Custom dropdown states & refs
     const [showMonthDropdown, setShowMonthDropdown] = useState(false);
@@ -308,149 +309,160 @@ export function WebCalendarTab() {
                         ))}
 
                         {/* Calendar Days */}
-                        {daysList.map((dayObj) => {
+                        {daysList.map((dayObj, dayIdx) => {
                             const isToday = isCurrentMonth && dayObj.day === currentDayNum;
                             const hasCost = dayObj.total > 0;
                             const isSelected = activeDay?.date === dayObj.date;
+                            const isHovered = hoveredDay?.date === dayObj.date;
+                            const showDetails = isHovered || isSelected;
+
+                            const cellCol = (startOffset + dayIdx) % 7;
+                            const cellRow = Math.floor((startOffset + dayIdx) / 7);
 
                             return (
-                                <motion.div
-                                    key={dayObj.date}
-                                    whileHover={{ scale: 1.03, y: -2 }}
-                                    whileTap={{ scale: 0.97 }}
-                                    onClick={() => setActiveDay(dayObj)}
-                                    className={`min-h-24 sm:min-h-32 p-2.5 sm:p-3.5 rounded-2xl border flex flex-col justify-between transition-all cursor-pointer select-none relative group overflow-hidden ${
-                                        isSelected
-                                            ? "bg-linear-to-br from-primary/25 via-[#2b170a] to-[#1f0d04] border-primary shadow-xl ring-2 ring-primary/60"
-                                            : isToday
-                                              ? "bg-linear-to-br from-accent/20 via-[#26160b] to-[#190c04] border-accent/80 shadow-md"
-                                              : hasCost
-                                                ? "bg-[#1d0e05] border-border/80 hover:border-primary/50 hover:bg-[#251206] shadow-sm"
-                                                : "bg-[#180b03]/60 border-border/30 hover:bg-[#200e04]/80 opacity-80"
-                                    }`}
-                                >
-                                    {/* Ambient card highlight effect */}
-                                    {hasCost && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-xl pointer-events-none group-hover:bg-primary/15 transition-all" />}
+                                <div key={dayObj.date} className={`relative group/cell ${isSelected ? "z-50" : isHovered ? "z-40" : "z-1"}`}>
+                                    <motion.div
+                                        whileHover={{ scale: 1.03, y: -2 }}
+                                        whileTap={{ scale: 0.97 }}
+                                        onMouseEnter={() => setHoveredDay(dayObj)}
+                                        onMouseLeave={() => setHoveredDay(null)}
+                                        onClick={() => setActiveDay((prev) => (prev?.date === dayObj.date ? null : dayObj))}
+                                        className={`min-h-24 sm:min-h-32 p-2.5 sm:p-3.5 rounded-2xl border flex flex-col justify-between transition-all cursor-pointer select-none relative group overflow-hidden ${
+                                            isSelected
+                                                ? "bg-linear-to-br from-primary/25 via-[#2b170a] to-[#1f0d04] border-primary shadow-xl ring-2 ring-primary/60"
+                                                : isToday
+                                                  ? "bg-linear-to-br from-accent/20 via-[#26160b] to-[#190c04] border-accent/80 shadow-md"
+                                                  : hasCost
+                                                    ? "bg-[#1d0e05] border-border/80 hover:border-primary/50 hover:bg-[#251206] shadow-sm"
+                                                    : "bg-[#180b03]/60 border-border/30 hover:bg-[#200e04]/80 opacity-80"
+                                        }`}
+                                    >
+                                        {/* Ambient card highlight effect */}
+                                        {hasCost && <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-full blur-xl pointer-events-none group-hover:bg-primary/15 transition-all" />}
 
-                                    {/* Header: Date Number & Badge */}
-                                    <div className="flex items-center justify-between relative z-10">
-                                        <span
-                                            className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-extrabold font-mono transition-transform group-hover:scale-110 ${
-                                                isToday ? "bg-accent text-white shadow-md font-black" : isSelected ? "bg-primary text-white font-black shadow-md" : hasCost ? "bg-white/20 text-white font-black" : "text-white font-bold"
-                                            }`}
-                                        >
-                                            {dayObj.day}
-                                        </span>
+                                        {/* Header: Date Number & Badge */}
+                                        <div className="flex items-center justify-between relative z-10">
+                                            <span
+                                                className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-extrabold font-mono transition-transform group-hover:scale-110 ${
+                                                    isToday ? "bg-accent text-white shadow-md font-black" : isSelected ? "bg-primary text-white font-black shadow-md" : hasCost ? "bg-white/20 text-white font-black" : "text-white font-bold"
+                                                }`}
+                                            >
+                                                {dayObj.day}
+                                            </span>
 
-                                        {isToday && <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/40 hidden sm:inline-block shadow-sm">Today</span>}
-                                    </div>
-
-                                    {/* Expense & Bill Badges */}
-                                    {hasCost ? (
-                                        <div className="space-y-1.5 mt-2 relative z-10">
-                                            {dayObj.expense > 0 && (
-                                                <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono px-2 py-1 rounded-lg bg-primary/15 border border-primary/30 text-primary font-bold shadow-sm">
-                                                    <span className="truncate hidden sm:inline text-[9px] uppercase tracking-wider">Exp</span>
-                                                    <span>৳{dayObj.expense.toLocaleString()}</span>
-                                                </div>
-                                            )}
-                                            {dayObj.bill > 0 && (
-                                                <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono px-2 py-1 rounded-lg bg-accent/15 border border-accent/30 text-accent font-bold shadow-sm">
-                                                    <span className="truncate hidden sm:inline text-[9px] uppercase tracking-wider">Bill</span>
-                                                    <span>৳{dayObj.bill.toLocaleString()}</span>
-                                                </div>
-                                            )}
-                                            {dayObj.expense > 0 && dayObj.bill > 0 && <div className="text-right text-[11px] sm:text-xs font-mono font-black text-amber-300 pt-0.5">৳{dayObj.total.toLocaleString()}</div>}
+                                            {isToday && <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/40 hidden sm:inline-block shadow-sm">Today</span>}
                                         </div>
-                                    ) : (
-                                        <div className="text-[10px] font-mono text-muted-foreground/30 text-center py-2 hidden sm:block">—</div>
-                                    )}
-                                </motion.div>
+
+                                        {/* Expense & Bill Badges */}
+                                        {hasCost ? (
+                                            <div className="space-y-1.5 mt-2 relative z-10">
+                                                {dayObj.expense > 0 && (
+                                                    <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono px-2 py-1 rounded-lg bg-primary/15 border border-primary/30 text-primary font-bold shadow-sm">
+                                                        <span className="truncate hidden sm:inline text-[9px] uppercase tracking-wider">Exp</span>
+                                                        <span>৳{dayObj.expense.toLocaleString()}</span>
+                                                    </div>
+                                                )}
+                                                {dayObj.bill > 0 && (
+                                                    <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono px-2 py-1 rounded-lg bg-accent/15 border border-accent/30 text-accent font-bold shadow-sm">
+                                                        <span className="truncate hidden sm:inline text-[9px] uppercase tracking-wider">Bill</span>
+                                                        <span>৳{dayObj.bill.toLocaleString()}</span>
+                                                    </div>
+                                                )}
+                                                {dayObj.expense > 0 && dayObj.bill > 0 && <div className="text-right text-[11px] sm:text-xs font-mono font-black text-amber-300 pt-0.5">৳{dayObj.total.toLocaleString()}</div>}
+                                            </div>
+                                        ) : (
+                                            <div className="text-[10px] font-mono text-muted-foreground/30 text-center py-2 hidden sm:block">—</div>
+                                        )}
+                                    </motion.div>
+
+                                    {/* Hover & Click Popover Card (Same design, no full screen backdrop modal) */}
+                                    <AnimatePresence>
+                                        {showDetails && (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.92, y: 8 }}
+                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                exit={{ opacity: 0, scale: 0.92, y: 8 }}
+                                                transition={{ duration: 0.15 }}
+                                                className={`absolute z-50 w-72 sm:w-80 bg-linear-to-b from-[#2a170a] via-[#221006] to-[#1c0c03] border border-primary/40 shadow-2xl rounded-3xl p-4 sm:p-5 font-sans space-y-4 pointer-events-auto backdrop-blur-2xl ${
+                                                    cellCol < 2 ? "left-0" : cellCol > 4 ? "right-0" : "left-1/2 -translate-x-1/2"
+                                                } ${cellRow > 2 ? "bottom-full mb-3" : "top-full mt-3"}`}
+                                            >
+                                                <div className="absolute top-0 right-0 w-28 h-28 bg-primary/10 rounded-full blur-xl pointer-events-none" />
+
+                                                {/* Header */}
+                                                <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+                                                    <div>
+                                                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-primary px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/20">Day Summary</span>
+                                                        <h3 className="text-sm sm:text-base font-extrabold text-foreground flex items-center gap-1.5 mt-1">
+                                                            <CalendarIcon className="w-4 h-4 text-primary shrink-0" />
+                                                            {dayObj.dayOfWeek}, {dayObj.date}
+                                                        </h3>
+                                                    </div>
+                                                    {isSelected && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setActiveDay(null);
+                                                            }}
+                                                            className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors cursor-pointer"
+                                                            title="Close"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* Breakdown List */}
+                                                <div className="space-y-2.5 font-mono text-xs relative z-10">
+                                                    <div className="flex items-center justify-between p-3 rounded-2xl bg-[#150a04]/90 border border-primary/20 shadow-inner">
+                                                        <div className="flex items-center gap-2.5">
+                                                            <div className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+                                                                <ShoppingBag className="w-3.5 h-3.5" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-bold text-foreground">Bazar Expense</p>
+                                                                <p className="text-[9px] text-muted-foreground font-sans">Daily grocery purchases</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="font-extrabold text-primary text-sm">৳{dayObj.expense.toLocaleString()}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between p-3 rounded-2xl bg-[#150a04]/90 border border-accent/20 shadow-inner">
+                                                        <div className="flex items-center gap-2.5">
+                                                            <div className="w-8 h-8 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center text-accent shrink-0">
+                                                                <Receipt className="w-3.5 h-3.5" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-bold text-foreground font-sans">Fixed Bills</p>
+                                                                <p className="text-[9px] text-muted-foreground font-sans">Utility & recurring bills</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="font-extrabold text-accent text-sm">৳{dayObj.bill.toLocaleString()}</span>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between p-3 rounded-2xl bg-linear-to-r from-primary/20 via-amber-500/15 to-accent/20 border border-primary/40 shadow-lg">
+                                                        <div className="flex items-center gap-2.5">
+                                                            <div className="w-8 h-8 rounded-xl bg-primary/25 border border-primary/40 flex items-center justify-center text-amber-300 shrink-0">
+                                                                <Sparkles className="w-3.5 h-3.5" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-black text-foreground font-sans">Total Daily Spend</p>
+                                                                <p className="text-[9px] text-muted-foreground font-sans">Combined expense</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="font-black text-amber-300 text-base">৳{dayObj.total.toLocaleString()}</span>
+                                                    </div>
+                                                </div>
+
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             );
                         })}
                     </div>
                 )}
             </div>
-
-            {/* Selected Day Details Popover Modal */}
-            <AnimatePresence>
-                {activeDay && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            transition={{ duration: 0.2 }}
-                            className="w-full max-w-md bg-linear-to-b from-[#2a170a] to-[#1c0c03] border border-primary/30 shadow-2xl rounded-3xl p-6 font-sans space-y-5 relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-
-                            {/* Modal Header */}
-                            <div className="flex items-center justify-between border-b border-white/10 pb-4 relative z-10">
-                                <div>
-                                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-primary px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/20">Day Summary</span>
-                                    <h3 className="text-lg font-extrabold text-foreground flex items-center gap-2 mt-1.5">
-                                        <CalendarIcon className="w-5 h-5 text-primary" />
-                                        {activeDay.dayOfWeek}, {activeDay.date}
-                                    </h3>
-                                </div>
-                                <button onClick={() => setActiveDay(null)} className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors cursor-pointer">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            {/* Breakdown List */}
-                            <div className="space-y-3 font-mono text-xs relative z-10">
-                                <div className="flex items-center justify-between p-4 rounded-2xl bg-[#150a04]/90 border border-primary/20 shadow-inner">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
-                                            <ShoppingBag className="w-4 h-4" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-foreground">Bazar Expense</p>
-                                            <p className="text-[10px] text-muted-foreground">Daily grocery purchases</p>
-                                        </div>
-                                    </div>
-                                    <span className="font-extrabold text-primary text-base">৳{activeDay.expense.toLocaleString()}</span>
-                                </div>
-
-                                <div className="flex items-center justify-between p-4 rounded-2xl bg-[#150a04]/90 border border-accent/20 shadow-inner">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center text-accent">
-                                            <Receipt className="w-4 h-4" />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-foreground font-sans">Fixed Bills</p>
-                                            <p className="text-[10px] text-muted-foreground font-sans">Utility & recurring bills</p>
-                                        </div>
-                                    </div>
-                                    <span className="font-extrabold text-accent text-base">৳{activeDay.bill.toLocaleString()}</span>
-                                </div>
-
-                                <div className="flex items-center justify-between p-4 rounded-2xl bg-linear-to-r from-primary/20 via-amber-500/15 to-accent/20 border border-primary/40 shadow-lg">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-xl bg-primary/25 border border-primary/40 flex items-center justify-center text-amber-300">
-                                            <Sparkles className="w-4 h-4" />
-                                        </div>
-                                        <div>
-                                            <p className="font-black text-foreground">Total Daily Spend</p>
-                                            <p className="text-[10px] text-muted-foreground">Combined expense</p>
-                                        </div>
-                                    </div>
-                                    <span className="font-black text-amber-300 text-lg">৳{activeDay.total.toLocaleString()}</span>
-                                </div>
-                            </div>
-
-                            {/* Footer */}
-                            <div className="pt-2 relative z-10">
-                                <button onClick={() => setActiveDay(null)} className="w-full py-3 rounded-2xl bg-linear-to-r from-primary to-amber-500 text-primary-foreground font-extrabold text-xs shadow-lg hover:brightness-110 transition-all cursor-pointer">
-                                    Close Details
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

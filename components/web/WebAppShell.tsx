@@ -127,7 +127,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
             filter: billFilter === "all" ? "ALL" : undefined,
             searchTerm: billSearch.trim() || undefined,
             page: billPage,
-            limit: 10,
+            limit: 12,
         },
         { skip: tab !== "bills" && tab !== "home" },
     );
@@ -143,9 +143,12 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
 
     // Monthly Expense Trend (12 Months breakdown)
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-    const { data: monthlyTrendResponse, isLoading: isMonthlyTrendLoading } = useGetMonthlyExpenseTrendQuery({ year: selectedYear }, {
-        skip: tab !== "home",
-    });
+    const { data: monthlyTrendResponse, isLoading: isMonthlyTrendLoading } = useGetMonthlyExpenseTrendQuery(
+        { year: selectedYear },
+        {
+            skip: tab !== "home",
+        },
+    );
     const monthlyTrendData = monthlyTrendResponse?.data || [];
 
     // Delete & Edit Modal States
@@ -860,17 +863,7 @@ export function WebAppShell({ stats, onLogout }: { stats?: GroupStats; onLogout:
                                 {/* ─── TAB: CALENDAR (GROUP MONTHLY DAILY BREAKDOWN) ───────── */}
                                 {tab === "calendar" && <WebCalendarTab />}
 
-                                {tab === "notifications" && (
-                                    <WebNotificationsTab
-                                        markAllAsRead={markAllAsRead}
-                                        deleteAllNotifications={deleteAllNotifications}
-                                        notifLoading={notifLoading}
-                                        notifData={notifData}
-                                        deleteNotification={deleteNotification}
-                                        page={notifPage}
-                                        setPage={setNotifPage}
-                                    />
-                                )}
+                                {tab === "notifications" && <WebNotificationsTab markAllAsRead={markAllAsRead} deleteAllNotifications={deleteAllNotifications} notifLoading={notifLoading} notifData={notifData} deleteNotification={deleteNotification} page={notifPage} setPage={setNotifPage} />}
 
                                 {/* ─── TAB: PROFILE (WEBSITE PROFILE EDITOR) ─────────────────── */}
                                 {tab === "profile" && (
